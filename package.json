@@ -1,0 +1,30 @@
+{
+  "name": "vizchange-stats",
+  "version": "0.1.0",
+  "description": "stats object module for vizchange.net",
+  "main": "module.js",
+  "scripts": {
+    "test": "mocha --timeout 200000 './*.spec.js'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nicklassundin/vizchange-stats.git"
+  },
+  "keywords": [
+    "vizchange",
+    "climatechange",
+    "circ"
+  ],
+  "author": "nicklas sundin johansson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nicklassundin/vizchange-stats/issues"
+  },
+  "homepage": "https://github.com/nicklassundin/vizchange-stats#readme",
+  "dependencies": {
+    "cli-progress": "^3.10.0",
+    "climate-plots-helper": "^1.0.5",
+    "mocha": "^9.2.1",
+    "node-libcurl": "^2.3.4"
+  }
+}
