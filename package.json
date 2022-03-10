@@ -26,5 +26,11 @@
     "climate-plots-helper": "^1.0.5",
     "mocha": "^9.2.1",
     "node-libcurl": "^2.3.4"
+  },
+  "release": {
+	  "branchs": [
+		  "release",
+		  "beta"
+	  ]
   }
 }
