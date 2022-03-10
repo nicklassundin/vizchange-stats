@@ -1,6 +1,6 @@
 {
   "name": "vizchange-stats",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "stats object module for vizchange.net",
   "main": "module.js",
   "scripts": {
