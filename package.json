@@ -4,7 +4,7 @@
   "description": "stats object module for vizchange.net",
   "main": "module.js",
   "scripts": {
-    "test": "mocha --timeout 200000 './*.spec.js'"
+    "test": "mocha --timeout 500000 './*.spec.js'"
   },
   "repository": {
     "type": "git",

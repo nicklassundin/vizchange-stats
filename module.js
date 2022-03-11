@@ -16,6 +16,7 @@ global.baselineUpper = constant.baselineUpper;
 // 	baselineLower: constant.baselineLower,
 // 	baselineUpper: constant.baselineUpper
 // }
+//
 
 module.exports = {
 	"temperature" (specs) {

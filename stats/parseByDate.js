@@ -4,7 +4,11 @@ const {PointFactory} = require('./factory.js')
 const {Point} = require('./point.js')
 const ByDateStruct = require('./parseByDateStruct.js');
 
+let config = require('./config.json');
+
 const parseByDate = function (specs, type = "mean", custom) {
+	specs = Object.assign(config.default, specs);	
+	// console.log(specs)
 	let factory = new PointFactory(specs);
 	let values = factory.createPoints(new Date(specs.start,1,1), new Date(specs.end,1,1))
 	let dateStruct = new ByDateStruct(type, custom)

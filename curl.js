@@ -133,7 +133,8 @@ module.exports = {
 		// console.log('type',type)
 		var url = `${preset.station[station]}&date=${parsePeriod(dates.start)}-${parsePeriod(dates.end)}`
 		if(['glob', '64n-90n', 'nhem'].includes(station) && ['glob_temp','nhem_temp','64n-90n_temp','temperature'].includes(type)){
-			url = `${url}&types=${preset.types[station+type]},station`
+			// url = `${url}&types=${preset.types[station+type]},station`
+			url = `${url}&types=${preset.types[station+type]}`
 				
 		}else if(type){
 			url = `${url}&types=${preset.types[type] != undefined ? preset.types[type] : type},station`
