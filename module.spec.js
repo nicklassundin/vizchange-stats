@@ -13,10 +13,10 @@ describe(
 	'Requests',
 	function() {
 		describe('Year', function() {
-			it('Yearly Week', (done) => {
-				let config = Object.assign(configs['year-week'],specs)
-				cache.result = parser.temperature(config).then((res) => {}).then(done)
-			})
+			// it('Yearly Week', (done) => {
+				// let config = Object.assign(configs['year-week'],specs)
+				// cache.result = parser.temperature(config).then((res) => {}).then(done)
+			// })
 			it('Yearly Month', (done) => {
 				let config = Object.assign(configs['year-month'],specs)
 				cache.result = parser.temperature(config).then((res) => {}).then(done)
@@ -43,10 +43,10 @@ describe(
 
 		})
 		describe('Century', function() {
-			it('Year', (done) => {
-				let config = Object.assign(configs['century-year'],specs)
-				cache.result = parser.temperature(config).then((res) => {}).then(done)
-			})
+			// it('Year', (done) => {
+				// let config = Object.assign(configs['century-year'],specs)
+				// cache.result = parser.temperature(config).then((res) => {}).then(done)
+			// })
 			it('5 Year', (done) => {
 				let config = Object.assign(configs['century-5year'],specs)
 				cache.result = parser.temperature(config).then((res) => {}).then(done)
