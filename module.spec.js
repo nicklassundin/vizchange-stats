@@ -12,6 +12,12 @@ let cache = {}
 describe(
 	'Requests',
 	function() {
+		describe('Latest', function() {
+			it('year', (done) => {
+				let config = Object.assign(configs['latest'],specs)
+				cache.result = parser.temperature(config).then((res) => {}).then(done)
+			})
+		})
 		describe('Year', function() {
 			// it('Yearly Week', (done) => {
 				// let config = Object.assign(configs['year-week'],specs)

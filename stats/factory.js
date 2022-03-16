@@ -24,12 +24,6 @@ function getDates(startDate, stopDate, specs) {
 	var dateArray = new Array();
 	var currentDate = startDate;
 	while (currentDate < stopDate) {
-		// console.log("current", currentDate)
-		// let diffTime = stopDate - currentDate.addDays(specs.interval);
-		// let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-		// if(diffDays > 0){
-			// diffDays = 0; 
-		// }
 		let nextDate = currentDate.addDays(specs.interval)
 		if(nextDate - stopDate >= 0){
 			nextDate = stopDate
@@ -71,47 +65,35 @@ module.exports.PointFactory = class PointFactory{
 		}
 	}
 	async createPoints(startDate, stopDate) {
-		let dates = await getDates(startDate, stopDate, this.specs)
+		const dates = getDates(startDate, stopDate, this.specs)
 		this.length = dates.length;
 		this.bar.start(this.length,0);
 		return dates.map(dates => {
 			// var delay = (Math.floor(Math.random() * 7)) + 2;
 			// setTimeout(delay * 1000);
+			// console.log(dates)
 			return this.createPoint(dates)
 		}).sort((a,b) => a.x-b.x)
 	}
-	async createPoint(dates){
+	createPoint(dates){
 		let station = this.station;
 		let type = this.type;
 		let date = new Date();
-		// let timeInMs = Math.random() * (3000);
-		// await sleep(timeInMs);
-		let res = await curl.curlProx(this.url, station, dates, type).then(response => {			
-			let points = {};
-			try{
-				response.forEach(each => {
-					let point = new Point(each, type)
+		return new Promise((res, rej) => {
 
-					// if(points[point.hash()]){
-					// TODO merge
-					// }else 
-					// if(point.y != undefined){
-					if(!points[point.hash()]){
-						points[point.hash()] = point		
-					}
-					// }
-				})
-			}catch(error){
-				throw error
-			}
-			this.barUpdate();
-			return Object.values(points)
-		}).catch(error => {
-			// console.log(error)
-			// throw error
-			return error
-		})
-		return res
+			curl.curlProx(this.url, station, dates, type).then(response => {			
+				try{
+					this.barUpdate();
+					res(Object.values(response.map(each => new Point(each, type))))
+				}catch(error){
+					throw error
+				}
+			}).catch(error => {
+				// console.log(error)
+				// throw error
+				return error
+			})
+		}) 
 
 	}
 	close(){

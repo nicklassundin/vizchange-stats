@@ -15,6 +15,7 @@ const parseByDate = function (specs, type = "mean", custom) {
 	return new Promise((res,rej) => {
 		values.then(val => {
 			Promise.all(val).then((vals) => {
+				console.log(vals)
 				if(vals.length < 1){
 					rej({
 						"ERROR": "missing error",
@@ -25,6 +26,7 @@ const parseByDate = function (specs, type = "mean", custom) {
 					rej(vals[0]) 
 				}else{
 					vals = vals.reduce((a,b) => {
+						// console.log(a)
 						return a.concat(b)
 					})
 					if(vals.length < 1){
@@ -39,6 +41,7 @@ const parseByDate = function (specs, type = "mean", custom) {
 							"entries": vals.length,
 						})
 						}
+						// console.log(vals)
 						res(dateStruct.build(vals));
 					}
 				}
