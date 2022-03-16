@@ -15,7 +15,7 @@ const parseByDate = function (specs, type = "mean", custom) {
 	return new Promise((res,rej) => {
 		values.then(val => {
 			Promise.all(val).then((vals) => {
-				console.log(vals)
+				// console.log(vals)
 				if(vals.length < 1){
 					rej({
 						"ERROR": "missing error",
