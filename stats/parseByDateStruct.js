@@ -2,29 +2,25 @@ const Struct = require('./struct.js');
 const help = require('climate-plots-helper');
 // const keys = Object.keys(values[0]),
 module.exports = class ByDateStruct {
-	constructor(type = mean, custom) {
+	constructor(type = mean, custom, entries) {
 		this.type = type;
 		this.values = {};
 		this.parsed = {};
 		this.years = {};
+		this.entries = entries;
 	}
 	"insert" (kn, ...k) {
 		return (entry) => {
-			// if(k.includes(undefined)){
-			// throw new Error({'message': 'undefined k'})
-			// }
-			// if(entry.y != undefined && !isNaN(entry.y)){
 				k = k.map(key => {
 					if(entry[key] != undefined) return entry[key]
 					return key
 				})
 				if(kn) k.unshift(kn)
 				this.values = this.recInsert(entry,k) 
-			// }
 		}
 
 	}
-	"recInsert" (entry, k, data = this.values ) {
+	"recInsert" (entry, k, data = this.values) {
 		let kn = k[0];
 		if(kn === undefined){
 			// return data;
@@ -48,6 +44,7 @@ module.exports = class ByDateStruct {
 			data[kn] = this.recInsert(entry, k.slice(1), data[kn]);
 		} else {
 			if(k[0].valueOf() == 'DOY'.valueOf() && entry.req[`avg_${entry.type}`] != undefined){
+				console.log("no avg")
 				data[kn].point = entry;
 			}else{
 				data[kn].VALUES.push(entry)
@@ -83,10 +80,6 @@ module.exports = class ByDateStruct {
 	// 		}
 	// 		return this.values
 	// 	}
-	"build" (entries) {
-		this.entries = entries;
-		return this
-	}
 	"construct" (bValues, x) {
 		try {
 			if(bValues == undefined){
@@ -107,6 +100,7 @@ module.exports = class ByDateStruct {
 
 	}
 	"request" (key) {
+		this.parse(key)
 		let type = this.type;
 		return new Promise((res, rej) => {
 			let vals = {};
@@ -133,6 +127,7 @@ module.exports = class ByDateStruct {
 						let lkey = Object.keys(this.values[key])[lngth-1];
 						delete this.values[key][lkey]
 					case "yrly":
+						// console.log(this.values[key])
 					case "months":
 					case "weeks":
 						this.values[key] = this.construct(this.values[key]);
@@ -141,9 +136,13 @@ module.exports = class ByDateStruct {
 							vals[year].values = Object.values(this.values[key][year])
 							vals[year].build(type)
 						})
+						// console.log(vals)
+						// fsfsd
 						this.values[key] = new Struct([],undefined, type);
+						// this.values[key] = vals 
 						this.values[key].values = Object.values(vals);
 						this.values[key] = this.construct(this.values[key])
+						// console.log(this.values[key])
 						res(this.values[key]);
 						break;
 					case "yrlyFull":
@@ -294,126 +293,125 @@ module.exports = class ByDateStruct {
 	}
 	get "monthly" () {
 
-		return this.parse("monthly");
+		return this.request("monthly");
 
 	}
 	get "weeks" () {
 
-		return this.parse("weeks");
+		return this.request("weeks");
 
 	}
 	get "months" () {
 
-		return this.parse("months");
+		return this.request("months");
 
 	}
 	get "weeksExtremeHigh" () {
 
-		return this.parse("weeksExtremeHigh");
+		return this.request("weeksExtremeHigh");
 
 	}
 	get "weeksExtremeHighLim" () {
 
-		return this.parse("weeksExtremeHighLim");
+		return this.request("weeksExtremeHighLim");
 
 	}
 	get "yrly" () {
-		return this.parse('yrly')
-		// return this.request("yrly");
+		return this.request('yrly')
 
 	}
 	get "yrlyFull" () {
 
-		return this.parse("yrlyFull");
+		return this.request("yrlyFull");
 
 	}
 	get "dailyExtremeHigh" () {
 
-		return this.parse("dailyExtremeHigh");
+		return this.request("dailyExtremeHigh");
 
 	}
 	get "dailyExtremeMaxLim" () {
 
-		return this.parse("dailyExtremeMaxLim");
+		return this.request("dailyExtremeMaxLim");
 
 	}
 	get "dailyExtremeMinLim" () {
 
-		return this.parse("dailyExtremeMinLim");
+		return this.request("dailyExtremeMinLim");
 
 	}
 	get "yrlySplit" () {
 
-		return this.parse("yrlySplit");
+		return this.request("yrlySplit");
 
 	}
 	get "decades" () {
-		return this.parse("decades");
+		return this.request("decades");
 	}
 	get "splitDecades" () {
-		return this.parse("splitDecades");
+		return this.request("splitDecades");
 	}
 	get "30period" () {
 
-		return this.parse("30period");
+		return this.request("30period");
 
 	}
 	get "customPeriod" () {
 
-		return this.parse("customPeriod");
+		return this.request("customPeriod");
 
 	}
 	get "meta" () {
 
-		return this.parse("meta");
+		return this.request("meta");
 
 	}
 	get "spring" () {
 
-		return this.parse("spring");
+		return this.request("spring");
 
 	}
 	get "summer" () {
 
-		return this.parse("summer");
+		return this.request("summer");
 
 	}
 	get "autumn" () {
 
-		return this.parse("autumn");
+		return this.request("autumn");
 
 	}
 	get "winter" () {
 
-		return this.parse("winter");
+		return this.request("winter");
 
 	}
 	get "yrlyTest" () {
 
-		return this.parse("yrlyTest");
+		return this.request("yrlyTest");
 
 	}
 	////
 	//
 	//
 	get "last" () {
-		return this.parse("last");
+		return this.request("last");
 
 	}
 	get "first" (){
-		return this.parse("first");
+		return this.request("first");
 
 	}
 	get "growDays" (){
-		return this.parse("growDays");
+		return this.request("growDays");
 	}
 	get "growWeeks" () {
 
-		return this.parse("growWeeks");
+		return this.request("growWeeks");
 
 	}
 	get "all" () {
-		return this.parse('all');
+		return this.request('all');
 	}
 "parse" (key) {
 	// console.log(key)
@@ -436,6 +434,10 @@ module.exports = class ByDateStruct {
 							'year',
 							'DOY'
 						)(entry);
+						// console.log("entry",entry)
+						// console.log("test")
+						// console.log('yrly',this.values.yrly)
+						// fdsfds
 						break
 					case 'summer':
 					case 'winter':
@@ -552,7 +554,7 @@ module.exports = class ByDateStruct {
 			})
 		console.log("time",(new Date()).getTime()-startTime)
 	}
-	return this.request(key);
+	// return this.request(key);
 }
 };
 

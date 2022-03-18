@@ -629,58 +629,39 @@ module.exports = class Struct {
 	}
 	"build" (type = this.type, lower = baselineLower, upper = baselineUpper, color) {
 		this.type = type;
-		this.y = undefined;
-		this.y;
 		if (this.values.length > 0) {
-
 			if (this.values[0].keys) {
 				this.keys = this.values[0].keys;
-
 			} else {
-
 				this.keys = Object.keys(this.values[0]);
-
 			}
-
 		}
-		this.type = type;
 		this.values = this.values.sort((a, b) => {
 			return a.x - b.x
 		})
-		const max = Math.max(...this.values.map((each) => each.y));
-		this.values = this.values.map((each) => {
+		// const max = Math.max(...this.values.map((each) => each.y));
+		// this.values = this.values.map((each) => {
 
-			switch (color) {
+		// 	switch (color) {
 
-				case "red":
-					each.color = `rgb(255,${255 - Math.floor(each.y * 255 / max)}, 0)`;
-					break;
-				case "blue":
-					each.color = `rgb(${
-						255 - Math.floor(each.y * 255 / max)},${
-							255 - Math.floor(each.y * 255 / max)},${
-								255})`;
+		// 		case "red":
+		// 			each.color = `rgb(255,${255 - Math.floor(each.y * 255 / max)}, 0)`;
+		// 			break;
+		// 		case "blue":
+		// 			each.color = `rgb(${
+		// 				255 - Math.floor(each.y * 255 / max)},${
+		// 					255 - Math.floor(each.y * 255 / max)},${
+		// 						255})`;
 
-					/*
-					 * Each.color = 'rgb(' + (255 - Math.floor(each.y * 255 / max)) + ',0,255)';
-					 * Each.color = 'rgb(255,0,' + (255 - Math.floor(each.y * 127 / max)) + ')';
-					 */
-					break;
-				case "green":
-					each.color = `rgb(${255 - Math.floor(each.y * 255 / max)},255, 0)`;
-					break;
-				default:
+		// 			break;
+		// 		case "green":
+		// 			each.color = `rgb(${255 - Math.floor(each.y * 255 / max)},255, 0)`;
+		// 			break;
+		// 		default:
+		// 			return each;
+			// }
 
-					/*
-					 * Var col = (255 - Math.floor(each.y * 255 / max));
-					 * Each.color = 'rgb('+col+','+col+','+col+')';
-					 */
-					return each;
-
-
-			}
-
-		});
+		// });
 		return this;
 	}
 	"Axis" (key) {

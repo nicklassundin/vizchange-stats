@@ -14,7 +14,14 @@ describe(
 	function() {
 		it('year', (done) => {
 			let config = Object.assign(configs['latest'],specs)
-			cache.result = parser.temperature(config).then((res) => {}).then(done)
+			cache.result = parser.temperature(config).then((res) => {
+				// console.log(Object.keys(res))
+				res.yrly.then(yrly => {
+					// console.log(yrly)
+					console.log('yrly length',yrly.values.length)
+				})
+				// console.log(res.entries.length)
+			}).then(done)
 		})
 	}
 )
