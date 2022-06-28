@@ -1,4 +1,5 @@
 const help = require('climate-plots-helper');
+const curl = require('../curl.js')
 
 let replace = (req, a, b) => {
 	if(req[a]){
@@ -8,24 +9,54 @@ let replace = (req, a, b) => {
 	return req;
 }
 
+let baselinePoint = undefined;
 class Point {
-	constructor(req, type){
-		this.subType = '';
-		this.type = type;
-		this.pos = req.position
+	// constructor(specs){
+	static build(specs, full=false){
+		return curl.curlProx(specs, full).then(res => {
+			if(!full)res = res.reduce((a,b) => Object.assign(a, b))
+			return curl.curlProx({
+				start: new Date(specs.baseline.start,1,1),
+				end: new Date(specs.baseline.end,1,1),
+			   	url: specs.url,
+				type: specs.type,
+				station: specs.station
+			}).then(baseline => {
+				baseline = baseline.reduce((a,b) => Object.assign(a, b));
+				Object.keys(baseline).forEach(key => {
+					res[key].baseline = baseline[key].avg	
+					res[key].diff = res[key].avg - baseline[key].avg	
+				})
+				// TODO cases
+				// first, last and numbers etc
+				if(full) return new Point(specs, res)
+				return new Point(specs, res);
+			})
+		})
+	}
+	constructor(specs, req){
+		this.specs = specs;
+		// this.subType = '';
+		this.type = specs.type;
+		let type = this.type;
+		// this.pos = req.position
 		req = replace(req,'glob_temp', 'temperature')
 		req = replace(req,'64n-90n_temp', 'temperature')
 		req = replace(req,'nhem_temp', 'temperature')
 		if(typeof req[type] == 'string' && req[type].length < 1) req[type] = undefined
 		this.req = req;
-		this.x = new Date(req.date);
+		
+
+		// this.x = specs.start
 		// this.y = req[type] === "" ? undefined : Number(req[type])
 		// if(req['avg_temperature']){
 			// console.log('y',this.y)
 			// console.log(req)
 		// }
-		if(this.y == undefined || isNaN(this.y)){
-			if(req[`avg_${type}`] != undefined || !isNaN(req[`avg_${type}`])){
+		// console.log(this.y)
+		// console.log(this)
+		if(req[`${this.type}`] == undefined){
+			if(req[`avg_${type}`] != undefined){
 				this.subType = 'avg';
 			}
 		}
@@ -64,39 +95,88 @@ class Point {
 			// console.log('this',this)
 		// }
 	}
+	get 'x'(){
+		if(this.req.date != undefined) return this.req.date
+		return this.specs.start
+	}
+	'filter' (f){
+		this.req = this.req.filter((x) => {
+			return f(Number(x[this.type]))
+		});
+		return this
+	}
+	get 'first'(){
+		this.req.sort((a, b) => {
+			return (new Date(a.date).getTime()) - (new Date(b.date).getTime())
+		})
+		this.req = this.req[0]
+		return this
+	}
+	get 'last'(){
+		this.req.sort((a, b) => {
+			return (new Date(a.date).getTime()) - (new Date(b.date).getTime())
+		})
+		this.req = this.req[this.req.length-1]
+		return this
+	}
 	set 'y' (val){
-		this.req[`${this.subType}${this.type}`] = val;
+		this.req[`${this.subType}${this.type}`] = val
 	}
 	get 'y' (){
-		return Number(this.req[`${this.subType}${this.type}`])
+		let y = this.req[`${this.type}`]
+		if(y == undefined) y = this.req[`${this.subType}${this.type}`];
+
+		if(y == undefined && this.SUBTYPE == 'sum') y = this.req[`avg_${this.type}`][this.SUBTYPE] 
+		if(typeof y == 'object') return Number(y[this.SUBTYPE])
+
+		return Number(y)
 	}
 	set 'subType' (subType){
+		if(subType == "mean") subType = 'avg'
 		if(subType){
-			this.SUBTYPE = `${subType}_`
+			this.SUBTYPE = `${subType}`
 		}else{
 			this.SUBTYPE = subType;
 		}
 	}
 	get 'subType' (){
-		return this.SUBTYPE;
+		if(!this.SUBTYPE) return ''
+		return `${this.SUBTYPE}_`;
 	}
 	'TYPE'(type){
-		return this.req[`${type}_${this.type}`]
+		// console.log(this.req[`${type}_${this.type}`][type])
+		// console.log(`${this.subType}${this.type}`)
+		// console.log(this.req[`${subType}${this.type}`])
+		// console.log(type)
+		// console.log(this.req[`${this.subType}${this.type}`][type])
+		return this.req[`${this.subType}${this.type}`][type]
 	}
 	get 'min' (){
 		return this.TYPE('min')
 	}
 	get 'max' (){
-		return this.TYPE('min')
+		return this.TYPE('max')
 	}
 	get 'avg' (){
-		return this.TYPE('min')
+		return this.TYPE('avg')
 	}
 	get 'sum' (){
-		return this.TYPE('min')
+		return this.TYPE('sum')
+	}
+	get 'difference' (){
+		return this.TYPE('diff')
 	}
 	get 'year' (){
 		return this.x.getFullYear();
+	}
+	get 'strDate'(){
+		return `${this.year}-${this.x.month+1}-${this.x.getDate()}`
+	}
+	get 'years' (){
+		let start = this.specs.start.getFullYear();
+		let end = this.specs.end.getFullYear();
+		let years = Array.from({length:(end-start)},(v,k)=>k+start)
+		return years
 	}
 	get 'month' (){
 		return this.x.getMonth();
@@ -106,6 +186,11 @@ class Point {
 	}
 	get 'DOY' (){
 		return help.dayOfYear(this.x)
+	}
+	get 'DOYs' (){
+		let start = help.dayOfYear(this.specs.start)
+		let end = help.dayOfYear(this.specs.end)
+		return [...Array(end-start).keys()].map(v => (v+start));
 	}
 	get '30periodyear' (){
 		return `${this.splitDecade - (this.splitDecade-1900) % 30 + 1}` 
@@ -135,13 +220,24 @@ class Point {
 	merge(point){
 		// TODO
 	}
-	'short' (){
+	clone(){
+	 return Object.assign(Object.create(Object.getPrototypeOf(this)), this)
+	}
+	'short' (type){
 		let next = {}
 		next.y = this.y
 		Object.keys(this).forEach(key => {
 			next[key] = this[key];
 		})
 		return next
+	}
+	'getSeed' () {
+		let specs = this.specs;
+		let req = this.req
+		return {
+			specs,
+			req
+		}
 	}
 }
 

@@ -21,7 +21,6 @@ global.baselineUpper = constant.baselineUpper;
 module.exports = {
 	"temperature" (specs) {
 		return parseByDate(specs)
-
 	},
 	"precipitation" (specs) {
 		return parseByDate(specs, 'sum')

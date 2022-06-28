@@ -126,8 +126,15 @@ let parsePeriod = function(date){
 
 module.exports = {
 	preset: preset,
-	curlProx: function(host, station, dates, type){
-	
+	curlProx: function(specs, full = false){
+		var station = specs.station;
+		var dates = {
+			start: specs.start,
+			end: specs.end
+		}
+		// console.log('dates',dates)
+		var host = specs.url;
+		var type = specs.type
 		// console.log('station',station)
 		// console.log('dates',dates)
 		// console.log('type',type)
@@ -137,7 +144,7 @@ module.exports = {
 			url = `${url}&types=${preset.types[station+type]}`
 				
 		}else if(type){
-			url = `${url}&types=${preset.types[type] != undefined ? preset.types[type] : type},station`
+			url = `${url}&types=${preset.types[type] != undefined ? preset.types[type] : type}`
 			// console.log('types',`${preset.types[type] != undefined ? preset.types[type] : type},station`)
 		} 
 		if(preset.station[station] === undefined) return Promise.reject({
@@ -147,8 +154,17 @@ module.exports = {
 			"URL": url
 		})
 		// console.log('URL', url)
+		// console.log((host)+url)
 		// ffsdfsd
-		return module.exports.curl((host)+url) 
+		//
+		if(full){
+			// console.log("full-request",(host)+url) 
+			// console.log(specs)	
+			return module.exports.curl((host)+url) 
+		}else{
+			// console.log('&calculate')
+			return module.exports.curl((host)+url+"&calculate") 
+		}
 	},
 	// requests: 300,
 	curl: function(url) {

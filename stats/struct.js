@@ -8,21 +8,63 @@ const regression = require("regression");
  * const $ = require( "jquery" )( window );
  */
 const {Point} = require('./point.js')
+const curl = require('../curl.js')
 
 function ColorToHex(color) {
-	  var hexadecimal = color.toString(16);
-	  return hexadecimal.length == 1 ? "0" + hexadecimal : hexadecimal;
+	var hexadecimal = color.toString(16);
+	return hexadecimal.length == 1 ? "0" + hexadecimal : hexadecimal;
 }
 
 function ConvertRGBtoHex(red, green, blue) {
-	  return "#" + ColorToHex(red) + ColorToHex(green) + ColorToHex(blue);
+	return "#" + ColorToHex(red) + ColorToHex(green) + ColorToHex(blue);
 }
 
+
 module.exports = class Struct {
-	constructor(values = [], x = undefined, type = "mean", f) {
+	static build(specs, x, type, f, full=false){
+		// console.log(specs)
+		switch (specs.key) {
+			case 'month':
+				if(typeof specs.start != 'object'){
+					specs.start = new Date(specs.start,0,1)
+				}
+				if(typeof specs.end != 'object'){
+					specs.end = new Date(specs.end+1,0,0)
+				}
+				break;
+			case 'year':
+			case 'DOY':
+			default:
+				if(typeof specs.start != 'object'){
+					specs.start = new Date(specs.start,0,1)
+				}
+				if(typeof specs.end != 'object'){
+					specs.end = new Date(specs.end+1,0,0)
+				}
+
+		}
+		return Point.build(specs, full).then(point => {
+			switch (type){
+				case 'first':
+					point = point.filter(f).first;
+					break;
+				case 'last':
+					point = point.filter(f).last;
+					break;
+				default:
+			}
+			return new Struct(point, specs, x, type)
+		})
+	}
+	constructor(point, specs, x = undefined, type = "mean", f) {
+
+		this.specs = specs;
+		// this.specs.start = new Date(specs.start,0,0)
+		// this.specs.end = new Date(specs.end,12,30)
+
+		this.entry = point
+		// this.entry.subType = type
 		this.f = f;
-		// this.values = values.filter((entry) => !isNaN(parseFloat(entry.y)) && isFinite(entry.y));
-		// this.values = values.filter((each) => each.y != undefined || each.y == 0);
 		this.x = x;
 		this.type = type
 		this.meta = {
@@ -30,61 +72,69 @@ module.exports = class Struct {
 			"src": "",
 		};
 		this.movAvg = undefined;
-		this.VALUES = [];
+		this.VALUES = {};
 		this.POINT = [];
 	}
 	set "y" (val) {
 		this.Y = val;
 	}
 	get "y" () {
-		if(this.Y === undefined){
-			try{
+		let val;
+		// if(this.Y === undefined){
+		// 	try{
 
-				if(this.values.length > 0 && this.values[0].build){
-					this.values = this.values.map(each => {
-						each.f = this.f
-						return each.build(this.type)
-					})
-				} 
-			}catch(ERROR){
-				console.log(this)
-				throw ERROR
-			}
-			this.values = this.values.filter((entry) => !isNaN(parseFloat(entry.y)) && isFinite(entry.y));
-			// this.values = this.values.sort((a, b) => {
-			// return a.x - b.x
-			// })
-		}
-		if(this.values.length < 1) return null
+		// 		if(this.values.length > 0 && this.values[0].reInit){
+		// 			this.values = this.values.map(each => {
+		// 				each.f = this.f
+		// 				return each.reInit(this.type)
+		// 			})
+		// 		} 
+		// 	}catch(ERROR){
+		// 		console.log('error no y', this)
+		// throw ERROR
+		// }
+		// val = this.values
+		// this.values = this.values.filter((entry) => !isNaN(parseFloat(entry.y)) && isFinite(entry.y));
+		// }
+		// if(this.values.length < 1){
+		// console.log('no values')
+		// console.log(val)
+		// return null
+		// } 
 		switch (this.type) {
+			case "difference":
+				// this.entry.subType = this.type
+				this.Y = this.entry.difference;
+				break;
 			case "mean":
-				this.Y = help.sum(this.values.map((each) => {
-					if(each instanceof Point && each.avg != undefined){
-						each.subType = 'avg';
-					}
-					return each.y
-				}));
-				this.Y /= this.count;
-				break;
+				// this.Y = help.sum(this.values.map((each) => {
+				// if(each instanceof Point && each.avg != undefined){
+				// each.subType = 'avg';
+				// }
+				// return each.y
+				// }));
+				// this.Y /= this.count;
+				// break;
 			case "max":
-				this.Y = Math.max(...this.values.map((each) => {
-					if(each instanceof Point && each.max != undefined){
-						each.subType = 'max';
-					}
-					return each.y
-				}));
-				break;
+				// this.Y = Math.max(...this.values.map((each) => {
+				// if(each instanceof Point && each.max != undefined){
+				// each.subType = 'max';
+				// }
+				// return each.y
+				// }));
+				// break;
 			case "min":
-				this.Y = Math.min(...this.values.map((each) => {
-					if(each instanceof Point && each.min != undefined){
-						each.subType = 'min';
-					}
-					return each.y
-
-				}));
-				break;
+				// this.Y = Math.min(...this.values.map((each) => {
+				// if(each instanceof Point && each.min != undefined){
+				// each.subType = 'min';
+				// }
+				// return each.y
+				// }));
+				// break;
 			case "sum":
-				this.Y = help.sum(this.values.map((each) => each.y));
+				// this.Y = help.sum(this.values.map((each) => each.y));
+				this.entry.subType = this.type
+				this.Y = this.entry.y
 				break;
 			case "number":
 				if(typeof this.f == 'function' && this.values[0] instanceof Point){
@@ -92,66 +142,32 @@ module.exports = class Struct {
 				}
 				this.Y = this.values.length;
 				break;
-			case "first":
-				var f = (e) => e.y <= 0;
-				this.values = this.values.filter(f);
-				////
-				var vals = this.values[0] 
-
-				if(this.values.length > 0 && vals != undefined){
-					this.Y = vals.y
-					if(!vals.typeMeta){
-						var date = new Date(vals.x)
-						this.typeMeta = {
-							"value": vals.y,
-							"fullDate": vals.x,
-							"year": vals.year,
-							"month": vals.month,
-							"date": date.getTime(),
-							"strDate": `${vals.year}-${vals.month+1}-${date.getDate()}`,
-							// "x": vals.x,
-							"x": vals.year,
-							"y": vals.DOY,
-						}
-					}else{
-						this.typeMeta = vals.typeMeta;
-					}
-				}else{
-					this.Y = null;
-				}
-				break;
 			case "last":
-				var f = (e) => e.y <= 0;
-				this.values = this.values.filter(f);
-				////
-				var vals = this.values[this.values.length-1] 
-				if(this.values.length > 0 && vals != undefined){
-					this.Y = vals.y
-					if(!vals.typeMeta){
-						var date = new Date(vals.x)
-						this.typeMeta = {
-							"value": vals.y,
-							"fullDate": vals.x,
-							"year": vals.year,
-							"month": vals.month,
-							"date": date.getTime(),
-							"strDate": `${vals.year}-${vals.month+1}-${date.getDate()}`,
-							// "x": vals.x,
-							"x": vals.year,
-							"y": vals.DOY,
-						}
-					}else{
-						this.typeMeta = vals.typeMeta;
+			case "first":
+				this.Y = this.entry.y
+				var vals = this.entry.y
+				if(!vals.typeMeta){
+					var date = new Date(vals.x)
+					this.typeMeta = {
+						"value": vals.y,
+						"fullDate": vals.x,
+						"year": vals.year,
+						"month": vals.month,
+						"date": date.getTime(),
+						"strDate": `${vals.year}-${vals.month+1}-${date.getDate()}`,
+						// "x": vals.x,
+						"x": vals.year,
+						"y": vals.DOY,
 					}
 				}else{
-					this.Y = null;
+					this.typeMeta = vals.typeMeta;
 				}
 				break;
 			default:
 				console.log(`default: ${type}`);
 
 		}
-		this.y = this.Y
+		// console.log("struct",this.Y)
 		return this.Y
 	}
 	get "count" () {
@@ -170,6 +186,21 @@ module.exports = class Struct {
 		return this.POINT[0]
 	}
 	get "values" () {
+		// if(this.VALUES.length == 0){
+		var genSpecs = JSON.parse(JSON.stringify(this.specs)); 
+		var key = genSpecs.keys.shift();
+		this.entry[`${key}s`].forEach(k => {
+			var specs = JSON.parse(JSON.stringify(genSpecs)); 
+			specs.start = k;
+			specs.end = k;
+			if(this.VALUES[k] == undefined){
+				this.VALUES[k] = Struct.build(specs, k, this.type, this.f)
+				// console.log(Object.keys(this.VALUES).length)
+			}
+		})
+		// }
+
+
 		if(this.point != undefined){
 			return [this.point]
 		}else if (Array.isArray(this.VALUES)) {
@@ -281,30 +312,68 @@ module.exports = class Struct {
 	get "maxAvg" () {
 		return this.AVGTYPE('max');
 	}
+	get "sum" (){
+		return this.TYPE('sum');
+	}
 	get "first" () {
-		return this.TYPE('first')
+		// return this.type('first');
+		return Struct.build(this.specs, this.x, 'first', this.f, true)
 	}
 	get "last" () {
-		return this.TYPE("last")
+		// return this.type('last');
+		return Struct.build(this.specs, this.x, 'last', this.f, true)
 	}
 	get "number" () {
 		return this.TYPE("number", this.f)
 	}
-	"AVGTYPE" (type) {
-		let res = new Struct([], this.x, type)
-		res.values = this.values.map(each => each.short())
-		return res.build(type)
+	get "difference" () {
+		return this.TYPE("difference", this.f)
+		// if(bsln == undefined){
+			// bsln = {
+				// lower: baselineLower,
+				// upper: baselineUpper
+			// }
+		// }else{
+			// bsln = JSON.parse(bsln);
+		// }
+		// let lower = bsln.lower;
+		// let upper = bsln.upper;
+		// try {
+			//TODO change to TYPE later
+			// const basevalue = help.mean(this.values.filter((value) => value.x >= lower && value.x <= upper).map((each) => each.y));
+			// console.log("basevalue",basevalue)
+			// return Array.from(this.values.map((each) => [
+				// each.x,
+				// each.y - basevalue
+			// ]));
+		// } catch (error) {
+			// throw error
+		// }
+	}
+	"AVGTYPE" (type, f) {
+		let entry = this.entry.clone()
+		let seed = entry.getSeed();
+		if(entry.subType.length > 0){
+			seed.specs.type = `${entry.subType}${entry.type}`
+		}
+		let nEntry = new Point(seed.specs, seed.req)
+		return new Struct(nEntry, seed.specs, this.x, type, f)
+		// return res
+		// let res = new Struct([], this.x, type)
+		// res.values = this.values.map(each => each.short())
+		// return res.build(type)
 	}
 	"TYPE" (type, f) {
-		let res = new Struct([], this.x, type, f)
+		let res = new Struct(this.entry.clone(), this.specs, this.x, type, f)
 		res.colored = this.colored;
 		res.color = this.color;
-		if(!(this.values[0] instanceof Point) && typeof this.values[0].TYPE === 'function'){
-			res.values = this.values.map(each => each.TYPE(type))	
-		}else{
-			res.values = this.values; 
-		}
-		return res.build(type)
+		return res
+		// if(!(this.values[0] instanceof Point) && typeof this.values[0].TYPE === 'function'){
+		// res.values = this.values.map(each => each.TYPE(type))	
+		// }else{
+		// res.values = this.values; 
+		// }
+		// return res.build(type)
 	}
 	"numberReq" () {
 		return this;
@@ -337,7 +406,7 @@ module.exports = class Struct {
 			xInterval: this.xInterval,
 			typeMeta: this.typeMeta,
 			date: (this.values.length === 1 ? this.values[0].short().date : null),
-			
+
 		}
 	}
 	// "subOccur" (type) {
@@ -595,29 +664,6 @@ module.exports = class Struct {
 		return result;
 
 	}
-	"difference" (bsln) {
-		if(bsln == undefined){
-			bsln = {
-				lower: baselineLower,
-				upper: baselineUpper
-			}
-		}else{
-			bsln = JSON.parse(bsln);
-		}
-		let lower = bsln.lower;
-		let upper = bsln.upper;
-		try {
-			//TODO change to TYPE later
-			const basevalue = help.mean(this.values.filter((value) => value.x >= lower && value.x <= upper).map((each) => each.y));
-			// console.log("basevalue",basevalue)
-			return Array.from(this.values.map((each) => [
-				each.x,
-				each.y - basevalue
-			]));
-		} catch (error) {
-			throw error
-		}
-	}
 	"changeY" (type){
 		let res = new Struct([],this.x,this.type)
 		if(this.values.length > 0 && typeof this.values[0].changeY === 'function'){
@@ -627,7 +673,7 @@ module.exports = class Struct {
 		res.values = this.values.map(each => each[type]);
 		return res.build();
 	}
-	"build" (type = this.type, lower = baselineLower, upper = baselineUpper, color) {
+	"reInit" (type = this.type, lower = baselineLower, upper = baselineUpper, color) {
 		this.type = type;
 		if (this.values.length > 0) {
 			if (this.values[0].keys) {
@@ -659,7 +705,7 @@ module.exports = class Struct {
 		// 			break;
 		// 		default:
 		// 			return each;
-			// }
+		// }
 
 		// });
 		return this;

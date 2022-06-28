@@ -6,7 +6,7 @@
 		"url": "vischange.k8s.glimworks.se/data/query/v1" 
 	},
 	"latest": {
-		"start": 2021,
+		"start": 2019,
 		"end": 2025,
 		"interval": 30,
 		"url": "vischange.k8s.glimworks.se/data/query/v1" 

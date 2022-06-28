@@ -4,8 +4,8 @@
   "description": "stats object module for vizchange.net",
   "main": "module.js",
   "scripts": {
-    "test": "mocha --timeout 500000 './*.spec.js'",
-    "test-quick": "mocha --timeout 500000 './*.quick.spec.js'"
+    "test": "mocha --timeout 500000 './*.slow.spec.js'",
+    "test-quick": "mocha --timeout 10000 './*.quick.spec.js'"
   },
   "repository": {
     "type": "git",
@@ -23,15 +23,16 @@
   },
   "homepage": "https://github.com/nicklassundin/vizchange-stats#readme",
   "dependencies": {
+    "assert": "^2.0.0",
     "cli-progress": "^3.10.0",
     "climate-plots-helper": "^1.0.5",
     "mocha": "^9.2.1",
     "node-libcurl": "^2.3.4"
   },
   "release": {
-	  "branchs": [
-		  "release",
-		  "beta"
-	  ]
+    "branchs": [
+      "release",
+      "beta"
+    ]
   }
 }

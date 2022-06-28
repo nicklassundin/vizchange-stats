@@ -2,57 +2,61 @@ const Struct = require('./struct.js');
 const help = require('climate-plots-helper');
 // const keys = Object.keys(values[0]),
 module.exports = class ByDateStruct {
-	constructor(type = mean, custom, entries) {
+	constructor(type = mean, custom, specs) {
+		this.specs = specs;
 		this.type = type;
 		this.values = {};
 		this.parsed = {};
 		this.years = {};
-		this.entries = entries;
 	}
 	"insert" (kn, ...k) {
-		return (entry) => {
-				k = k.map(key => {
-					if(entry[key] != undefined) return entry[key]
-					return key
-				})
-				if(kn) k.unshift(kn)
-				this.values = this.recInsert(entry,k) 
-		}
+		let specs = this.specs;
+		specs.keys = k
+		let type = this.type;
+		return  Struct.build(specs, kn, type)
+		// return (entry) => {
+			// k = k.map(key => {
+				// if(entry[key] != undefined) return entry[key]
+				// return key
+			// })
+			// if(kn) k.unshift(kn)
+			// this.values = this.recInsert(entry,k) 
+		// }
 
 	}
-	"recInsert" (entry, k, data = this.values) {
-		let kn = k[0];
-		if(kn === undefined){
-			// return data;
-		}
-		if(!data[kn]) {
-			if (k.length > 1) {
-				data[kn] = this.recInsert(entry, k.slice(1), {});
-			} else {
-				data[kn] = new Struct(
-					[],
-					kn,
-					this.type
-				);
-				if(k[0].valueOf() == 'DOY'.valueOf() && entry.req[`avg_${entry.type}`] != undefined){
-					data[kn].point = entry;
-				}else{
-					data[kn].values.push(entry)
-				}
-			}
-		} else if (k.length > 1) {
-			data[kn] = this.recInsert(entry, k.slice(1), data[kn]);
-		} else {
-			if(k[0].valueOf() == 'DOY'.valueOf() && entry.req[`avg_${entry.type}`] != undefined){
-				console.log("no avg")
-				data[kn].point = entry;
-			}else{
-				data[kn].VALUES.push(entry)
-			}
-		}
-		return data;
+	// "recInsert" (entry, k, data = this.values) {
+	// 	let kn = k[0];
+	// 	if(kn === undefined){
+	// 		// return data;
+	// 	}
+	// 	if(!data[kn]) {
+	// 		if (k.length > 1) {
+	// 			data[kn] = this.recInsert(entry, k.slice(1), {});
+	// 		} else {
+	// 			data[kn] = new Struct(
+	// 				[],
+					// kn,
+					// this.type
+				// );
+				// if(k[0].valueOf() == 'DOY'.valueOf() && entry.req[`avg_${entry.type}`] != undefined){
+					// data[kn].point = entry;
+				// }else{
+					// data[kn].values.push(entry)
+				// }
+			// }
+		// } else if (k.length > 1) {
+			// data[kn] = this.recInsert(entry, k.slice(1), data[kn]);
+		// } else {
+			// if(k[0].valueOf() == 'DOY'.valueOf() && entry.req[`avg_${entry.type}`] != undefined){
+				// console.log("no avg")
+				// data[kn].point = entry;
+			// }else{
+				// data[kn].VALUES.push(entry)
+			// }
+		// }
+		// return data;
 
-	}
+	// }
 	// "temp"(){
 	// 	if (this.custom) {
 
@@ -80,26 +84,24 @@ module.exports = class ByDateStruct {
 	// 		}
 	// 		return this.values
 	// 	}
-	"construct" (bValues, x) {
-		try {
-			if(bValues == undefined){
-				return new ByDateStruct('mean',x)
-			}else if(typeof bValues.build === 'function'){
-				return bValues.build(this.type);
-			}else{
-				Object.keys(bValues).map(key => {
-					return this.construct(bValues[key], key); 
-				})
-				return bValues;
-			}
-
-		} catch (error) {
-			throw error;
-
-		}
-
-	}
+	// "construct" (bValues, x) {
+	// 	try {
+	// 		if(bValues == undefined){
+	// 			return new ByDateStruct('mean',x)
+	// 		}else if(typeof bValues.build === 'function'){
+	// 			return bValues.build(this.type);
+	// 		}else{
+	// 			Object.keys(bValues).map(key => {
+	// 				return this.construct(bValues[key], key); 
+	// 			})
+	// 			return bValues;
+			// }
+		// } catch (error) {
+			// throw error;
+		// }
+	// }
 	"request" (key) {
+		// console.log('parseByDateStruct - request key', key)
 		this.parse(key)
 		let type = this.type;
 		return new Promise((res, rej) => {
@@ -111,9 +113,9 @@ module.exports = class ByDateStruct {
 				this.parsed[key] = true;
 				switch (key) {
 					case "monthly":
-						this.values[key] = this.construct(this.values[key]);
+						this.values[key] = []; 
 						Object.keys(this.values[key]).forEach((month) => {
-							vals[month] = new Struct([], parseInt(month), type)
+							vals[month] = new Struct(specs, parseInt(month), type)
 							vals[month].values = Object.values(this.values[key][month])
 							vals[month].build(type)
 						});
@@ -130,33 +132,10 @@ module.exports = class ByDateStruct {
 						// console.log(this.values[key])
 					case "months":
 					case "weeks":
-						this.values[key] = this.construct(this.values[key]);
-						Object.keys(this.values[key]).forEach(year => {
-							vals[year] = new Struct([], parseInt(year), type)
-							vals[year].values = Object.values(this.values[key][year])
-							vals[year].build(type)
-						})
-						// console.log(vals)
-						// fsfsd
-						this.values[key] = new Struct([],undefined, type);
-						// this.values[key] = vals 
-						this.values[key].values = Object.values(vals);
-						this.values[key] = this.construct(this.values[key])
-						// console.log(this.values[key])
 						res(this.values[key]);
 						break;
 					case "yrlyFull":
-						Object.keys(this.values[key]).forEach((year) => {
-							this.values[key][year] = this.construct(
-								this.values[key][year],
-								parseInt(year)
-							);
-
-
-						});
-						res(this.values[key]);
-						break;
-					case "yrlyTest":
+						this.values[key] = new Struct(this.values, key, type)
 						res(this.values[key]);
 						break;
 					case "dailyExtremeHigh":
@@ -417,144 +396,127 @@ module.exports = class ByDateStruct {
 	// console.log(key)
 	if(!this.values[key]){
 		let startTime = (new Date()).getTime();
-		this.entries
-			.forEach((entry, index) => {
-				let date = entry.x
-				const year = entry.year;
-				if (!this.years[`${year}`]) {
-					this.years[year] = `${year}`;
-				}
-				switch (key) {
-					case 'all':
-						this.insert('all')(entry)
-						break;
-					case 'yrly': 
-						this.insert(
-							"yrly",
-							'year',
-							'DOY'
-						)(entry);
-						// console.log("entry",entry)
-						// console.log("test")
-						// console.log('yrly',this.values.yrly)
-						// fdsfds
-						break
-					case 'summer':
-					case 'winter':
-					case 'autumn':
-					case 'spring':
-						// TODO should cahnge to 'season' [season], year 
-						// to match decasdes and others
-						this.insert(
-							false,
-							'season',
-							'year'
-							// ,entry.DOY
-						)(entry);
-						break;
-					case 'decades':
-						this.insert("decades",
-							'decade',
-							'year'
-							// ,entry.DOY
-						)(entry);
-						break;
-					case 'splitDecades':
-						this.insert(key,
-							'allTime',
-							'splitMonth'
-						)(entry);
-						this.insert(key,
-							'splitDecade',
-							'splitMonth'
-						)(entry);
-						break;
-					case '30period':
-						this.insert(key, 
-							'allTime',
-							'splitMonth'
-						)(entry)
-						this.insert(key, 
-							'30periodyear',
-							'splitMonth'
-						)(entry)
-						break;
-					case 'yrlySplit':
-						var splitDOY = ((year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0)) ? 366 : 365) + entry.DOY;
-						this.insert(
-							"yrlySplit",
-							// key,
-							entry.splitYear,
-							(entry.splitYear === entry.year ? entry.DOY : splitDOY)
-						)(entry);
-						break;
-					case 'yrlyFull':
-						this.insert(
-							"yrlyFull",
-							entry.decade,
-							entry.monthName
-						)(entry);
-						break;
-					case 'monthly':
-						this.insert(
-							"monthly",
-							entry.monthName,
-							// key,
-							entry.year
-						)(entry);
-						break
-					case 'weeks':
-						this.insert(
-							"weeks",
-							// key,
-							entry.year,
-							entry.week
-						)(entry);
-						break;
-					case 'months':
-						this.insert(
-							"months",
-							// key,
-							entry.year,
-							entry.monthName
-						)(entry);
-						break;
-					case 'custom':
-						if (this.custom) {
+		switch (key) {
+			case 'all':
+				this.insert('all')(entry)
+				break;
+			case 'yrly': 
+				this.values[key] = this.insert(
+					"yrly",
+					'year',
+					'DOY'
+				)
+				break
+			case 'summer':
+			case 'winter':
+			case 'autumn':
+			case 'spring':
+				// TODO should cahnge to 'season' [season], year 
+				// to match decasdes and others
+				this.insert(
+					false,
+					'season',
+					'year'
+					// ,entry.DOY
+				)(entry);
+				break;
+			case 'decades':
+				this.insert("decades",
+					'decade',
+					'year'
+					// ,entry.DOY
+				)(entry);
+				break;
+			case 'splitDecades':
+				this.insert(key,
+					'allTime',
+					'splitMonth'
+				)(entry);
+				this.insert(key,
+					'splitDecade',
+					'splitMonth'
+				)(entry);
+				break;
+			case '30period':
+				this.insert(key, 
+					'allTime',
+					'splitMonth'
+				)(entry)
+				this.insert(key, 
+					'30periodyear',
+					'splitMonth'
+				)(entry)
+				break;
+			case 'yrlySplit':
+				var splitDOY = ((year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0)) ? 366 : 365) + entry.DOY;
+				this.insert(
+					"yrlySplit",
+					// key,
+					entry.splitYear,
+					(entry.splitYear === entry.year ? entry.DOY : splitDOY)
+				)(entry);
+				break;
+			case 'yrlyFull':
+				this.insert(
+					"yrlyFull",
+					entry.decade,
+					entry.monthName
+				)(entry);
+				break;
+			case 'monthly':
+				this.insert(
+					"monthly",
+					entry.monthName,
+					// key,
+					entry.year
+				)(entry);
+				break
+			case 'weeks':
+				this.insert(
+					"weeks",
+					// key,
+					entry.year,
+					entry.week
+				)(entry);
+				break;
+			case 'months':
+				this.insert(
+					"months",
+					// key,
+					entry.year,
+					entry.monthName
+				)(entry);
+				break;
+			case 'custom':
+				if (this.custom) {
 
-							if (!this.values.customPeriod) {
+					if (!this.values.customPeriod) {
 
-								this.values.customPeriod = {};
+						this.values.customPeriod = {};
 
-							}
-							const pkey = custom(date);
-							if (pkey) {
+					}
+					const pkey = custom(date);
+					if (pkey) {
 
-								if (!this.values.customPeriod[pkey]) {
+						if (!this.values.customPeriod[pkey]) {
 
-									this.values.customPeriod[pkey] = new Struct(
-										[],
-										pkey,
-										type
-									);
-
-								}
-								this.values.customPeriod[key].values.push(entry);
-
-							}
+							this.values.customPeriod[pkey] = new Struct(
+								[],
+								pkey,
+								type
+							);
 
 						}
-					case 'default':
-						break;
+						this.values.customPeriod[key].values.push(entry);
+
+					}
+
 				}
-				//if(entry.req['min_temperature']){
-				//	console.log('entry',entry)
-				//	console.log(this.values['yrly'][entry.year+''][entry.DOY].values[0].req)
-				//} 
-			})
-		console.log("time",(new Date()).getTime()-startTime)
+			case 'default':
+				break;
+		}
+		// console.log("time",(new Date()).getTime()-startTime)
 	}
-	// return this.request(key);
 }
 };
 
