@@ -8,7 +8,7 @@ let specs = {
 	station: 'abisko',
 	baseline: {
 		'start': 1960,
-		'end': 2080
+		'end': 1980
 	}
 }
 let configs = require('./stats/config.json')
@@ -76,37 +76,44 @@ describe(
 							return yrly.values[1]
 						})
 					}) 
+					cache.result[2025] = cache.result.then(res => {
+						return res.yrly.then(yrly => {
+							return yrly.values[4]
+						})
+					}) 
+				})
+				it.only('empty', () => {
+					return cache.result[2025].then(year => {
+						return assert.equal(year.y, undefined)
+					})
 				})
 				it.only('min', () => {
 					return cache.result[2019].then(year => {
 						var min = year.min
-						// console.log(year)
-						// console.log(year.entry.req)
-						// console.log(year.min)
 						return assert.equal(min.y, -26.6)
 					})
 				})
-				it.only('minAvg', () => {
+				it('minAvg', () => {
 					return cache.result[2019].then(year => {
 						var avg = year.minAvg
 						var y = -16.7 
 						return assert.equal(y, avg.y)
 					})
 				})
-				it.only('max', () => {
+				it('max', () => {
 					return cache.result[2019].then(year => {
 						var max = year.max
 						return assert.equal(max.y, 24.1)
 					})
 				})
-				it.only('maxAvg', () => {
+				it('maxAvg', () => {
 					return cache.result[2019].then(year => {
 						var avg = year.maxAvg
 						var y = 18.1 
 						return assert.equal(y, avg.y)
 					})
 				})
-				it.only('sum', () => {
+				it('sum', () => {
 					return cache.result[2019].then(year => {
 						var sum = year.sum
 						// console.log(sum)
@@ -132,12 +139,12 @@ describe(
 				// 		})
 				// 	})
 				// })
-				it.only('number', () => {
+				it('number', () => {
 					return cache.result[2019].then(year => {
 						return assert.equal(365, year.values.length)
 					})
 				})
-				it.only('difference', () => {
+				it('difference', () => {
 					return cache.result[2019].then(year => {
 						var diff = year.difference
 						// console.log(diff)

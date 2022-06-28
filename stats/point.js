@@ -11,14 +11,18 @@ let replace = (req, a, b) => {
 
 let baselinePoint = undefined;
 class Point {
-	// constructor(specs){
 	static build(specs, full=false){
 		return curl.curlProx(specs, full).then(res => {
-			if(!full)res = res.reduce((a,b) => Object.assign(a, b))
+			if(res.length < 1) return {
+				'ERROR': 'empty result',
+				'specs': specs
+			}
+			if(!full) res = res.reduce((a,b) => Object.assign(a, b))
+
 			return curl.curlProx({
 				start: new Date(specs.baseline.start,1,1),
 				end: new Date(specs.baseline.end,1,1),
-			   	url: specs.url,
+				url: specs.url,
 				type: specs.type,
 				station: specs.station
 			}).then(baseline => {
@@ -45,16 +49,12 @@ class Point {
 		req = replace(req,'nhem_temp', 'temperature')
 		if(typeof req[type] == 'string' && req[type].length < 1) req[type] = undefined
 		this.req = req;
-		
+
 
 		// this.x = specs.start
 		// this.y = req[type] === "" ? undefined : Number(req[type])
 		// if(req['avg_temperature']){
-			// console.log('y',this.y)
-			// console.log(req)
 		// }
-		// console.log(this.y)
-		// console.log(this)
 		if(req[`${this.type}`] == undefined){
 			if(req[`avg_${type}`] != undefined){
 				this.subType = 'avg';
@@ -86,14 +86,6 @@ class Point {
 			this.splitYear = this.year
 		}
 		this.splitDecade = this.splitYear - this.splitYear % 10 +1;
-		// console.log('req',req)
-		// console.log('y',this.y)
-		// if(Object.keys(req).includes('snowdepth_single')){
-			// console.log('y',this.y)
-			// console.log('type',type)
-			// console.log('req',req)
-			// console.log('this',this)
-		// }
 	}
 	get 'x'(){
 		if(this.req.date != undefined) return this.req.date
@@ -144,11 +136,6 @@ class Point {
 		return `${this.SUBTYPE}_`;
 	}
 	'TYPE'(type){
-		// console.log(this.req[`${type}_${this.type}`][type])
-		// console.log(`${this.subType}${this.type}`)
-		// console.log(this.req[`${subType}${this.type}`])
-		// console.log(type)
-		// console.log(this.req[`${this.subType}${this.type}`][type])
 		return this.req[`${this.subType}${this.type}`][type]
 	}
 	get 'min' (){
@@ -221,7 +208,7 @@ class Point {
 		// TODO
 	}
 	clone(){
-	 return Object.assign(Object.create(Object.getPrototypeOf(this)), this)
+		return Object.assign(Object.create(Object.getPrototypeOf(this)), this)
 	}
 	'short' (type){
 		let next = {}

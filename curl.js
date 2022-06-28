@@ -132,20 +132,15 @@ module.exports = {
 			start: specs.start,
 			end: specs.end
 		}
-		// console.log('dates',dates)
 		var host = specs.url;
 		var type = specs.type
-		// console.log('station',station)
-		// console.log('dates',dates)
-		// console.log('type',type)
 		var url = `${preset.station[station]}&date=${parsePeriod(dates.start)}-${parsePeriod(dates.end)}`
 		if(['glob', '64n-90n', 'nhem'].includes(station) && ['glob_temp','nhem_temp','64n-90n_temp','temperature'].includes(type)){
 			// url = `${url}&types=${preset.types[station+type]},station`
 			url = `${url}&types=${preset.types[station+type]}`
-				
+
 		}else if(type){
 			url = `${url}&types=${preset.types[type] != undefined ? preset.types[type] : type}`
-			// console.log('types',`${preset.types[type] != undefined ? preset.types[type] : type},station`)
 		} 
 		if(preset.station[station] === undefined) return Promise.reject({
 			"ERROR": "No such station",
@@ -153,22 +148,16 @@ module.exports = {
 			"data": [],
 			"URL": url
 		})
-		// console.log('URL', url)
-		// console.log((host)+url)
 		// ffsdfsd
 		//
 		if(full){
-			// console.log("full-request",(host)+url) 
-			// console.log(specs)	
 			return module.exports.curl((host)+url) 
 		}else{
-			// console.log('&calculate')
 			return module.exports.curl((host)+url+"&calculate") 
 		}
 	},
 	// requests: 300,
 	curl: function(url) {
-		// console.log('URL', url)
 		const curl = new Curl();
 		curl.setOpt('URL', url)
 		curl.setOpt('FOLLOWLOCATION', true);
@@ -179,8 +168,6 @@ module.exports = {
 				// console.info(data.length);
 				// console.info('---');
 				// console.info("time",this.getInfo( 'TOTAL_TIME' ));
-				// console.log("data",data)
-				//
 
 				if(debug.slow){
 					debug.slow = debug.slow['TOTAL_TIME'] > this.getInfo('TOTAL_TIME') ?
@@ -199,6 +186,7 @@ module.exports = {
 						url
 					}
 				}
+				// console.log('time', this.getInfo('TOTAL_TIME'))
 				this.close();
 				if(statusCode === 504){
 					rej(statusCode)
@@ -206,21 +194,31 @@ module.exports = {
 					res([]);
 				}else {
 					json = JSON.parse(data)
-					// console.log("json",json)
-					// console.log('URL', url)
 					res(json)
 				}
 			});
 
-		}) 
+		})
 		curl.on('error', () => {
 			curl.close.bind(curl)
 		});
+		return new Promise((res, rej) => {
+
 		process.nextTick(() => {
-			// setTimeout(curl.perform(), Math.floor(Math.random()*200))
 			curl.perform()
+			res(Promise.race([req, 
+				new Promise((res, rej) => {
+					let time = 3000;
+					let to = setTimeout(() => {
+						clearTimeout(to)
+						rej({'ERROR': `toLong time: ${time}`,
+							'url': url
+						})
+					},time)
+				})
+			]))
 		});
-		return req
+		})
 	},
 }
 

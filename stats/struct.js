@@ -22,7 +22,6 @@ function ConvertRGBtoHex(red, green, blue) {
 
 module.exports = class Struct {
 	static build(specs, x, type, f, full=false){
-		// console.log(specs)
 		switch (specs.key) {
 			case 'month':
 				if(typeof specs.start != 'object'){
@@ -52,6 +51,9 @@ module.exports = class Struct {
 					point = point.filter(f).last;
 					break;
 				default:
+			}
+			if(point.ERROR){
+				return point.ERROR
 			}
 			return new Struct(point, specs, x, type)
 		})
@@ -90,15 +92,12 @@ module.exports = class Struct {
 		// 			})
 		// 		} 
 		// 	}catch(ERROR){
-		// 		console.log('error no y', this)
 		// throw ERROR
 		// }
 		// val = this.values
 		// this.values = this.values.filter((entry) => !isNaN(parseFloat(entry.y)) && isFinite(entry.y));
 		// }
 		// if(this.values.length < 1){
-		// console.log('no values')
-		// console.log(val)
 		// return null
 		// } 
 		switch (this.type) {
@@ -164,10 +163,8 @@ module.exports = class Struct {
 				}
 				break;
 			default:
-				console.log(`default: ${type}`);
 
 		}
-		// console.log("struct",this.Y)
 		return this.Y
 	}
 	get "count" () {
@@ -195,7 +192,6 @@ module.exports = class Struct {
 			specs.end = k;
 			if(this.VALUES[k] == undefined){
 				this.VALUES[k] = Struct.build(specs, k, this.type, this.f)
-				// console.log(Object.keys(this.VALUES).length)
 			}
 		})
 		// }
@@ -341,7 +337,6 @@ module.exports = class Struct {
 		// try {
 			//TODO change to TYPE later
 			// const basevalue = help.mean(this.values.filter((value) => value.x >= lower && value.x <= upper).map((each) => each.y));
-			// console.log("basevalue",basevalue)
 			// return Array.from(this.values.map((each) => [
 				// each.x,
 				// each.y - basevalue
@@ -386,7 +381,6 @@ module.exports = class Struct {
 				return this.values
 			}	
 		}catch(error){
-			console.log(this)
 			throw error
 		}
 	}
@@ -541,8 +535,6 @@ module.exports = class Struct {
 
 	}
 	"closest" (date) {
-		// console.log(date)
-		// console.log(typeof date)
 		if(typeof date == 'string') date = new Date(date)
 		const oneDay = 24 * 60 * 60 * 1000,
 			distance = [];
