@@ -208,7 +208,7 @@ module.exports = {
 			curl.perform()
 			res(Promise.race([req, 
 				new Promise((res, rej) => {
-					let time = 3000;
+					let time = 100000;
 					let to = setTimeout(() => {
 						clearTimeout(to)
 						rej({'ERROR': `toLong time: ${time}`,

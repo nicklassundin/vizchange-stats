@@ -15,12 +15,39 @@ let configs = require('./stats/config.json')
 let cache = {}
 
 const assert = require('assert');
+describe('Request-full', function() {
+	before(function () {
+		let config = Object.assign(configs['full'],specs)
+		cache.fullresult = parser.temperature(config)
+	})
+	it('y', () => {
+		return cache.fullresult.then(all => {
+			return all.yrly.then(yrly => {
+				// console.log(yrly)
+				let y = -0.21810069713400465;
+				return assert.equal(yrly.y, y)
+			})
+		})
+	})
+	it.only('values', () => {
+		return cache.fullresult.then(all => {
+			return all.yrly.then(yrly => {
+				return yrly.values.then(values => {
+					console.log(values)
+					// Promise.all(values).then(v => {
+						// console.log(v.map(each => each.x))
+					// })
+					return assert.equal(values.length, 10)
+				})
+			})
+		})
+	})
+})
 describe(
 	'Requests',
 	function() {
 		before(function () {
 			let config = Object.assign(configs['latest'],specs)
-			// console.log(config)
 			cache.result = parser.temperature(config)
 		});
 		it('yearly', (done) => {
@@ -73,21 +100,25 @@ describe(
 				before(function() {
 					cache.result[2019] = cache.result.then(res => {
 						return res.yrly.then(yrly => {
-							return yrly.values[1]
+							return yrly.values.then(values => {
+								return values[1]
+							})
 						})
 					}) 
 					cache.result[2025] = cache.result.then(res => {
 						return res.yrly.then(yrly => {
-							return yrly.values[4]
+							return yrly.values.then(values => {
+								return values[4]
+							})
 						})
 					}) 
 				})
-				it.only('empty', () => {
+				it('empty', () => {
 					return cache.result[2025].then(year => {
 						return assert.equal(year.y, undefined)
 					})
 				})
-				it.only('min', () => {
+				it('min', () => {
 					return cache.result[2019].then(year => {
 						var min = year.min
 						return assert.equal(min.y, -26.6)

@@ -74,7 +74,7 @@ module.exports = class Struct {
 			"src": "",
 		};
 		this.movAvg = undefined;
-		this.VALUES = {};
+		this.VALUES = Promise.resolve({});
 		this.POINT = [];
 	}
 	set "y" (val) {
@@ -170,12 +170,11 @@ module.exports = class Struct {
 	get "count" () {
 		return this.values.length
 	}
-	set "values" (val) {
-		this.VALUES = val
-		// this.VALUES = val.sort((a,b) => {
-		// return a.x - b.x 
-		// });
-	}
+	// set "values" (val) {
+	// this.VALUES = val.sort((a,b) => {
+	// // return a.x - b.x 
+	// });
+	// }
 	set "point" (val){
 		this.POINT.push(val)
 	}
@@ -183,33 +182,33 @@ module.exports = class Struct {
 		return this.POINT[0]
 	}
 	get "values" () {
-		// if(this.VALUES.length == 0){
 		var genSpecs = JSON.parse(JSON.stringify(this.specs)); 
 		var key = genSpecs.keys.shift();
-		this.entry[`${key}s`].forEach(k => {
-			var specs = JSON.parse(JSON.stringify(genSpecs)); 
-			specs.start = k;
-			specs.end = k;
-			if(this.VALUES[k] == undefined){
-				this.VALUES[k] = Struct.build(specs, k, this.type, this.f)
+
+		let getValues = function(entry, values, type, f){
+			let k = entry.shift();
+
+			if(entry.length < 1){
+				return values
+			}else{
+				var specs = JSON.parse(JSON.stringify(genSpecs)); 
+				specs.start = k;
+				specs.end = k;
+				values = values.then(val => {
+					val[k] = Struct.build(specs, k, type, f)
+					return val
+				})
+				return getValues(entry, values, type, f)
 			}
-		})
-		// }
-
-
-		if(this.point != undefined){
-			return [this.point]
-		}else if (Array.isArray(this.VALUES)) {
-			return this.VALUES
-			// return this.VALUES.sort((a,b) => {
-			// return a.x - b.x 
-			// });
-		} else if (typeof this.VALUES === "object") {
-			return Object.values(this.VALUES)
-			// .sort((a,b) => {
-			// return a.x - b.x 
-			// });
 		}
+		this.VALUES = getValues(this.entry[`${key}s`], this.VALUES, this.type, this.f)	
+
+		// if(this.point != undefined){
+		// return [this.point]
+		// }else
+		return this.VALUES.then(vals => {
+			return Object.values(vals)
+		})
 		return undefined;
 	}
 	get "valuesAll" () {
@@ -325,24 +324,24 @@ module.exports = class Struct {
 	get "difference" () {
 		return this.TYPE("difference", this.f)
 		// if(bsln == undefined){
-			// bsln = {
-				// lower: baselineLower,
-				// upper: baselineUpper
-			// }
+		// bsln = {
+		// lower: baselineLower,
+		// upper: baselineUpper
+		// }
 		// }else{
-			// bsln = JSON.parse(bsln);
+		// bsln = JSON.parse(bsln);
 		// }
 		// let lower = bsln.lower;
 		// let upper = bsln.upper;
 		// try {
-			//TODO change to TYPE later
-			// const basevalue = help.mean(this.values.filter((value) => value.x >= lower && value.x <= upper).map((each) => each.y));
-			// return Array.from(this.values.map((each) => [
-				// each.x,
-				// each.y - basevalue
-			// ]));
+		//TODO change to TYPE later
+		// const basevalue = help.mean(this.values.filter((value) => value.x >= lower && value.x <= upper).map((each) => each.y));
+		// return Array.from(this.values.map((each) => [
+		// each.x,
+		// each.y - basevalue
+		// ]));
 		// } catch (error) {
-			// throw error
+		// throw error
 		// }
 	}
 	"AVGTYPE" (type, f) {
