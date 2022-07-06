@@ -186,7 +186,10 @@ module.exports = {
 						url
 					}
 				}
-				// console.log('time', this.getInfo('TOTAL_TIME'))
+				// console.log({
+					// 'url': url,
+					// 'time': this.getInfo('TOTAL_TIME')
+				// })
 				this.close();
 				if(statusCode === 504){
 					rej(statusCode)
@@ -208,7 +211,7 @@ module.exports = {
 			curl.perform()
 			res(Promise.race([req, 
 				new Promise((res, rej) => {
-					let time = 100000;
+					let time = 30000;
 					let to = setTimeout(() => {
 						clearTimeout(to)
 						rej({'ERROR': `toLong time: ${time}`,

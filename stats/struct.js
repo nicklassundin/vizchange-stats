@@ -185,7 +185,8 @@ module.exports = class Struct {
 		var genSpecs = JSON.parse(JSON.stringify(this.specs)); 
 		var key = genSpecs.keys.shift();
 
-		let getValues = function(entry, values, type, f){
+
+		let getValues = async function(entry, values, type, f){
 			let k = entry.shift();
 
 			if(entry.length < 1){

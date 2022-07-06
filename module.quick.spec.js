@@ -20,7 +20,7 @@ describe('Request-full', function() {
 		let config = Object.assign(configs['full'],specs)
 		cache.fullresult = parser.temperature(config)
 	})
-	it('y', () => {
+	it.only('y', () => {
 		return cache.fullresult.then(all => {
 			return all.yrly.then(yrly => {
 				// console.log(yrly)
@@ -30,14 +30,12 @@ describe('Request-full', function() {
 		})
 	})
 	it.only('values', () => {
-		return cache.fullresult.then(all => {
-			return all.yrly.then(yrly => {
+		return cache.fullresult.then(res => {
+			return res.yrly.then(yrly => {
 				return yrly.values.then(values => {
-					console.log(values)
-					// Promise.all(values).then(v => {
-						// console.log(v.map(each => each.x))
-					// })
-					return assert.equal(values.length, 10)
+					return Promise.all(values).then(vals => {
+						return assert.equal(vals.length, 110)
+					})
 				})
 			})
 		})
@@ -56,13 +54,30 @@ describe(
 				}).then(done)
 			})
 		})
+		it('values', () => {
+			return cache.result.then(res => {
+				return res.yrly.then(yrly => {
+					return yrly.values.then(values => {
+						return Promise.all(values).then(vals => {
+
+							return assert.equal(vals.length, 5)
+						})
+					})
+				})
+			})
+		})
 		it('values to VALUES', () => {
 			return cache.result.then((res) => {
 				return res.yrly.then(yrly => {
-					yrly.values
-					return yrly.values[0].then(value => {
-						return Object.values(yrly.VALUES)[0].then(VALUE => {
-							return assert.equal(VALUE, value)
+					return yrly.values.then(vals => {
+
+						return vals[0].then(value => {
+							return yrly.VALUES.then(VALS => {
+
+								return Object.values(VALS)[0].then(VALUE => {
+									return assert.equal(VALUE, value)
+								})
+							})
 						})
 					})
 				})

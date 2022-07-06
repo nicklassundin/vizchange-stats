@@ -9,6 +9,12 @@ let replace = (req, a, b) => {
 	return req;
 }
 
+class baseline {
+	construct(specs){
+
+	}
+}
+
 let baselinePoint = undefined;
 class Point {
 	static build(specs, full=false){
