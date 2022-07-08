@@ -170,11 +170,6 @@ module.exports = class Struct {
 	get "count" () {
 		return this.values.length
 	}
-	// set "values" (val) {
-	// this.VALUES = val.sort((a,b) => {
-	// // return a.x - b.x 
-	// });
-	// }
 	set "point" (val){
 		this.POINT.push(val)
 	}
@@ -195,22 +190,41 @@ module.exports = class Struct {
 				var specs = JSON.parse(JSON.stringify(genSpecs)); 
 				specs.start = k;
 				specs.end = k;
-				values = values.then(val => {
-					val[k] = Struct.build(specs, k, type, f)
-					return val
-				})
+				values[k] = Struct.build(specs, k, type, f)
 				return getValues(entry, values, type, f)
 			}
 		}
-		this.VALUES = getValues(this.entry[`${key}s`], this.VALUES, this.type, this.f)	
+		this.VALUES = this.VALUES.then(vals => {
+			if(Object.keys(vals).length > 0){
+				// console.log("length > 0")
+				return vals
+			}else{
+				// console.log("length < 0")
+
+				return getValues(this.entry[`${key}s`], vals, this.type, this.f)	
+			}
+		})
 
 		// if(this.point != undefined){
 		// return [this.point]
 		// }else
 		return this.VALUES.then(vals => {
-			return Object.values(vals)
+			return Promise.all(Object.values(vals)).then(values => {
+				return values.map(each => {
+					if(each instanceof Error){
+						return Promise.reject(each)
+					}else{
+						return Promise.resolve(each)
+					}
+				})
+			}).then(v => {
+				return Promise.allSettled(v).then(res => {
+					return res.filter(r => { 
+						return r.status == 'fulfilled'
+					}).map(each => each.value)
+				})
+			})
 		})
-		return undefined;
 	}
 	get "valuesAll" () {
 
@@ -374,15 +388,16 @@ module.exports = class Struct {
 		return this;
 	}
 	get "shortValues" () {
-		try{
-			if(this.values.length > 0 && typeof this.values[0].short === 'function'){
-				return this.values.map(each => each.short(this.y));
-			}else{
-				return this.values
-			}	
-		}catch(error){
-			throw error
-		}
+		// TODO 
+		return this.values.then(vals => {
+			return vals.map(each => {
+				if(typeof each.short === 'function'){
+					return each.short(this.y);
+				}else{
+					return each.short
+				}
+			})
+		})
 	}
 	get "yValues" (){
 		return this.shortValues.map(each => each.y)
@@ -390,6 +405,7 @@ module.exports = class Struct {
 	"short" (y) {
 		if(this.typeMeta != undefined) return this.typeMeta
 		return {
+			compressed: true,
 			y: this.y,
 			x: this.x,
 			colors: {
@@ -716,37 +732,35 @@ module.exports = class Struct {
 	}
 	"clone" () {
 		return new Struct(this.values, this.x, this.type)
-		// {"values": [],
-		// ...this};
 
 	}
 	"map" (F) {
 		return new Struct(F(this.values), this.x, this.type)
 	}
 	get "xInterval" () {
-
-		let x1 = new Date(Math.min.apply(
-			null,
-			this.values.map((each) => (each.xInterval
-				? Math.min.apply(
-					null,
-					each.xInterval
-				)
-				: new Date(each.x)))
-		)).getTime();
-		let x2 = new Date(Math.max.apply(
-			null,
-			this.values.map((each) => (each.xInterval
-				? Math.max.apply(
-					null,
-					each.xInterval
-				)
-				: new Date(each.x)))
-		)).getTime();
-		return {
-			x: x1,
-			x2: x2	
-		}
+		// TODO
+		// let x1 = new Date(Math.min.apply(
+			// null,
+			// this.values.map((each) => (each.xInterval
+			// 	? Math.min.apply(
+			// 		null,
+			// 		each.xInterval
+			// 	)
+			// 	: new Date(each.x)))
+		// )).getTime();
+		// let x2 = new Date(Math.max.apply(
+			// null,
+			// this.values.map((each) => (each.xInterval
+			// 	? Math.max.apply(
+					// null,
+					// each.xInterval
+				// )
+				// : new Date(each.x)))
+		// )).getTime();
+		// return {
+			// x: x1,
+			// x2: x2	
+		// }
 	}
 };
 // exports.struct = struct;

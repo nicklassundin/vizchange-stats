@@ -20,7 +20,7 @@ class Point {
 	static build(specs, full=false){
 		return curl.curlProx(specs, full).then(res => {
 			if(res.length < 1) return {
-				'ERROR': 'empty result',
+				'ERROR': new Error('empty result'),
 				'specs': specs
 			}
 			if(!full) res = res.reduce((a,b) => Object.assign(a, b))

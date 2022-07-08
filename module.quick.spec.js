@@ -20,7 +20,7 @@ describe('Request-full', function() {
 		let config = Object.assign(configs['full'],specs)
 		cache.fullresult = parser.temperature(config)
 	})
-	it.only('y', () => {
+	it('y', () => {
 		return cache.fullresult.then(all => {
 			return all.yrly.then(yrly => {
 				// console.log(yrly)
@@ -29,7 +29,7 @@ describe('Request-full', function() {
 			})
 		})
 	})
-	it.only('values', () => {
+	it('values', () => {
 		return cache.fullresult.then(res => {
 			return res.yrly.then(yrly => {
 				return yrly.values.then(values => {
@@ -54,13 +54,25 @@ describe(
 				}).then(done)
 			})
 		})
-		it('values', () => {
+		it.only('shortValues', () => {
+			return cache.result.then(res => {
+				return res.yrly.then(yrly => {
+					return yrly.shortValues.then(values => {
+						return Promise.all(values).then(vals => {
+							// console.log('vals', vals)
+							return assert.equal(vals[0].compressed, true)
+						})
+					})
+				})
+			})
+		})
+		it.only('values', () => {
 			return cache.result.then(res => {
 				return res.yrly.then(yrly => {
 					return yrly.values.then(values => {
 						return Promise.all(values).then(vals => {
 
-							return assert.equal(vals.length, 5)
+							return assert.equal(vals.length, 3)
 						})
 					})
 				})

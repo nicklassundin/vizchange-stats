@@ -187,8 +187,8 @@ module.exports = {
 					}
 				}
 				// console.log({
-					// 'url': url,
-					// 'time': this.getInfo('TOTAL_TIME')
+				// 	'url': url,
+				// 	'time': this.getInfo('TOTAL_TIME')
 				// })
 				this.close();
 				if(statusCode === 504){
