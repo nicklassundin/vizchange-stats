@@ -78,7 +78,7 @@
 		"url": "vischange.k8s.glimworks.se/data/query/v1" 
 	},
 	"full": {
-		"start": 1910,
+		"start": 1920,
 		"end": 2021,
 		"interval": 36510,
 		"url": "vischange.k8s.glimworks.se/data/query/v1" 

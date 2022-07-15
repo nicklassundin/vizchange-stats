@@ -85,8 +85,6 @@ const preset = {
 		// '': ['?position='],
 	},
 	types: {
-		// temperatures: 'temperature,max_temperature,avg_temperature,min_temperature',
-		// temperature: 'avg_temperature,min_temperature,max_temperature',
 		temperature: 'temperature,avg_temperature,min_temperature,max_temperature',
 		precipitation: 'precipitation,avg_temperature',
 		growingSeason: 'temperature',
@@ -211,7 +209,7 @@ module.exports = {
 			curl.perform()
 			res(Promise.race([req, 
 				new Promise((res, rej) => {
-					let time = 30000;
+					let time = 50000;
 					let to = setTimeout(() => {
 						clearTimeout(to)
 						rej({'ERROR': `toLong time: ${time}`,

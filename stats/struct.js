@@ -1,6 +1,5 @@
 // const help = require("./../helpers.js");
 const help = require('climate-plots-helper')
-const regression = require("regression");
 
 /*
  * Const { JSDOM } = require( "jsdom" );
@@ -8,16 +7,17 @@ const regression = require("regression");
  * const $ = require( "jquery" )( window );
  */
 const {Point} = require('./point.js')
-const curl = require('../curl.js')
 
+/**
 function ColorToHex(color) {
 	var hexadecimal = color.toString(16);
-	return hexadecimal.length == 1 ? "0" + hexadecimal : hexadecimal;
+	return hexadecimal.length === 1 ? "0" + hexadecimal : hexadecimal;
 }
 
 function ConvertRGBtoHex(red, green, blue) {
 	return "#" + ColorToHex(red) + ColorToHex(green) + ColorToHex(blue);
 }
+ */
 
 
 module.exports = class Struct {
@@ -69,19 +69,17 @@ module.exports = class Struct {
 		this.f = f;
 		this.x = x;
 		this.type = type
-		this.meta = {
-			"fields": [],
-			"src": "",
-		};
+	//	this.meta = {
+	//		"fields": [],
+	//		"src": "",
+	//	};
 		this.movAvg = undefined;
 		this.VALUES = Promise.resolve({});
-		this.POINT = [];
 	}
 	set "y" (val) {
 		this.Y = val;
 	}
 	get "y" () {
-		let val;
 		// if(this.Y === undefined){
 		// 	try{
 
@@ -144,22 +142,22 @@ module.exports = class Struct {
 			case "last":
 			case "first":
 				this.Y = this.entry.y
-				var vals = this.entry.y
-				if(!vals.typeMeta){
-					var date = new Date(vals.x)
+				let values = this.entry.y;
+				if(!values.typeMeta){
+					let date = new Date(values.x);
 					this.typeMeta = {
-						"value": vals.y,
-						"fullDate": vals.x,
-						"year": vals.year,
-						"month": vals.month,
+						"value": values.y,
+						"fullDate": values.x,
+						"year": values.year,
+						"month": values.month,
 						"date": date.getTime(),
-						"strDate": `${vals.year}-${vals.month+1}-${date.getDate()}`,
-						// "x": vals.x,
-						"x": vals.year,
-						"y": vals.DOY,
+						"strDate": `${values.year}-${values.month+1}-${date.getDate()}`,
+						// "x": values.x,
+						"x": values.year,
+						"y": values.DOY,
 					}
 				}else{
-					this.typeMeta = vals.typeMeta;
+					this.typeMeta = values.typeMeta;
 				}
 				break;
 			default:
@@ -170,46 +168,36 @@ module.exports = class Struct {
 	get "count" () {
 		return this.values.length
 	}
+	/**
 	set "point" (val){
 		this.POINT.push(val)
 	}
 	get "point" (){
 		return this.POINT[0]
+	}*/
+	async getValues (specs, key, k, values, type, f, full) {
+		specs.start = k;
+		specs.end = k;
+		values[k] = Struct.build(specs, k, type, f, full);
+		return values;
 	}
 	get "values" () {
-		var genSpecs = JSON.parse(JSON.stringify(this.specs)); 
-		var key = genSpecs.keys.shift();
+		let genSpecs = JSON.parse(JSON.stringify(this.specs));
+		let key = genSpecs.keys.shift();
 
-
-		let getValues = async function(entry, values, type, f){
-			let k = entry.shift();
-
-			if(entry.length < 1){
+		this.VALUES = this.VALUES.then(values => {
+			if(Object.keys(values).length > 0){
 				return values
 			}else{
-				var specs = JSON.parse(JSON.stringify(genSpecs)); 
-				specs.start = k;
-				specs.end = k;
-				values[k] = Struct.build(specs, k, type, f)
-				return getValues(entry, values, type, f)
-			}
-		}
-		this.VALUES = this.VALUES.then(vals => {
-			if(Object.keys(vals).length > 0){
-				// console.log("length > 0")
-				return vals
-			}else{
-				// console.log("length < 0")
-
-				return getValues(this.entry[`${key}s`], vals, this.type, this.f)	
+				return this.entry[`${key}s`].map(k => {
+					return this.getValues(JSON.parse(JSON.stringify(genSpecs)), key, k, values, this.type, this.f)
+				}).reduce((a,b) => {
+					return Object.assign(a,b)
+				})
 			}
 		})
-
-		// if(this.point != undefined){
-		// return [this.point]
-		// }else
-		return this.VALUES.then(vals => {
-			return Promise.all(Object.values(vals)).then(values => {
+		return this.VALUES.then(values => {
+			return Promise.all(Object.values(values)).then(values => {
 				return values.map(each => {
 					if(each instanceof Error){
 						return Promise.reject(each)
@@ -219,31 +207,15 @@ module.exports = class Struct {
 				})
 			}).then(v => {
 				return Promise.allSettled(v).then(res => {
-					return res.filter(r => { 
-						return r.status == 'fulfilled'
+					return res.filter(r => {
+						return r.status === 'fulfilled'
 					}).map(each => each.value)
 				})
 			})
 		})
 	}
 	get "valuesAll" () {
-
-		if (this.values[0] != undefined) {
-
-			if (this.values[0].values != undefined) {
-
-				return this.values.map((each) => each.values).reduce((a, c) => a.concat(c));
-
-			}
-
-			return this.values;
-
-
-		}
-
-		return this.values;
-
-
+		return Struct.build(this.specs, this.x, this.type, this.f, true)
 	}
 	"split" (f) {
 		if (this.values[0].split) {
@@ -279,7 +251,7 @@ module.exports = class Struct {
 		let g = (entry) => {
 			const y = f(...entry.values.map((each) => each.y));
 			return {
-				"subX": entry.values.filter((each) => each.y == y).map((each) => new Date(each.x)),
+				"subX": entry.values.filter((each) => each.y === y).map((each) => new Date(each.x)),
 				y,
 				"x": entry.x
 			};
@@ -403,7 +375,7 @@ module.exports = class Struct {
 		return this.shortValues.map(each => each.y)
 	}
 	"short" (y) {
-		if(this.typeMeta != undefined) return this.typeMeta
+		if(this.typeMeta !== undefined) return this.typeMeta
 		return {
 			compressed: true,
 			y: this.y,
@@ -597,7 +569,7 @@ module.exports = class Struct {
 			};
 		distance.forEach((value, index) => {
 
-			if (value == min) {
+			if (value === min) {
 
 				result.data = values[index];
 
@@ -609,7 +581,7 @@ module.exports = class Struct {
 	}
 	"plotMovAvg" () {
 
-		if (this.movAvg != undefined) {
+		if (this.movAvg !== undefined) {
 
 			return this.movAvg;
 
@@ -651,7 +623,7 @@ module.exports = class Struct {
 	}
 	"plotMovAvgCI" () {
 
-		if (this.movAvg == undefined) {
+		if (this.movAvg === undefined) {
 
 			this.movAvg = this.plotMovAvg();
 
@@ -683,6 +655,7 @@ module.exports = class Struct {
 	}
 	"reInit" (type = this.type, lower = baselineLower, upper = baselineUpper, color) {
 		this.type = type;
+		// TODO insert lower and upper values
 		if (this.values.length > 0) {
 			if (this.values[0].keys) {
 				this.keys = this.values[0].keys;
@@ -724,7 +697,7 @@ module.exports = class Struct {
 		const result = {};
 		keys.forEach((each) => {
 
-			result[each] = this.values.filter((entry) => each == entry[key]);
+			result[each] = this.values.filter((entry) => each === entry[key]);
 
 		});
 		return result;

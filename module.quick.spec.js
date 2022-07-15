@@ -3,6 +3,7 @@ const parser = require('./module.js')
 global.climateplots = {
 	dev: true
 }
+global
 let specs = {
 	type: 'temperature',
 	station: 'abisko',
@@ -20,21 +21,32 @@ describe('Request-full', function() {
 		let config = Object.assign(configs['full'],specs)
 		cache.fullresult = parser.temperature(config)
 	})
-	it('y', () => {
+	it.only('y', () => {
 		return cache.fullresult.then(all => {
 			return all.yrly.then(yrly => {
 				// console.log(yrly)
-				let y = -0.21810069713400465;
+				let y = -0.16245443107397492;
 				return assert.equal(yrly.y, y)
 			})
 		})
 	})
-	it('values', () => {
+	it.only('values', () => {
 		return cache.fullresult.then(res => {
 			return res.yrly.then(yrly => {
 				return yrly.values.then(values => {
 					return Promise.all(values).then(vals => {
-						return assert.equal(vals.length, 110)
+						return assert.equal(vals.length, 101)
+					})
+				})
+			})
+		})
+	})
+	it.only('value of index [0]', () => {
+		return cache.fullresult.then(res => {
+			return res.yrly.then(yrly => {
+				return yrly.values.then(values => {
+					return Promise.all(values).then(vals => {
+						return assert.equal(vals[0].x, 1920)
 					})
 				})
 			})
@@ -48,18 +60,11 @@ describe(
 			let config = Object.assign(configs['latest'],specs)
 			cache.result = parser.temperature(config)
 		});
-		it('yearly', (done) => {
-			cache.result.then((res) => {
-				res.yrly.then(yrly => {
-				}).then(done)
-			})
-		})
 		it.only('shortValues', () => {
 			return cache.result.then(res => {
 				return res.yrly.then(yrly => {
 					return yrly.shortValues.then(values => {
 						return Promise.all(values).then(vals => {
-							// console.log('vals', vals)
 							return assert.equal(vals[0].compressed, true)
 						})
 					})
@@ -78,35 +83,29 @@ describe(
 				})
 			})
 		})
-		it('values to VALUES', () => {
+		it.only('yearly - length test', () => {
 			return cache.result.then((res) => {
 				return res.yrly.then(yrly => {
-					return yrly.values.then(vals => {
-
-						return vals[0].then(value => {
-							return yrly.VALUES.then(VALS => {
-
-								return Object.values(VALS)[0].then(VALUE => {
-									return assert.equal(VALUE, value)
-								})
-							})
-						})
+					return yrly.values.then(values => {
+						return assert.equal(values.length, 3)
 					})
 				})
 			})
 		})
-		it('yearly - length test', () => {
+		it.only('valuesAll', () => {
 			return cache.result.then((res) => {
 				return res.yrly.then(yrly => {
-					return assert.equal(6, yrly.values.length)
+					return yrly.valuesAll.then(values => {
+							return assert.equal(300, values.length)
+						})
 				})
 			})
 		})
 		it('a year', () => {
 			return cache.result.then((res) => {
 				return res.yrly.then(yrly => {
-					return yrly.values[0].then(year => {
-						return assert.equal(2019, year.x)
+					return yrly.values.then(years => {
+						return assert.equal(2019, year[0].x)
 					})
 				})
 			})

@@ -9,13 +9,31 @@ let replace = (req, a, b) => {
 	return req;
 }
 
-class baseline {
-	construct(specs){
+class Baseline {
+	constructor(){
+		this.cache = {};
+	}
+	getBaseline(specs){
+		let start = specs.baseline.start;
+		let end = specs.baseline.end;
+		if(undefined === this.cache[`${start}${end}`]){
+			this.cache[`${start}${end}`] = curl.curlProx({
+				start: new Date(specs.baseline.start,1,1),
+				end: new Date(specs.baseline.end,1,1),
+				url: specs.url,
+				type: specs.type,
+				station: specs.station
+			}).then(baseline => {
+				return baseline.reduce((a,b) => Object.assign(a, b));
+			})
+		}
+		return this.cache[`${start}${end}`]
 
 	}
 }
 
-let baselinePoint = undefined;
+let baselineContain = new Baseline();
+
 class Point {
 	static build(specs, full=false){
 		return curl.curlProx(specs, full).then(res => {
@@ -25,14 +43,7 @@ class Point {
 			}
 			if(!full) res = res.reduce((a,b) => Object.assign(a, b))
 
-			return curl.curlProx({
-				start: new Date(specs.baseline.start,1,1),
-				end: new Date(specs.baseline.end,1,1),
-				url: specs.url,
-				type: specs.type,
-				station: specs.station
-			}).then(baseline => {
-				baseline = baseline.reduce((a,b) => Object.assign(a, b));
+			return baselineContain.getBaseline(specs).then(baseline => {
 				Object.keys(baseline).forEach(key => {
 					res[key].baseline = baseline[key].avg	
 					res[key].diff = res[key].avg - baseline[key].avg	
@@ -61,8 +72,8 @@ class Point {
 		// this.y = req[type] === "" ? undefined : Number(req[type])
 		// if(req['avg_temperature']){
 		// }
-		if(req[`${this.type}`] == undefined){
-			if(req[`avg_${type}`] != undefined){
+		if(req[`${this.type}`] === undefined){
+			if(req[`avg_${type}`] !== undefined){
 				this.subType = 'avg';
 			}
 		}
@@ -71,9 +82,9 @@ class Point {
 			this.y = help.dayOfYear(date)
 			this.date = date;
 			if(help.isFirstHalfYear(date.getMonth())){
-				this.y += (((this.year-1) % 4 === 0 && (this.year-1) % 100 > 0) || (this.year) %400 == 0) ? 366 : 365;
+				this.y += (((this.year-1) % 4 === 0 && (this.year-1) % 100 > 0) || (this.year) %400 === 0) ? 366 : 365;
 			}
-		}else if(['co2_weekly'].includes(type) && this.y != undefined && !isNaN(this.y)){
+		}else if(['co2_weekly'].includes(type) && this.y !== undefined && !isNaN(this.y)){
 			this.req[type] = this.req[type].replace(' ', '')
 		}else{
 			this.date = this.x;
@@ -94,7 +105,7 @@ class Point {
 		this.splitDecade = this.splitYear - this.splitYear % 10 +1;
 	}
 	get 'x'(){
-		if(this.req.date != undefined) return this.req.date
+		if(this.req.date !== undefined) return this.req.date
 		return this.specs.start
 	}
 	'filter' (f){
@@ -122,15 +133,15 @@ class Point {
 	}
 	get 'y' (){
 		let y = this.req[`${this.type}`]
-		if(y == undefined) y = this.req[`${this.subType}${this.type}`];
+		if(y === undefined) y = this.req[`${this.subType}${this.type}`];
 
-		if(y == undefined && this.SUBTYPE == 'sum') y = this.req[`avg_${this.type}`][this.SUBTYPE] 
+		if(y === undefined && this.SUBTYPE === 'sum') y = this.req[`avg_${this.type}`][this.SUBTYPE]
 		if(typeof y == 'object') return Number(y[this.SUBTYPE])
 
 		return Number(y)
 	}
 	set 'subType' (subType){
-		if(subType == "mean") subType = 'avg'
+		if(subType === "mean") subType = 'avg'
 		if(subType){
 			this.SUBTYPE = `${subType}`
 		}else{
