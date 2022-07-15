@@ -1,6 +1,5 @@
 const help = require('climate-plots-helper');
 const regression = require("regression");
-const {PointFactory} = require('./factory.js')
 const {Point} = require('./point.js')
 const ByDateStruct = require('./parseByDateStruct.js');
 
