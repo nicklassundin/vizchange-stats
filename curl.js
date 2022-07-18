@@ -1,6 +1,6 @@
 
-let libcurl = require('node-libcurl');
-const { Curl } = libcurl;
+//let libcurl = require('node-libcurl');
+//const { Curl } = libcurl;
 // const { Curl, libcurl } = 
 // const WaitNotify = require('wait-notify');
 // const waitNotify = new WaitNotify();
@@ -9,6 +9,7 @@ const { Curl } = libcurl;
 // const host = `vischange.k8s.glimworks.se/data/query/v1`;
 //
 
+const axios = require('axios');
 
 
 
@@ -121,7 +122,7 @@ let parsePeriod = function(date){
 	let day = pad(date.getDate());
 	return `${year}${month}${day}`;
 }
-
+const totalProductsCount = 500;
 module.exports = {
 	preset: preset,
 	curlProx: function(specs, full = false){
@@ -149,10 +150,28 @@ module.exports = {
 		// ffsdfsd
 		//
 		if(full){
-			return module.exports.curl((host)+url) 
+			return module.exports.axios('https://'+(host)+url)
 		}else{
-			return module.exports.curl((host)+url+"&calculate") 
+			return module.exports.axios('https://'+(host)+url+"&calculate")
 		}
+	},
+	async axios(url){
+		return new Promise (async (resolve, reject) => {
+			try {
+				let currentItem = 1;
+				while (currentItem < (totalProductsCount + 1)) {
+					const product = await axios.get(url).then(res => {
+						return res.data
+					});
+					//fs.writeFileSync(`./product-${currentItem}.json`, JSON.stringify(product.data, null, 2));
+					currentItem++;
+					resolve(product)
+				}
+			} catch (e) {
+				reject(e)
+			}
+
+		})
 	},
 	// requests: 300,
 	curl: function(url) {

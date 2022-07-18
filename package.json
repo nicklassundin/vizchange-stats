@@ -5,7 +5,8 @@
   "main": "module.js",
   "scripts": {
     "test": "mocha --timeout 500000 './*.slow.spec.js'",
-    "test-quick": "mocha --timeout 50000 './*.quick.spec.js'"
+    "test-quick": "mocha --timeout 50000 './*.quick.spec.js'",
+    "webpack": "webpack --mode=development"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,7 @@
   "homepage": "https://github.com/nicklassundin/vizchange-stats#readme",
   "dependencies": {
     "assert": "^2.0.0",
+    "axios": "^0.27.2",
     "cli-progress": "^3.10.0",
     "climate-plots-helper": "^1.0.5",
     "mocha": "^9.2.1",
@@ -34,5 +36,11 @@
       "release",
       "beta"
     ]
+  },
+  "devDependencies": {
+    "https": "^1.0.0",
+    "https-browserify": "^1.0.0",
+    "webpack": "^5.73.0",
+    "webpack-cli": "^4.10.0"
   }
 }

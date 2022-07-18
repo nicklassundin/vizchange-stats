@@ -8,7 +8,7 @@ const help = require('climate-plots-helper')
  */
 const {Point} = require('./point.js')
 
-/**
+
 function ColorToHex(color) {
 	var hexadecimal = color.toString(16);
 	return hexadecimal.length === 1 ? "0" + hexadecimal : hexadecimal;
@@ -17,7 +17,6 @@ function ColorToHex(color) {
 function ConvertRGBtoHex(red, green, blue) {
 	return "#" + ColorToHex(red) + ColorToHex(green) + ColorToHex(blue);
 }
- */
 
 
 module.exports = class Struct {
@@ -187,6 +186,7 @@ module.exports = class Struct {
 
 		this.VALUES = this.VALUES.then(values => {
 			if(Object.keys(values).length > 0){
+				console.log("cached")
 				return values
 			}else{
 				return this.entry[`${key}s`].map(k => {

@@ -6,9 +6,51 @@ global.climateplots = {
 let specs = {
 	type: 'precipitation',
 	station: 'abisko',
+	baseline: {
+		'start': 1960,
+		'end': 1980
+	}
 }
 let configs = require('./stats/config.json')
 let cache = {}
+const assert = require('assert');
+describe('Request-full', function() {
+	before(function () {
+		let config = Object.assign(configs['full'],specs)
+		cache.fullresult = parser.temperature(config)
+	})
+	it.only('y', () => {
+		return cache.fullresult.then(all => {
+			return all.yrly.then(yrly => {
+				// console.log(yrly)
+				let y = 1.5903616882136928;
+				return assert.equal(yrly.y, y)
+			})
+		})
+	})
+	it.only('values', () => {
+		return cache.fullresult.then(res => {
+			return res.yrly.then(yrly => {
+				return yrly.values.then(values => {
+					return Promise.all(values).then(vals => {
+						return assert.equal(vals.length, 101)
+					})
+				})
+			})
+		})
+	})
+	it.only('value of index [0]', () => {
+		return cache.fullresult.then(res => {
+			return res.yrly.then(yrly => {
+				return yrly.values.then(values => {
+					return Promise.all(values).then(vals => {
+						return assert.equal(vals[0].x, 1920)
+					})
+				})
+			})
+		})
+	})
+})
 describe(
 	'Requests',
 	function() {

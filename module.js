@@ -7,10 +7,11 @@ const {parseByDate} = require('./stats/parseByDate.js')
  * TODO temporary hotfix
  */
 const constant = require("./stats/const.json");
+/**
 global.startYear = constant.startYear;
 global.baselineLower = constant.baselineLower;
 global.baselineUpper = constant.baselineUpper;
-
+*/
 // global.vizchangeStats = {
 // 	startYear: constant.startYear,
 // 	baselineLower: constant.baselineLower,
