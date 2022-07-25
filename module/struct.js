@@ -10,13 +10,13 @@ const {Point} = require('./point.js')
 
 
 function ColorToHex(color) {
-	var hexadecimal = color.toString(16);
+	let hexadecimal = color.toString(16);
 	return hexadecimal.length === 1 ? "0" + hexadecimal : hexadecimal;
 }
 
-function ConvertRGBtoHex(red, green, blue) {
-	return "#" + ColorToHex(red) + ColorToHex(green) + ColorToHex(blue);
-}
+//function ConvertRGBtoHex(red, green, blue) {
+//	return "#" + ColorToHex(red) + ColorToHex(green) + ColorToHex(blue);
+//}
 
 
 module.exports = class Struct {
@@ -39,9 +39,9 @@ module.exports = class Struct {
 				if(typeof specs.end != 'object'){
 					specs.end = new Date(specs.end+1,0,0)
 				}
-
 		}
-		return Point.build(specs, full).then(point => {
+
+		let poi = Point.build(specs, full).then(point => {
 			switch (type){
 				case 'first':
 					point = point.filter(f).first;
@@ -54,8 +54,9 @@ module.exports = class Struct {
 			if(point.ERROR){
 				return point.ERROR
 			}
-			return new Struct(point, specs, x, type)
+			return point
 		})
+		return new Struct(poi, specs, x, type, f)
 	}
 	constructor(point, specs, x = undefined, type = "mean", f) {
 
@@ -100,7 +101,7 @@ module.exports = class Struct {
 		switch (this.type) {
 			case "difference":
 				// this.entry.subType = this.type
-				this.Y = this.entry.difference;
+				this.Y = this.entry.then(() => this.difference);
 				break;
 			case "mean":
 				// this.Y = help.sum(this.values.map((each) => {
@@ -129,19 +130,23 @@ module.exports = class Struct {
 				// break;
 			case "sum":
 				// this.Y = help.sum(this.values.map((each) => each.y));
-				this.entry.subType = this.type
-				this.Y = this.entry.y
+				this.entry = this.entry.then((entry) => {
+					entry.subType = this.type;
+					return entry
+				})
+				this.Y = this.entry.then((entry) => entry.y)
 				break;
 			case "number":
 				if(typeof this.f == 'function' && this.values[0] instanceof Point){
-					this.values = this.values.filter(this.f)
+					// TODO check if works
+					this.values = this.values.then((value) => value.filter(this.f))
 				}
-				this.Y = this.values.length;
+				this.Y = this.values.then((value) => value.length);
 				break;
 			case "last":
 			case "first":
-				this.Y = this.entry.y
-				let values = this.entry.y;
+				this.Y = this.entry.then(entry => entry.y)
+				let values = this.Y;
 				if(!values.typeMeta){
 					let date = new Date(values.x);
 					this.typeMeta = {
@@ -186,14 +191,14 @@ module.exports = class Struct {
 
 		this.VALUES = this.VALUES.then(values => {
 			if(Object.keys(values).length > 0){
-				console.log("cached")
 				return values
 			}else{
-				return this.entry[`${key}s`].map(k => {
+				return this.entry.then(entry => {
+					return entry[`${key}s`].map(k => {
 					return this.getValues(JSON.parse(JSON.stringify(genSpecs)), key, k, values, this.type, this.f)
 				}).reduce((a,b) => {
 					return Object.assign(a,b)
-				})
+				})})
 			}
 		})
 		return this.VALUES.then(values => {
@@ -273,12 +278,8 @@ module.exports = class Struct {
 				type,
 				abs
 			)
-
 		} catch (error) {
-
 			throw error
-			return {"values": undefined};
-
 		}
 
 	}
@@ -332,20 +333,23 @@ module.exports = class Struct {
 		// }
 	}
 	"AVGTYPE" (type, f) {
-		let entry = this.entry.clone()
+		return this.entry.then((entry) => {
+
 		let seed = entry.getSeed();
 		if(entry.subType.length > 0){
 			seed.specs.type = `${entry.subType}${entry.type}`
 		}
-		let nEntry = new Point(seed.specs, seed.req)
-		return new Struct(nEntry, seed.specs, this.x, type, f)
+			let nEntry = new Point(seed.specs, seed.req)
+			return new Struct(nEntry, seed.specs, this.x, type, f)
+		})
+
 		// return res
 		// let res = new Struct([], this.x, type)
 		// res.values = this.values.map(each => each.short())
 		// return res.build(type)
 	}
 	"TYPE" (type, f) {
-		let res = new Struct(this.entry.clone(), this.specs, this.x, type, f)
+		let res = new Struct(this.entry.then(entry => entry.clone()), this.specs, this.x, type, f)
 		res.colored = this.colored;
 		res.color = this.color;
 		return res
@@ -483,7 +487,6 @@ module.exports = class Struct {
 
 			case "sum":
 				return this.count * variance(this.values.map((each) => each.y));
-				break;
 			default:
 				return variance(this.values.map((each) => each.y));
 
@@ -655,7 +658,12 @@ module.exports = class Struct {
 	}
 	"reInit" (type = this.type, lower = baselineLower, upper = baselineUpper, color) {
 		this.type = type;
+		// TODO use color
+		this.color = color;
 		// TODO insert lower and upper values
+		this.specs.baseline.start = lower;
+		this.specs.baseline.end = upper;
+		// END
 		if (this.values.length > 0) {
 			if (this.values[0].keys) {
 				this.keys = this.values[0].keys;

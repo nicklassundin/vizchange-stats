@@ -11,7 +11,7 @@ let specs = {
 		'end': 1980
 	}
 }
-let configs = require('./stats/config.json')
+let configs = require('./module/config.json')
 let cache = {}
 const assert = require('assert');
 describe('Request-full', function() {

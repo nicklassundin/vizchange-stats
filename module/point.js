@@ -34,6 +34,7 @@ class Baseline {
 
 let baselineContain = new Baseline();
 
+
 class Point {
 	static build(specs, full=false){
 		return curl.curlProx(specs, full).then(res => {
@@ -42,20 +43,22 @@ class Point {
 				'specs': specs
 			}
 			if(!full) res = res.reduce((a,b) => Object.assign(a, b))
-
-			return baselineContain.getBaseline(specs).then(baseline => {
-				Object.keys(baseline).forEach(key => {
-					res[key].baseline = baseline[key].avg	
-					res[key].diff = res[key].avg - baseline[key].avg	
-				})
-				// TODO cases
-				// first, last and numbers etc
-				if(full) return new Point(specs, res)
-				return new Point(specs, res);
-			})
+			return new Point(specs, res, full);
 		})
 	}
-	constructor(specs, req){
+	get 'diff' (){
+		return baselineContain.getBaseline(this.specs).then(baseline => {
+			Object.keys(baseline).forEach(key => {
+				this.req[key].baseline = baseline[key].avg
+				this.req[key].diff = this.req[key].avg - baseline[key].avg
+			})
+			// TODO cases
+			// first, last and numbers etc
+			return new Point(this.specs, this.req, this.full);
+		})
+	}
+	constructor(specs, req, full=false){
+		this.full = full;
 		this.specs = specs;
 		// this.subType = '';
 		this.type = specs.type;
@@ -78,7 +81,7 @@ class Point {
 			}
 		}
 		if(['breakup', 'freezeup'].includes(type)){
-			var date = new Date(req[type]);
+			let date = new Date(req[type]);
 			this.y = help.dayOfYear(date)
 			this.date = date;
 			if(help.isFirstHalfYear(date.getMonth())){
@@ -179,8 +182,7 @@ class Point {
 	get 'years' (){
 		let start = this.specs.start.getFullYear();
 		let end = this.specs.end.getFullYear();
-		let years = Array.from({length:(end-start)},(v,k)=>k+start)
-		return years
+		return Array.from({length: (end - start)}, (v, k) => k + start)
 	}
 	get 'month' (){
 		return this.x.getMonth();
@@ -211,23 +213,20 @@ class Point {
 	}
 	merge(other){
 		return Object.assign(true, {}, this, other);
-	}
+	}/*
 	equals(other){
-		return this.pos[0] == other.pos[0] && this.pos[1] == other.pos[1]  && this.x.getTime() == other.x.getTime() 
-	}
-	hash(){
-		return this.pos[0] +this.pos[1]+this.y+this.x.getTime()
+		return this.pos[0] === other.pos[0] && this.pos[1] === other.pos[1]  && this.x.getTime() === other.x.getTime()
 	}
 	eq(other){
 		return this.equals(other)
 	}
-	merge(point){
-		// TODO
-	}
+	hash(){
+		return this.pos[0] +this.pos[1]+this.y+this.x.getTime()
+	}*/
 	clone(){
 		return Object.assign(Object.create(Object.getPrototypeOf(this)), this)
 	}
-	'short' (type){
+	'short' (){
 		let next = {}
 		next.y = this.y
 		Object.keys(this).forEach(key => {

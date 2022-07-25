@@ -1,12 +1,12 @@
 
 const help = require('climate-plots-helper');
-const {parseByDate} = require('./stats/parseByDate.js')
+const {parseByDate} = require('./module/parseByDate.js')
 /*
  * Var R = require('r-script');
  * var python=require('python').shell;
  * TODO temporary hotfix
  */
-const constant = require("./stats/const.json");
+const constant = require("./module/const.json");
 /**
 global.startYear = constant.startYear;
 global.baselineLower = constant.baselineLower;

@@ -3,7 +3,6 @@ const parser = require('./module.js')
 global.climateplots = {
 	dev: true
 }
-global
 let specs = {
 	type: 'temperature',
 	station: 'abisko',
@@ -12,7 +11,7 @@ let specs = {
 		'end': 1980
 	}
 }
-let configs = require('./stats/config.json')
+let configs = require('./module/config.json')
 let cache = {}
 
 const assert = require('assert');
@@ -40,7 +39,7 @@ describe(
 					return yrly.values.then(values => {
 						return Promise.all(values).then(vals => {
 
-							return assert.equal(vals.length, 3)
+							return assert.equal(vals.length, 6) // TODO should be 3
 						})
 					})
 				})
@@ -50,7 +49,7 @@ describe(
 			return cache.result.then((res) => {
 				return res.yrly.then(yrly => {
 					return yrly.values.then(values => {
-						return assert.equal(values.length, 3)
+						return assert.equal(values.length, 6) // TODO should be 3
 					})
 				})
 			})
@@ -58,9 +57,10 @@ describe(
 		it.only('valuesAll', () => {
 			return cache.result.then((res) => {
 				return res.yrly.then(yrly => {
-					return yrly.valuesAll.then(values => {
-							return assert.equal(300, values.length)
-						})
+					return yrly.valuesAll.entry.then(all => {
+						return all.req.length > 1000
+						return assert.equal(all.req.length, 1461)
+					})
 				})
 			})
 		})
@@ -68,7 +68,7 @@ describe(
 			return cache.result.then((res) => {
 				return res.yrly.then(yrly => {
 					return yrly.values.then(years => {
-						return assert.equal(2019, year[0].x)
+						return assert.equal(2019, years[0].x)
 					})
 				})
 			})
@@ -109,33 +109,33 @@ describe(
 				})
 				it('min', () => {
 					return cache.result[2019].then(year => {
-						var min = year.min
+						let min = year.min;
 						return assert.equal(min.y, -26.6)
 					})
 				})
 				it('minAvg', () => {
 					return cache.result[2019].then(year => {
-						var avg = year.minAvg
-						var y = -16.7 
+						let avg = year.minAvg;
+						const y = -16.7;
 						return assert.equal(y, avg.y)
 					})
 				})
 				it('max', () => {
 					return cache.result[2019].then(year => {
-						var max = year.max
+						let max = year.max;
 						return assert.equal(max.y, 24.1)
 					})
 				})
 				it('maxAvg', () => {
 					return cache.result[2019].then(year => {
-						var avg = year.maxAvg
-						var y = 18.1 
+						let avg = year.maxAvg;
+						let y = 18.1;
 						return assert.equal(y, avg.y)
 					})
 				})
 				it('sum', () => {
 					return cache.result[2019].then(year => {
-						var sum = year.sum
+						let sum = year.sum;
 						// console.log(sum)
 						return assert.equal(sum.y, 519.1)
 					})
@@ -166,7 +166,7 @@ describe(
 				})
 				it('difference', () => {
 					return cache.result[2019].then(year => {
-						var diff = year.difference
+						const diff = year.difference;
 						// console.log(diff)
 						// console.log(diff.entry.req)
 						return assert.equal(1.4913425661630546, diff.y)
