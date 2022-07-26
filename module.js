@@ -50,4 +50,5 @@ module.exports = {
 	"co2_weekly" (specs){
 		return parseByDate(specs)
 	},
+	"configs": require('./config')
 };

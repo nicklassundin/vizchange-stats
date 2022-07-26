@@ -1,0 +1,80 @@
+{
+	"live": {
+		"baseline": {
+			"start": 1970,
+			"end": 1980
+		},
+		"dates": {
+			"start": 1910,
+			"end": 2025
+		},
+		"url": "staging-devop-deploy-vischange.k8s.glimworks.se/data/query/v1"
+	},
+	"xsLive": {
+		"baseline": {
+			"start": 1970,
+			"end": 1980
+		},
+		"dates": {
+			"start": 2018,
+			"end": 2030
+		},
+		"url": "staging-devop-deploy-vischange.k8s.glimworks.se/data/query/v1"
+	},
+	"empty": {
+		"baseline": {
+			"start": 1970,
+			"end": 1980
+		},
+		"dates": {
+			"start": 1910,
+			"end": 1920
+		},
+		"url": "staging-devop-deploy-vischange.k8s.glimworks.se/data/query/v1"
+	},
+	"debug": {
+		"baseline": {
+			"start": 1970,
+			"end": 1980
+		},
+		"dates": {
+			"start": 1970,
+			"end": 1974
+		},
+		"url": "localhost/debug/data/query/v1/test",
+		"debug": true
+	},
+	"multi": {
+		"baseline": {
+			"start": 1970,
+			"end": 1980
+		},
+		"dates": {
+			"start": 1970,
+			"end": 1974
+		},
+		"url": "localhost/debug/data/query/v1/test"
+	},
+	"xsProduction": {
+		"baseline": {
+			"start": 1970,
+			"end": 1980
+		},
+		"dates": {
+			"start": 2018,
+			"end": 2030
+		},
+		"url": "vischange.k8s.glimworks.se/data/query/v1"
+	},
+	"production": {
+		"baseline": {
+			"start": 1970,
+			"end": 1980
+		},
+		"dates": {
+			"start": 1910,
+			"end": 2025
+		},
+		"url": "vischange.k8s.glimworks.se/data/query/v1"
+	}
+}
