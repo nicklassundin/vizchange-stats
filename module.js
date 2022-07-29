@@ -20,6 +20,37 @@ global.baselineUpper = constant.baselineUpper;
 //
 
 module.exports = {
+	getByParams: function (specs, params){
+		return this.recursive(params, this[params[0]](specs))
+	},
+	"recursive": function(params, data, index = 1){
+		if(params.length - index <= 1){
+			if(typeof data.then === 'function'){
+				return data.then(function(results){
+					if(Array.isArray(results)){
+						return Promise.all(results).then(function(values){
+							return values[params[index]]
+						})
+					}
+					return results[params[index]]
+				})
+			}
+			if(typeof data.then === 'function'){
+				return data.then(function(results){
+					return results[params[index]]
+				})
+			}
+			return data[params[index]];
+		}else if(typeof data.then === 'function'){
+			return data.then(function(values){
+				return module.exports.recursive(params, values[params[index]], index+1)
+			})
+		}else if(typeof data === 'function'){
+			return module.exports.recursive(params, data(params[index]), index+1)
+		}else{
+			return module.exports.recursive(params, data[params[index]], index+1)
+		}
+	},
 	"temperature" (specs) {
 		return parseByDate(specs)
 	},
