@@ -130,7 +130,7 @@ describe(
                         })
                     })
                 })
-                it.only('empty', () => {
+                it('empty', () => {
                     return cache.result[2025].then(year => {
                         console.log(year.y)
                         return assert.equal(year.y, undefined)
