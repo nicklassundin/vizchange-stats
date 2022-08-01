@@ -5,7 +5,7 @@
   "main": "module.js",
   "scripts": {
     "test": "mocha --timeout 30000 './*.quick.spec.js'",
-    "test-slow": "mocha --timeout 5§00000 './*.slow.spec.js'",
+    "test-slow": "mocha --timeout 500000 './*.slow.spec.js'",
     "test-quick": "mocha --timeout 5000 './*.quick.spec.js'",
     "webpack": "webpack --mode=development"
   },
