@@ -51,35 +51,46 @@ module.exports = {
 			return module.exports.recursive(params, data[params[index]], index+1)
 		}
 	},
+	getStruct: function(specs, type = undefined) {
+		if(this.cache[specs.station] === undefined){
+			this.cache[specs.station] = {}
+		}
+		if(this.cache[specs.station][specs.type] === undefined){
+			this.cache[specs.station][specs.type] = {}
+		}
+		this.cache[specs.station][specs.type] = parseByDate(specs, type)
+		return this.cache[specs.station][specs.type].then((value) => { return value})
+	},
+	cache: {},
 	"temperature" (specs) {
-		return parseByDate(specs)
+		return this.getStruct(specs)
 	},
 	"precipitation" (specs) {
-		return parseByDate(specs, 'sum')
+		return this.getStruct(specs, 'sum')
 	},
 	// "growingSeason" (specs) {
 	// return parseByDate(specs) 
 	// },
 	"snowdepth_single" (specs) {
-		return parseByDate(specs)
+		return this.getStruct(specs)
 	},
 	"complete_ice_cover" (specs) {
-		return parseByDate(specs)
+		return this.getStruct(specs)
 	},
 	"perma" (specs) {
-		return parseByDate(specs)
+		return this.getStruct(specs)
 	},
 	"icetime" (specs) {
-		return parseByDate(specs)
+		return this.getStruct(specs)
 	},
 	"breakup" (specs) {
-		return parseByDate(specs)
+		return this.getStruct(specs)
 	},
 	"freezeup" (specs) {
-		return parseByDate(specs)
+		return this.getStruct(specs)
 	},
 	"co2_weekly" (specs){
-		return parseByDate(specs)
+		return this.getStruct(specs)
 	},
 	"configs": require('./config')
 };

@@ -37,6 +37,22 @@ describe(
                     return assert.equal(values, 2019)
                 })
             })
+            it('multiple', function () {
+                let params = ['temperature', 'yrly', 'y'];
+                let config = Object.assign(configs['latest'], specs)
+                return Promise.all([parser.getByParams(config, params),
+                    parser.getByParams(config, params)]).then(values => {
+                    return assert.equal(values[0], values[1])
+                })
+            })
+            it('cached', function () {
+                let params = ['temperature', 'yrly', 'y'];
+                let config = Object.assign(configs['latest'], specs)
+                parser.getByParams(config, params)
+                return parser.cache['abisko']['temperature'].then(values => {
+                    return values
+                })
+            })
         })
         describe.only('functionality', function () {
             it('y', () => {
