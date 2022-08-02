@@ -11,12 +11,12 @@ let specs = {
 		'end': 1980
 	}
 }
-let configs = require('./module/config.json')
+let configs = require('./config.json')
 let cache = {}
 const assert = require('assert');
 describe('Request-full', function() {
 	before(function () {
-		let config = Object.assign(configs['full'],specs)
+		let config = Object.assign(configs['production'],specs)
 		cache.fullresult = parser.temperature(config)
 	})
 	it.only('y', () => {

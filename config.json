@@ -76,5 +76,16 @@
 			"end": 2025
 		},
 		"url": "vischange.k8s.glimworks.se/data/query/v1"
+	},
+	"latest": {
+		"dates": {
+			"start": 2019,
+			"end": 2025
+		},
+		"baseline": {
+			"start": 1970,
+			"end": 1980
+		},
+		"url": "vischange.k8s.glimworks.se/data/query/v1"
 	}
 }

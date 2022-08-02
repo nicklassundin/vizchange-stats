@@ -11,7 +11,7 @@ let specs = {
         'end': 1980
     }
 }
-let configs = require('./module/config.json')
+let configs = require('./config.json')
 let cache = {}
 
 const assert = require('assert');

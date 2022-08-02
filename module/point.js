@@ -109,7 +109,7 @@ class Point {
 	}
 	get 'x'(){
 		if(this.req.date !== undefined) return this.req.date
-		return this.specs.start
+		return this.specs.dates.start
 	}
 	'filter' (f){
 		this.req = this.req.filter((x) => {
@@ -180,8 +180,8 @@ class Point {
 		return `${this.year}-${this.x.month+1}-${this.x.getDate()}`
 	}
 	get 'years' (){
-		let start = this.specs.start.getFullYear();
-		let end = this.specs.end.getFullYear();
+		let start = this.specs.dates.start.getFullYear();
+		let end = this.specs.dates.end.getFullYear();
 		return Array.from({length: (end - start)}, (v, k) => k + start)
 	}
 	get 'month' (){
@@ -194,8 +194,8 @@ class Point {
 		return help.dayOfYear(this.x)
 	}
 	get 'DOYs' (){
-		let start = help.dayOfYear(this.specs.start)
-		let end = help.dayOfYear(this.specs.end)
+		let start = help.dayOfYear(this.specs.dates.start)
+		let end = help.dayOfYear(this.specs.dates.end)
 		return [...Array(end-start).keys()].map(v => (v+start));
 	}
 	get '30periodyear' (){

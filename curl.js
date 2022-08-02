@@ -128,8 +128,8 @@ module.exports = {
 	curlProx: function(specs, full = false){
 		var station = specs.station;
 		var dates = {
-			start: specs.start,
-			end: specs.end
+			start: specs.dates.start,
+			end: specs.dates.end
 		}
 		var host = specs.url;
 		var type = specs.type

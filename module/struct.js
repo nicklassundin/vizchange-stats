@@ -23,21 +23,21 @@ module.exports = class Struct {
 	static build(specs, x, type, f, full=false){
 		switch (specs.key) {
 			case 'month':
-				if(typeof specs.start != 'object'){
-					specs.start = new Date(specs.start,0,1)
+				if(typeof specs.dates.start != 'object'){
+					specs.dates.start = new Date(specs.dates.start,0,1)
 				}
 				if(typeof specs.end != 'object'){
-					specs.end = new Date(specs.end+1,0,0)
+					specs.dates.end = new Date(specs.dates.end+1,0,0)
 				}
 				break;
 			case 'year':
 			case 'DOY':
 			default:
-				if(typeof specs.start != 'object'){
-					specs.start = new Date(specs.start,0,1)
+				if(typeof specs.dates.start != 'object'){
+					specs.dates.start = new Date(specs.dates.start,0,1)
 				}
-				if(typeof specs.end != 'object'){
-					specs.end = new Date(specs.end+1,0,0)
+				if(typeof specs.dates.end != 'object'){
+					specs.dates.end = new Date(specs.dates.end+1,0,0)
 				}
 		}
 
@@ -180,8 +180,8 @@ module.exports = class Struct {
 		return this.POINT[0]
 	}*/
 	async getValues (specs, key, k, values, type, f, full) {
-		specs.start = k;
-		specs.end = k;
+		specs.dates.start = k;
+		specs.dates.end = k;
 		values[k] = Struct.build(specs, k, type, f, full);
 		return values;
 	}
