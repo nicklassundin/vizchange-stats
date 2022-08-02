@@ -4,7 +4,7 @@
   "description": "stats object module for vizchange.net",
   "main": "module.js",
   "scripts": {
-    "test": "mocha --timeout 5000 './*.quick.spec.js'",
+    "test": "mocha --timeout 10000 './*.quick.spec.js'",
     "test-slow": "mocha --timeout 500000 './*.slow.spec.js'",
     "test-quick": "mocha --timeout 5000 './*.quick.spec.js'",
     "webpack": "webpack --mode=development"
