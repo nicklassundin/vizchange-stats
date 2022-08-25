@@ -81,7 +81,6 @@ describe(
                     return res.yrly.then(yrly => {
                         return yrly.values.then(values => {
                             return Promise.all(values).then(vals => {
-
                                 return assert.equal(vals.length, 6) // TODO should be 3
                             })
                         })

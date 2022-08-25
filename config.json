@@ -77,6 +77,17 @@
 		},
 		"url": "vischange.k8s.glimworks.se/data/query/v1"
 	},
+	"productionRedirect": {
+		"baseline": {
+			"start": 1970,
+			"end": 1980
+		},
+		"dates": {
+			"start": 1910,
+			"end": 2025
+		},
+		"url": "vizchange.hopto.org/data/query/v1"
+	},
 	"latest": {
 		"dates": {
 			"start": 2019,

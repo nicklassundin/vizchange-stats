@@ -155,7 +155,9 @@ module.exports = {
 			return module.exports.axios('https://'+(host)+url+"&calculate")
 		}
 	},
+	number: 0,
 	async axios(url){
+		this.number += 1;
 		return new Promise (async (resolve, reject) => {
 			try {
 				let currentItem = 1;
