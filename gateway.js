@@ -171,9 +171,12 @@ module.exports = {
 	async axios(url){
 		this.number += 1;
 		let path = `debug/${url.split('/').join('')}.json`;
+
+		/*
 		if(fs.existsSync(path)){
 			return require('./'+path)
 		}
+		/* */
 
 		return new Promise (async (resolve, reject) => {
 			try {
@@ -181,7 +184,7 @@ module.exports = {
 				while (currentItem < (totalProductsCount + 1)) {
 					const product = await axios.get(url).then(res => {
 
-						/*  TODO automatically write this when debugging is enabled */
+						/*  TODO automatically write this when debugging is enabled
 						let fs = require('fs');
 						fs.writeFile(`debug/${url.split('/').join('')}.json`, JSON.stringify(res.data), (error) => {
 							if(error) throw error

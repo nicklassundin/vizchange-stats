@@ -122,35 +122,40 @@ describe(
                     let params = ['precipitation', 'yrlyFull', 'changeY', 'snow', 'y']
                     let config = Object.assign(configs['latest'], precipitation_specs)
                     return parser.getByParams(config, params).then(values => {
-                        return assert.equal(values, 308)
+                        return assert.ok(Math.abs(values-308) < 0.00001)
+                        //return assert.equal(values, 308)
                      })
                 })
                 it('values - total', () => {
                     let params = ['precipitation', 'yrlyFull', 'values', 1, 'y']
                     let config = Object.assign(configs['latest'], precipitation_specs)
                     return parser.getByParams(config, params).then(values => {
-                        return assert.equal(values,399.2999999999999)
+                        return assert.ok(Math.abs(values - 399.3) < 0.0001 )
+                        //return assert.equal(values,399.2999999999999)
                     })
                 })
                 it('values - snow', () => {
                     let params = ['precipitation', 'yrlyFull', 'changeY', 'snow', 'values', 1, 'y']
                     let config = Object.assign(configs['latest'], precipitation_specs)
                     return parser.getByParams(config, params).then(values => {
-                        return assert.equal(values,132.8)
+                        return assert.ok(Math.abs(values - 132.8) < 0.0001 )
+                      //  return assert.equal(values,132.8)
                     })
                 })
                 it('values - rain', () => {
                     let params = ['precipitation', 'yrlyFull', 'changeY', 'rain', 'values', 1, 'y']
                     let config = Object.assign(configs['latest'], precipitation_specs)
                     return parser.getByParams(config, params).then(values => {
-                        return assert.equal(values,266.49999999999994)
+                        return assert.ok(Math.abs(values - 266.5) < 0.0001 )
+                      //  return assert.equal(values,266.49999999999994)
                     })
                 })
                 it('shortValues', () => {
                     let params = ['precipitation', 'yrlyFull', 'changeY', 'snow', 'shortValues', 1, 'y']
                     let config = Object.assign(configs['latest'], precipitation_specs)
                     return parser.getByParams(config, params).then(values => {
-                        return assert.equal(values, 132.8)
+                        return assert.ok(Math.abs(values - 132.8) < 0.0001 )
+                       // return assert.equal(values, 132.8)
                     })
                 })
             })
