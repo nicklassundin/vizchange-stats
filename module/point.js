@@ -1,5 +1,5 @@
 const help = require('climate-plots-helper');
-const curl = require('../curl.js')
+const curl = require('../gateway.js')
 
 let replace = (req, a, b) => {
 	if(req[a]){
@@ -17,9 +17,11 @@ class Baseline {
 		let start = specs.baseline.start;
 		let end = specs.baseline.end;
 		if(undefined === this.cache[`${start}${end}`]){
-			this.cache[`${start}${end}`] = curl.curlProx({
-				start: new Date(specs.baseline.start,1,1),
-				end: new Date(specs.baseline.end,1,1),
+			this.cache[`${start}${end}`] = curl.proxRequest({
+				dates: {
+					start: new Date(specs.baseline.start,1,1),
+					end: new Date(specs.baseline.end,1,1),
+				},
 				url: specs.url,
 				type: specs.type,
 				station: specs.station
@@ -28,16 +30,48 @@ class Baseline {
 			})
 		}
 		return this.cache[`${start}${end}`]
-
 	}
 }
 
 let baselineContain = new Baseline();
 
+class PointReq {
+	static build(requests){
+		let result = {}
+		requests.forEach(req => {
+			if(typeof result[`${req.date}${req.position}`] !== 'object') result[`${req.date}${req.position}`] = {}
+			Object.assign(result[`${req.date}${req.position}`], req)
+		})
+		return Object.values(result).map(each => new PointReq(each))
+	}
+	constructor(request){
+		this.request = request;
+
+		request = replace(request,'glob_temp', 'temperature')
+		request = replace(request,'64n-90n_temp', 'temperature')
+		request = replace(request,'nhem_temp', 'temperature')
+		Object.keys(request).forEach((key) => {
+			this[key] = request[key];
+		})
+		if(typeof this['avg_temperature'] === 'object'){
+
+		}else if(Object.keys(this).includes('avg_temperature') && Object.keys(this).includes('precipitation')){
+			this.snow = (this['avg_temperature'] > 0) ? 0 : Number(this['precipitation'])
+			this.rain = (this['avg_temperature'] <= 0) ? 0 : Number(this['precipitation'])
+		}
+	}
+	get "keys" (){
+		if(Array.isArray(this.request)){
+			return Object.keys(this.request.reduce((a, b) => Object.assign(a, b)))
+		}else{
+			return Object.keys(this.request)
+		}
+	}
+}
 
 class Point {
 	static build(specs, full=false){
-		return curl.curlProx(specs, full).then(res => {
+		return curl.proxRequest(specs, full).then(res => {
 			if(res.length < 1) return {
 				'ERROR': new Error('empty result'),
 				'specs': specs
@@ -46,39 +80,26 @@ class Point {
 			return new Point(specs, res, full);
 		})
 	}
-	get 'diff' (){
-		return baselineContain.getBaseline(this.specs).then(baseline => {
-			Object.keys(baseline).forEach(key => {
-				this.req[key].baseline = baseline[key].avg
-				this.req[key].diff = this.req[key].avg - baseline[key].avg
-			})
-			// TODO cases
-			// first, last and numbers etc
-			return new Point(this.specs, this.req, this.full);
-		})
-	}
 	constructor(specs, req, full=false){
 		this.full = full;
 		this.specs = specs;
+		if(typeof this.specs.dates.start === 'string'){
+			this.specs.dates.start = new Date(this.specs.dates.start)
+			this.specs.dates.end = new Date(this.specs.dates.end)
+		}
 		// this.subType = '';
 		this.type = specs.type;
+		this.subType = specs.subType
 		let type = this.type;
 		// this.pos = req.position
-		req = replace(req,'glob_temp', 'temperature')
-		req = replace(req,'64n-90n_temp', 'temperature')
-		req = replace(req,'nhem_temp', 'temperature')
+		//req = replace(req,'glob_temp', 'temperature')
+		//req = replace(req,'64n-90n_temp', 'temperature')
+		//req = replace(req,'nhem_temp', 'temperature')
 		if(typeof req[type] == 'string' && req[type].length < 1) req[type] = undefined
-		this.req = req;
-
-
-		// this.x = specs.start
-		// this.y = req[type] === "" ? undefined : Number(req[type])
-		// if(req['avg_temperature']){
-		// }
-		if(req[`${this.type}`] === undefined){
-			if(req[`avg_${type}`] !== undefined){
-				this.subType = 'avg';
-			}
+		if(full){
+			this.req = PointReq.build(req);
+		}else{
+			this.req = new PointReq(req);
 		}
 		if(['breakup', 'freezeup'].includes(type)){
 			let date = new Date(req[type]);
@@ -107,44 +128,107 @@ class Point {
 		}
 		this.splitDecade = this.splitYear - this.splitYear % 10 +1;
 	}
+	'dateSlice' (start, end) {
+		let req = this.req;
+		if(Array.isArray(req)){
+			req = req.filter((e) => {
+				return (e.date > start) && (e.date < end)
+			})
+			return new Point(this.specs, req, this.full)
+		}else{
+			if((this.specs.dates.start > start) && (this.specs.dates.end < end)){
+				return this
+			}else{
+				return NaN
+			}
+		}
+	}
 	get 'x'(){
-		if(this.req.date !== undefined) return this.req.date
-		return this.specs.dates.start
+		let date = this.req.date
+		if(date === undefined){
+			date = this.specs.dates.start;
+		}
+		if(typeof date === 'string') return new Date(date);
+		return date
 	}
 	'filter' (f){
-		this.req = this.req.filter((x) => {
-			return f(Number(x[this.type]))
+		let req = JSON.parse(JSON.stringify(this.req)).filter((x) => {
+			switch (this.SUBTYPE){
+				case 'first':
+				case 'last':
+					return f(Number(x[`${this.specs.parentType}_${this.type}`]))
+				default:
+					return f(Number(x[`${this.subType}${this.type}`]))
+			}
 		});
-		return this
+		return new Point(this.specs, req, this.full)
 	}
 	get 'first'(){
-		this.req.sort((a, b) => {
+		let req = this.req.sort((a, b) => {
 			return (new Date(a.date).getTime()) - (new Date(b.date).getTime())
-		})
-		this.req = this.req[0]
-		return this
+		})[0]
+		req[`${this.subType}${this.type}`] = req[`${this.specs.parentType}_${this.type}`]
+		return new Point(this.specs, req, false)
 	}
 	get 'last'(){
-		this.req.sort((a, b) => {
+		let req = this.req.sort((a, b) => {
 			return (new Date(a.date).getTime()) - (new Date(b.date).getTime())
+		})[this.req.length-1]
+		req[`${this.subType}${this.type}`] = req[`${this.specs.parentType}_${this.type}`]
+		return new Point(this.specs, req, false)
+	}
+	get 'difference' (){
+		return baselineContain.getBaseline(this.specs).then(baseline => {
+
+			let req = Object.assign(Object.create(Object.getPrototypeOf(this.req)), this.req)
+			Object.keys(baseline).forEach(key => {
+				req[key].baseline = baseline[key].avg
+				req[key].difference = this.req[key].avg - baseline[key].avg
+			})
+			return new Point(this.specs, req, this.full)
 		})
-		this.req = this.req[this.req.length-1]
-		return this
 	}
 	set 'y' (val){
 		this.req[`${this.subType}${this.type}`] = val
 	}
-	get 'y' (){
-		let y = this.req[`${this.type}`]
-		if(y === undefined) y = this.req[`${this.subType}${this.type}`];
-
-		if(y === undefined && this.SUBTYPE === 'sum') y = this.req[`avg_${this.type}`][this.SUBTYPE]
+	'getY'(req = this.req){
+		// TODO stream line this
+		switch (this.SUBTYPE){
+			case 'difference':
+				return req[`${this.specs.parentType}_${this.type}`].difference
+			default:
+		}
+		let y = req[`${this.type}`]
+		if(y === undefined) y = req[`${this.subType}${this.type}`];
+		if(y === undefined && this.SUBTYPE === 'sum') y = req[`avg_${this.type}`]
 		if(typeof y == 'object') return Number(y[this.SUBTYPE])
-
 		return Number(y)
 	}
+	get 'y' (){
+		if(this.full){
+			switch(this.SUBTYPE){
+				case 'sum':
+					return this.req.map(each => this.getY(each)).filter(y => y !== undefined && !isNaN(y)).reduce((a,b) => a + b)
+				case 'avg':
+					return this.req.map(each => this.getY(each)).filter(y => y !== undefined && !isNaN(y)).reduce((a,b) => a + b)/this.req.length
+				case 'min':
+					return Math.min(this.req.map(each => this.getY(each))).filter(y => y !== undefined && !isNaN(y))
+				case 'max':
+					return Math.max(this.req.map(each => this.getY(each))).filter(y => y !== undefined && !isNaN(y))
+				case 'last':
+				case 'first':
+					return this.getY(this.req[0]);
+				case 'difference':
+					return this.difference
+				default:
+					return this.req.map(each => this.getY(each))
+
+			}
+		}else{
+			return this.getY()
+		}
+	}
 	set 'subType' (subType){
-		if(subType === "mean") subType = 'avg'
 		if(subType){
 			this.SUBTYPE = `${subType}`
 		}else{
@@ -170,8 +254,15 @@ class Point {
 	get 'sum' (){
 		return this.TYPE('sum')
 	}
-	get 'difference' (){
-		return this.TYPE('diff')
+	"changeY" (type) {
+		let specs = JSON.parse(JSON.stringify(this.specs));
+		specs.type = type
+		let req = JSON.parse(JSON.stringify(this.req));
+		if(Array.isArray(req)){
+			return new Point(specs, req, this.full)
+		}
+		if(isNaN(this.req[type])) return NaN
+		return new Point(specs, this.req, this.full)
 	}
 	get 'year' (){
 		return this.x.getFullYear();
@@ -204,13 +295,6 @@ class Point {
 	get '30period' (){
 		return `${this['30periodyear']-this.century}-${this['30periodyear']-this.century+29}`
 	}
-	get 'snow'(){
-		this.req.snow = (this.req['avg_temperature'] > 0) ? 0 : Number(this.req['precipitation'])
-		return new Point(this.req, 'snow'); 
-	}
-	get 'rain'(){
-		this.req.rain = (this.req['avg_temperature'] <= 0) ? 0 : Number(this.req['precipitation'])
-	}
 	merge(other){
 		return Object.assign(true, {}, this, other);
 	}/*
@@ -224,7 +308,7 @@ class Point {
 		return this.pos[0] +this.pos[1]+this.y+this.x.getTime()
 	}*/
 	clone(){
-		return Object.assign(Object.create(Object.getPrototypeOf(this)), this)
+		return new Point(this.specs, this.req, this.full)
 	}
 	'short' (){
 		let next = {}

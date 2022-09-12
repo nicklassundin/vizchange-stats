@@ -2,18 +2,18 @@ const Struct = require('./struct.js');
 const help = require('climate-plots-helper');
 // const keys = Object.keys(values[0]),
 module.exports = class ByDateStruct {
-	constructor(type = mean, custom, specs) {
+	constructor(type = 'avg', custom, specs) {
 		this.specs = specs;
 		this.type = type;
 		this.values = {};
 		this.parsed = {};
 		this.years = {};
 	}
-	"insert" (kn, ...k) {
+	"insert"(full, kn, ...k) {
 		let specs = this.specs;
 		specs.keys = k
 		let type = this.type;
-		return  Struct.build(specs, kn, type)
+		return Struct.build(specs, kn, type, undefined, full)
 		// return (entry) => {
 			// k = k.map(key => {
 				// if(entry[key] != undefined) return entry[key]
@@ -128,14 +128,12 @@ module.exports = class ByDateStruct {
 						let lngth = Object.keys(this.values[key]).length
 						let lkey = Object.keys(this.values[key])[lngth-1];
 						delete this.values[key][lkey]
+						res(this.values[key])
+						break;
 					case "yrly":
-						// console.log(this.values[key])
 					case "months":
 					case "weeks":
-						res(this.values[key]);
-						break;
 					case "yrlyFull":
-						this.values[key] = new Struct(this.values, key, type)
 						res(this.values[key]);
 						break;
 					case "dailyExtremeHigh":
@@ -170,8 +168,8 @@ module.exports = class ByDateStruct {
 							// This.values[key] = (y.max ? y.max : y.total).occurrence((e) => 30 < e);
 							this.values[key] = y.total
 								? y.total
-								: y,
-								res(this.values[key]);
+								: y
+							res(this.values[key]);
 
 						});
 						break;
@@ -395,17 +393,13 @@ module.exports = class ByDateStruct {
 "parse" (key) {
 	// console.log(key)
 	if(!this.values[key]){
-		let startTime = (new Date()).getTime();
+		(new Date()).getTime();
 		switch (key) {
 			case 'all':
-				this.insert('all')(entry)
+				this.insert(false, 'all')(entry)
 				break;
 			case 'yrly': 
-				this.values[key] = this.insert(
-					"yrly",
-					'year',
-					'DOY'
-				)
+				this.values[key] = this.insert(false, "yrly", 'year', 'DOY')
 				break
 			case 'summer':
 			case 'winter':
@@ -413,79 +407,34 @@ module.exports = class ByDateStruct {
 			case 'spring':
 				// TODO should cahnge to 'season' [season], year 
 				// to match decasdes and others
-				this.insert(
-					false,
-					'season',
-					'year'
-					// ,entry.DOY
-				)(entry);
+				this.insert(false, false, 'season', 'year')(entry);
 				break;
 			case 'decades':
-				this.insert("decades",
-					'decade',
-					'year'
-					// ,entry.DOY
-				)(entry);
+				this.insert(false, "decades", 'decade', 'year')(entry);
 				break;
 			case 'splitDecades':
-				this.insert(key,
-					'allTime',
-					'splitMonth'
-				)(entry);
-				this.insert(key,
-					'splitDecade',
-					'splitMonth'
-				)(entry);
+				this.insert(false, key, 'allTime', 'splitMonth')(entry);
+				this.insert(false, key, 'splitDecade', 'splitMonth')(entry);
 				break;
 			case '30period':
-				this.insert(key, 
-					'allTime',
-					'splitMonth'
-				)(entry)
-				this.insert(key, 
-					'30periodyear',
-					'splitMonth'
-				)(entry)
+				this.insert(false, key, 'allTime', 'splitMonth')(entry)
+				this.insert(false, key, '30periodyear', 'splitMonth')(entry)
 				break;
 			case 'yrlySplit':
 				var splitDOY = ((year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0)) ? 366 : 365) + entry.DOY;
-				this.insert(
-					"yrlySplit",
-					// key,
-					entry.splitYear,
-					(entry.splitYear === entry.year ? entry.DOY : splitDOY)
-				)(entry);
+				this.insert(false, "yrlySplit", entry.splitYear, (entry.splitYear === entry.year ? entry.DOY : splitDOY))(entry);
 				break;
 			case 'yrlyFull':
-				this.insert(
-					"yrlyFull",
-					entry.decade,
-					entry.monthName
-				)(entry);
+				this.values[key] = this.insert(true, "yrlyFull", "year");
 				break;
 			case 'monthly':
-				this.insert(
-					"monthly",
-					entry.monthName,
-					// key,
-					entry.year
-				)(entry);
+				this.insert(false, "monthly", entry.monthName, entry.year)(entry);
 				break
 			case 'weeks':
-				this.insert(
-					"weeks",
-					// key,
-					entry.year,
-					entry.week
-				)(entry);
+				this.insert(false, "weeks", entry.year, entry.week)(entry);
 				break;
 			case 'months':
-				this.insert(
-					"months",
-					// key,
-					entry.year,
-					entry.monthName
-				)(entry);
+				this.insert(false, "months", entry.year, entry.monthName)(entry);
 				break;
 			case 'custom':
 				if (this.custom) {
@@ -512,6 +461,7 @@ module.exports = class ByDateStruct {
 					}
 
 				}
+				break;
 			case 'default':
 				break;
 		}

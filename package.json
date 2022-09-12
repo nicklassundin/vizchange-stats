@@ -27,6 +27,7 @@
   "dependencies": {
     "assert": "^2.0.0",
     "axios": "^0.27.2",
+    "axios-cache-interceptor": "^0.10.7",
     "cli-progress": "^3.10.0",
     "climate-plots-helper": "^1.0.5",
     "mocha": "^9.2.1",

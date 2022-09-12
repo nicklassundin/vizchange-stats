@@ -1,11 +1,10 @@
-
-const help = require('climate-plots-helper');
 const {parseByDate} = require('./module/parseByDate.js')
 /*
  * Var R = require('r-script');
  * var python=require('python').shell;
  * TODO temporary hotfix
  */
+// TODO use const.json instead
 const constant = require("./module/const.json");
 /**
 global.startYear = constant.startYear;
@@ -24,7 +23,7 @@ module.exports = {
 		return this.recursive(params, this[params[0]](specs))
 	},
 	"recursive": function(params, data, index = 1){
-		if(params.length - index <= 1){
+		if(params.length - index === 1){
 			if(typeof data.then === 'function'){
 				return data.then(function(results){
 					if(Array.isArray(results)){
@@ -41,8 +40,13 @@ module.exports = {
 				})
 			}
 			return data[params[index]];
+		}else if(params.length - index < 1){
+			return data
 		}else if(typeof data.then === 'function'){
 			return data.then(function(values){
+				if(typeof values[params[index]] === 'function'){
+					return module.exports.recursive(params, values[params[index]](params[index+1]), index+2)
+				}
 				return module.exports.recursive(params, values[params[index]], index+1)
 			})
 		}else if(typeof data === 'function'){

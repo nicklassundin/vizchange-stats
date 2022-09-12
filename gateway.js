@@ -10,7 +10,9 @@
 //
 
 const axios = require('axios');
-
+const { setupCache } = require('axios-cache-interceptor');
+setupCache(axios)
+const fs = require("fs");
 
 
 let getSmhiStation = async function(id){
@@ -32,8 +34,9 @@ let getSmhiStation = async function(id){
 					result(`?position=${json.position[0].longitude},${json.position[0].latitude}`)
 				} catch (error) {
 					console.error(error.message);
+					reject(error)
 
-				};
+				}
 
 			});
 
@@ -47,7 +50,7 @@ let getSmhiStation = async function(id){
 const preset = {
 	stationTypes: {
 		abisko: ['temperature, precipitation', 'growingSeason','snowdepth_single', 'decadeMeans', 'periodMeans', 'perma'],
-		umeå: ['temperature, precipitation', 'growingSeason'],
+		umea: ['temperature, precipitation', 'growingSeason'],
 		pavlopetri: ['temperature, precipitation', 'growingSeason','snowdepth_single', 'decadeMeans', 'periodMeans', 'perma'],
 		glob: ['glob','co2_weekly'],
 		nhem: ['nhem_temp'],
@@ -80,7 +83,7 @@ const preset = {
 		'narkevaere': '?position=19.76583333333,68.1977778&radius=30',
 		'storflaket': '?position=18.96527777778,68.3475&radius=30',
 		'bergfors': '?position=19.762777777778,68.1455556&radius=30',
-		get 'umeå'() {
+		get 'umea'() {
 			return preset.station['140480']+'&radius=10000'
 		}
 		// '': ['?position='],
@@ -88,6 +91,8 @@ const preset = {
 	types: {
 		temperature: 'temperature,avg_temperature,min_temperature,max_temperature',
 		precipitation: 'precipitation,avg_temperature',
+		snow: 'precipitation,avg_temperature',
+		rain: 'precipitation,avg_temperature',
 		growingSeason: 'temperature',
 		perma: 'perma',
 		lakeice: 'freezeup,breakup',
@@ -116,16 +121,23 @@ let debug = {
 }
 
 let parsePeriod = function(date){
-	let pad = (value) => value >= 10 ? `${value}` : `0${value}`;
-	let year = date.getFullYear();
-	let month = pad(date.getMonth()+1);
-	let day = pad(date.getDate());
-	return `${year}${month}${day}`;
+	try{
+		if(typeof date === 'string') date = new Date(date);
+		let pad = (value) => value >= 10 ? `${value}` : `0${value}`;
+		let year = date.getFullYear();
+		let month = pad(date.getMonth()+1);
+		let day = pad(date.getDate());
+		return `${year}${month}${day}`;
+	}catch(error){
+		console.log(typeof date)
+		throw error;
+	}
+
 }
 const totalProductsCount = 500;
 module.exports = {
 	preset: preset,
-	curlProx: function(specs, full = false){
+	proxRequest: function(specs, full = false){
 		var station = specs.station;
 		var dates = {
 			start: specs.dates.start,
@@ -139,7 +151,7 @@ module.exports = {
 			url = `${url}&types=${preset.types[station+type]}`
 
 		}else if(type){
-			url = `${url}&types=${preset.types[type] != undefined ? preset.types[type] : type}`
+			url = `${url}&types=${preset.types[type] !== undefined ? preset.types[type] : type}`
 		} 
 		if(preset.station[station] === undefined) return Promise.reject({
 			"ERROR": "No such station",
@@ -158,11 +170,23 @@ module.exports = {
 	number: 0,
 	async axios(url){
 		this.number += 1;
+		let path = `debug/${url.split('/').join('')}.json`;
+		if(fs.existsSync(path)){
+			return require('./'+path)
+		}
+
 		return new Promise (async (resolve, reject) => {
 			try {
 				let currentItem = 1;
 				while (currentItem < (totalProductsCount + 1)) {
 					const product = await axios.get(url).then(res => {
+
+						/*  TODO automatically write this when debugging is enabled */
+						let fs = require('fs');
+						fs.writeFile(`debug/${url.split('/').join('')}.json`, JSON.stringify(res.data), (error) => {
+							if(error) throw error
+						}) /* */
+
 						return res.data
 					});
 					//fs.writeFileSync(`./product-${currentItem}.json`, JSON.stringify(product.data, null, 2));
@@ -170,6 +194,7 @@ module.exports = {
 					resolve(product)
 				}
 			} catch (e) {
+				console.log("rejected", url)
 				reject(e)
 			}
 
@@ -181,7 +206,7 @@ module.exports = {
 		curl.setOpt('URL', url)
 		curl.setOpt('FOLLOWLOCATION', true);
 		var req = new Promise((res, rej) => {
-			curl.on('end', function (statusCode, data, headers) {
+			curl.on('end', function (statusCode, data) {
 				// console.info("curl req", statusCode);
 				// console.info('---');
 				// console.info(data.length);
