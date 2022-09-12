@@ -14,7 +14,6 @@ const { setupCache } = require('axios-cache-interceptor');
 setupCache(axios)
 const fs = require("fs");
 
-
 let getSmhiStation = async function(id){
 	return await new Promise((result, reject) => {
 		let host = `https://opendata-download-metobs.smhi.se`
@@ -169,10 +168,9 @@ module.exports = {
 	},
 	number: 0,
 	async axios(url){
-		this.number += 1;
-		let path = `debug/${url.split('/').join('')}.json`;
 
 		/*
+		let path = `debug/${url.split('/').join('')}.json`;
 		if(fs.existsSync(path)){
 			return require('./'+path)
 		}
@@ -180,10 +178,7 @@ module.exports = {
 
 		return new Promise (async (resolve, reject) => {
 			try {
-				let currentItem = 1;
-				while (currentItem < (totalProductsCount + 1)) {
 					const product = await axios.get(url).then(res => {
-
 						/*  TODO automatically write this when debugging is enabled
 						let fs = require('fs');
 						fs.writeFile(`debug/${url.split('/').join('')}.json`, JSON.stringify(res.data), (error) => {
@@ -192,10 +187,9 @@ module.exports = {
 
 						return res.data
 					});
-					//fs.writeFileSync(`./product-${currentItem}.json`, JSON.stringify(product.data, null, 2));
-					currentItem++;
+					if(!product.cached) this.number += 1;
+					//console.log(this.number, url)
 					resolve(product)
-				}
 			} catch (e) {
 				console.log("rejected", url)
 				reject(e)
