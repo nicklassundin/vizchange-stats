@@ -144,15 +144,12 @@ module.exports = class Struct {
                 return values
             } else {
                 return this.entry.then(entry => {
-                    try {
+                        if(entry[`${key}s`] === undefined) return []
                         return entry[`${key}s`].map(k => {
                             return this.getValues(JSON.parse(JSON.stringify(genSpecs)), key, k, values, this.type, this.f, this.full)
                         }).reduce((a, b) => {
                             return Object.assign(a, b)
                         })
-                    }catch (error) {
-                        console.log(error)
-                    }
                 })
             }
         })
