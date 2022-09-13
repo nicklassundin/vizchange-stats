@@ -192,6 +192,7 @@ module.exports = {
 					resolve(product)
 			} catch (e) {
 				console.log("rejected", url)
+				console.log("error", e)
 				reject(e)
 			}
 
