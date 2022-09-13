@@ -264,6 +264,10 @@ describe(
                         // return assert.equal(values, 1.4913425661630546)
                     })
                 })
+                it('precipitation', () => {
+                    let params = ['precipitation', 'yrly', 'difference'];
+
+                })
             })
     }
 )
