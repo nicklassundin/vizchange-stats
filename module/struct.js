@@ -151,7 +151,7 @@ module.exports = class Struct {
                             return Object.assign(a, b)
                         })
                     }catch (error) {
-                        throw error
+                        console.log(error)
                     }
                 })
             }
