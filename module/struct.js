@@ -308,20 +308,22 @@ module.exports = class Struct {
 	}
 	"short" (y) {
 		if(this.typeMeta !== undefined) return this.typeMeta
-		return {
-			compressed: true,
-			y: this.y,
-			x: this.x,
-			colors: {
+		return this.y.then(y => {
+			return {
+				compressed: true,
+				y: y,
+				x: this.x,
+				colors: {
 				red: ColorToHex(255,55+Math.floor(y * 200 / (this.y-y)), 0),
-				blue: ColorToHex(55+Math.floor(y * 200 / (this.y-y)), 255, 0)
-			}, 
-			type: this.type,
-			xInterval: this.xInterval,
-			typeMeta: this.typeMeta,
-			date: (this.values.length === 1 ? this.values[0].short().date : null),
+					blue: ColorToHex(55+Math.floor(y * 200 / (this.y-y)), 255, 0)
+			},
+				type: this.type,
+					xInterval: this.xInterval,
+				typeMeta: this.typeMeta,
+				date: (this.values.length === 1 ? this.values[0].short().date : null),
 
-		}
+			}
+		})
 	}
 	// "subOccur" (type) {
 	"occurrence" (type){
