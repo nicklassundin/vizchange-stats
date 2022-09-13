@@ -81,6 +81,14 @@ describe(
                     return assert.equal(values, true)
                 })
             })
+            it('short', () => {
+
+                let params = ['temperature', 'yrly']
+                let config = Object.assign(configs['latest'], specs)
+                return parser.getByParams(config, params).then(values => {
+                    return assert.equal(typeof values.short().then, 'function')
+                })
+            })
             it('values', () => {
                 let params = ['temperature', 'yrly', 'values', 'length']
                 let config = Object.assign(configs['latest'], specs)
