@@ -159,8 +159,6 @@ module.exports = {
 			"data": [],
 			"URL": url
 		})
-		// ffsdfsd
-		//
 		if(full){
 			return module.exports.axios('https://'+(host)+url)
 		}else{
@@ -176,7 +174,7 @@ module.exports = {
 			return require('./'+path)
 		}
 		/* */
-
+	//	console.log('url', url)
 		return new Promise (async (resolve, reject) => {
 			try {
 					const product = await axios.get(url).then(res => {
@@ -188,7 +186,7 @@ module.exports = {
 
 						return res.data
 					});
-					if(!product.cached) this.number += 1;
+					//if(!product.cached) this.number += 1;
 					//console.log(this.number, url)
 					resolve(product)
 			} catch (e) {

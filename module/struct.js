@@ -46,8 +46,8 @@ module.exports = class Struct {
         }
         return new Struct(undefined, specs, x, type, f, full, parentType)
     }
-
     constructor(point = undefined, specs, x = undefined, type = "avg", f, full = false, parentType) {
+    //   console.log('constructor', type)
         this.full = full;
         this.specs = specs;
         this.specs.parentType = parentType;
@@ -58,12 +58,11 @@ module.exports = class Struct {
         this.parentType = parentType
         this.movAvg = undefined;
         this.VALUES = Promise.resolve({});
-    }
 
+    }
     set "entry"(value) {
         if (!isNaN(value) && value !== undefined) this.POINT = value
     }
-
     get "entry"() {
         if (this.POINT === undefined) {
             let specs = JSON.parse(JSON.stringify(this.specs));
@@ -131,28 +130,28 @@ module.exports = class Struct {
     async getValues(specs, key, k, values, type, f, full) {
         specs.dates.start = k;
         specs.dates.end = k;
-        values[k] = Struct.build(specs, k, type, f, full);
+        values[k] = Struct.build(specs, k, type, f, full, specs.parentType);
         return values;
     }
-
     get "values"() {
         let genSpecs = JSON.parse(JSON.stringify(this.specs));
         let key = genSpecs.keys.shift();
-
+        let type = this.type;
+        let f = this.f;
+        let full = this.full;
+        let parentType = this.specs.parentType;
         this.VALUES = this.VALUES.then(values => {
             if (Object.keys(values).length > 0) {
                 return values
             } else {
-                return this.entry.then(entry => {
-                        if(entry[`${key}s`] === undefined) return []
-                        return entry[`${key}s`].map(k => {
-                            return this.getValues(JSON.parse(JSON.stringify(genSpecs)), key, k, values, this.type, this.f, this.full)
-                        }).reduce((a, b) => {
-                            return Object.assign(a, b)
-                        })
+                return (new Point(genSpecs))[`${key}s`].map(k => {
+                    return this.getValues(JSON.parse(JSON.stringify(genSpecs)), key, k, values, type, f, full, parentType)
+                }).reduce((a, b) => {
+                    return Object.assign(a, b)
                 })
             }
         })
+
         return this.VALUES.then(values => {
             return Promise.all(Object.values(values)).then(values => {
                 return values.map(each => {
@@ -207,7 +206,6 @@ module.exports = class Struct {
         return res.build(type)
 
     }
-
     "filterForm"(f, type, abs) {
         let g = (entry) => {
             const y = f(...entry.values.map((each) => each.y));
@@ -319,7 +317,6 @@ module.exports = class Struct {
     }
 
     get "shortValues"() {
-        // TODO
         return this.values.then(vals => {
             return vals.map(each => {
                 if (typeof each.short === 'function') {
@@ -620,8 +617,10 @@ module.exports = class Struct {
         specs.dates.end = new Date(specs.dates.end)
         let entry = this.entry.then((entry) => {
             return entry.changeY(type)
+        }).then((result) => {
+            return result
         })
-        return new Struct(entry, specs, this.x, this.type, this.f, this.full)
+        return new Struct(entry, specs, this.x, this.type, this.f, this.full, this.parentType)
     }
 
     "reInit"(type = this.type, lower = baselineLower, upper = baselineUpper, color) {

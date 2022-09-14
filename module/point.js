@@ -80,7 +80,7 @@ class Point {
 			return new Point(specs, res, full);
 		})
 	}
-	constructor(specs, req, full=false){
+	constructor(specs, req = {}, full=false){
 		this.full = full;
 		this.specs = specs;
 		if(typeof this.specs.dates.start === 'string'){
@@ -261,7 +261,10 @@ class Point {
 		if(Array.isArray(req)){
 			return new Point(specs, req, this.full)
 		}
-		if(isNaN(this.req[type])) return NaN
+		if(isNaN(this.req[type])){
+			console.log(type, this.req)
+			return NaN
+		}
 		return new Point(specs, this.req, this.full)
 	}
 	get 'year' (){

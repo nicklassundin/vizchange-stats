@@ -26,11 +26,7 @@ const assert = require('assert');
 describe(
     'Requests',
     function () {
-        before(function () {
-            let config = Object.assign(configs['latest'], specs)
-            cache.result = parser.temperature(config)
-        });
-        describe.only('recursive', function () {
+        describe('recursive', function () {
             it('promises', function () {
                 let params = ['temperature', 'yrly', 'y'];
                 let config = Object.assign(configs['latest'], specs)
@@ -62,11 +58,7 @@ describe(
                 })
             })
         })
-        describe.only('functionality', function () {
-            before(function () {
-                let precipitation_config = Object.assign(configs['latest'], precipitation_specs)
-                cache.resultPrecipitation = parser.precipitation(precipitation_config);
-            })
+        describe('functionality', function () {
             it('y', () => {
                 let params = ['temperature', 'yrly', 'y']
                 let config = Object.assign(configs['latest'], specs)
@@ -97,95 +89,76 @@ describe(
                 })
             })
             it('valuesAll', () => {
-                return cache.result.then((res) => {
-                    return res.yrly.then(yrly => {
-                        return yrly.valuesAll.entry.then(all => {
-                            return all.req.length > 1000
-                        })
-                    })
+                let params = ['temperature', 'yrly', 'valuesAll', 'entry', 'req', 'length']
+                let config = Object.assign(configs['latest'], specs)
+                return parser.getByParams(config, params).then(values => {
+                    return assert.equal(values, 1461)
                 })
             })
             it('a year', () => {
-                return cache.result.then((res) => {
-                    return res.yrly.then(yrly => {
-                        return yrly.values.then(years => {
-                            return assert.equal(2019, years[0].x)
-                        })
-                    })
+                let params = ['temperature', 'yrly', 'values', 0, 'x']
+                let config = Object.assign(configs['latest'], specs)
+                return parser.getByParams(config, params).then(values => {
+                    return assert.equal(values, 2019)
                 })
             })
-            it('a DOY', () => {
-                return cache.result.then((res) => {
-                    return res.yrly.then(yrly => {
-                        return yrly.values.then(year => {
-                            year[0].values.then(doy => {
-                                return assert.equal(0, doy[0].x)
-                            })
-                        })
-                    })
+            it('order - a DOY - first', () => {
+                let params = ['temperature', 'yrly', 'values', 0, 'values', 0, 'x']
+                let config = Object.assign(configs['latest'], specs)
+                return parser.getByParams(config, params).then(values => {
+                    return assert.equal(values, 1)
                 })
             })
             describe('changeY', function () {
-                it('total - y', () => {
+                it('yrlyFull - total - snow - y', () => {
                     let params = ['precipitation', 'yrlyFull', 'changeY', 'snow', 'y']
                     let config = Object.assign(configs['latest'], precipitation_specs)
                     return parser.getByParams(config, params).then(values => {
+                        console.log(values)
                         return assert.ok(Math.abs(values-308) < 0.00001)
                         //return assert.equal(values, 308)
                      })
                 })
-                it('values - total', () => {
+                it('yrlyFull - values - total', () => {
                     let params = ['precipitation', 'yrlyFull', 'values', 1, 'y']
                     let config = Object.assign(configs['latest'], precipitation_specs)
                     return parser.getByParams(config, params).then(values => {
+                        console.log(values)
                         return assert.ok(Math.abs(values - 399.3) < 0.0001 )
                         //return assert.equal(values,399.2999999999999)
                     })
                 })
-                it('values - snow', () => {
+                it('yrlyFull - values - snow', () => {
                     let params = ['precipitation', 'yrlyFull', 'changeY', 'snow', 'values', 1, 'y']
                     let config = Object.assign(configs['latest'], precipitation_specs)
                     return parser.getByParams(config, params).then(values => {
+                        console.log(values)
                         return assert.ok(Math.abs(values - 132.8) < 0.0001 )
                       //  return assert.equal(values,132.8)
                     })
                 })
-                it('values - rain', () => {
+                it('yrlyFull - values - rain', () => {
                     let params = ['precipitation', 'yrlyFull', 'changeY', 'rain', 'values', 1, 'y']
                     let config = Object.assign(configs['latest'], precipitation_specs)
                     return parser.getByParams(config, params).then(values => {
+                        console.log(values)
                         return assert.ok(Math.abs(values - 266.5) < 0.0001 )
                       //  return assert.equal(values,266.49999999999994)
                     })
                 })
-                it('shortValues', () => {
+                it('yrlyFull - shortValues - snow', () => {
                     let params = ['precipitation', 'yrlyFull', 'changeY', 'snow', 'shortValues', 1, 'y']
                     let config = Object.assign(configs['latest'], precipitation_specs)
                     return parser.getByParams(config, params).then(values => {
+                        console.log(values)
                         return assert.ok(Math.abs(values - 132.8) < 0.0001 )
                        // return assert.equal(values, 132.8)
                     })
                 })
             })
         })
-        describe.only('functions',
+        describe('functions',
             function () {
-                before(function () {
-                    cache.result[2019] = cache.result.then(res => {
-                        return res.yrly.then(yrly => {
-                            return yrly.values.then(values => {
-                                return values[1]
-                            })
-                        })
-                    })
-                    cache.result[2025] = cache.result.then(res => {
-                        return res.yrly.then(yrly => {
-                            return yrly.values.then(values => {
-                                return values[4]
-                            })
-                        })
-                    })
-                })
                 it('empty', () => {
                     let params = ['temperature', 'yrly', 'values', 4, 'y']
                     let config = Object.assign(configs['latest'], specs)
@@ -264,9 +237,18 @@ describe(
                         // return assert.equal(values, 1.4913425661630546)
                     })
                 })
+                it('difference - simulated request', () => {
+                    let params = ['temperature', 'yrly', 'difference', 'values', 0, 'y']
+                    let config = Object.assign(configs['latest'], specs)
+                    return parser.getByParams(config, params).then(values => {
+                        return assert.equal(values, 1.1674387000899455)
+                        // TODO check validitys
+                        return assert.equal(values, 2.3431622934364897)
+                    })
+                })
                 it('precipitation', () => {
                     let params = ['precipitation', 'yrly', 'difference'];
-
+                    // TODO
                 })
             })
     }
