@@ -425,7 +425,7 @@ module.exports = class ByDateStruct {
 				this.insert(false, "yrlySplit", entry.splitYear, (entry.splitYear === entry.year ? entry.DOY : splitDOY))(entry);
 				break;
 			case 'yrlyFull':
-				this.values[key] = this.insert(true, "yrlyFull", "year");
+				this.values[key] = this.insert(true, "yrlyFull", "year", 'DOY');
 				break;
 			case 'monthly':
 				this.insert(false, "monthly", entry.monthName, entry.year)(entry);

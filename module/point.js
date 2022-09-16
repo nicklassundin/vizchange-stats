@@ -69,16 +69,19 @@ class PointReq {
 	}
 }
 
+let queue = Promise.resolve({});
 class Point {
 	static build(specs, full=false){
-		return curl.proxRequest(specs, full).then(res => {
-			if(res.length < 1) return {
-				'ERROR': new Error('empty result'),
-				'specs': specs
-			}
-			if(!full) res = res.reduce((a,b) => Object.assign(a, b))
-			return new Point(specs, res, full);
-		})
+		return queue.then().then(() => {
+				return curl.proxRequest(specs, full).then(res => {
+					if (res.length < 1) return {
+						'ERROR': new Error('empty result'),
+						'specs': specs
+					}
+					if (!full) res = res.reduce((a, b) => Object.assign(a, b))
+					return new Point(specs, res, full);
+				})
+			})
 	}
 	constructor(specs, req = {}, full=false){
 		this.full = full;
@@ -179,11 +182,29 @@ class Point {
 	}
 	get 'difference' (){
 		return baselineContain.getBaseline(this.specs).then(baseline => {
-
 			let req = Object.assign(Object.create(Object.getPrototypeOf(this.req)), this.req)
+		/*	console.log('req', req)
+			console.log('this.req', this.req)
+			console.log('baseline', baseline)
+
+		 */
 			Object.keys(baseline).forEach(key => {
-				req[key].baseline = baseline[key].avg
-				req[key].difference = this.req[key].avg - baseline[key].avg
+				try{
+					if(req[key] !== undefined){
+						req[key].baseline = baseline[key].avg
+						req[key].difference = this.req[key].avg - baseline[key].avg
+					}else{
+						req[key] = {
+							baseline: NaN,
+							difference: NaN
+						}
+					}
+				}catch(error){
+					console.log(key)
+					console.log(req)
+				//	console.log(req[key])
+					throw error
+				}
 			})
 			return new Point(this.specs, req, this.full)
 		})
@@ -193,12 +214,17 @@ class Point {
 	}
 	'getY'(req = this.req){
 		// TODO stream line this
+		let y = req[`${this.type}`]
 		switch (this.SUBTYPE){
 			case 'difference':
+				if(typeof y == 'object'){
+					return y.difference
+				}else if(this.specs.parentType === 'sum') {
+					return req[`avg_${this.type}`].difference
+				}
 				return req[`${this.specs.parentType}_${this.type}`].difference
 			default:
 		}
-		let y = req[`${this.type}`]
 		if(y === undefined) y = req[`${this.subType}${this.type}`];
 		if(y === undefined && this.SUBTYPE === 'sum') y = req[`avg_${this.type}`]
 		if(typeof y == 'object') return Number(y[this.SUBTYPE])
@@ -262,10 +288,9 @@ class Point {
 			return new Point(specs, req, this.full)
 		}
 		if(isNaN(this.req[type])){
-			console.log(type, this.req)
 			return NaN
 		}
-		return new Point(specs, this.req, this.full)
+		return new Point(specs, req, this.full)
 	}
 	get 'year' (){
 		return this.x.getFullYear();

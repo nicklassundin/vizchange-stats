@@ -11,9 +11,9 @@
 
 const axios = require('axios');
 // TODO this should work on client side FIXME
-//const { setupCache } = require('axios-cache-interceptor');
-//setupCache(axios)
-const fs = require("fs");
+const { setupCache } = require('axios-cache-interceptor');
+setupCache(axios)
+//const fs = require("fs");
 
 let getSmhiStation = async function(id){
 	return await new Promise((result, reject) => {
@@ -152,7 +152,7 @@ module.exports = {
 
 		}else if(type){
 			url = `${url}&types=${preset.types[type] !== undefined ? preset.types[type] : type}`
-		} 
+		}
 		if(preset.station[station] === undefined) return Promise.reject({
 			"ERROR": "No such station",
 			"keys": Object.keys(preset.station),
@@ -167,7 +167,6 @@ module.exports = {
 	},
 	number: 0,
 	async axios(url){
-
 		/*
 		let path = `debug/${url.split('/').join('')}.json`;
 		if(fs.existsSync(path)){
@@ -175,26 +174,12 @@ module.exports = {
 		}
 		/* */
 	//	console.log('url', url)
-		return new Promise (async (resolve, reject) => {
-			try {
-					const product = await axios.get(url).then(res => {
-						/*  TODO automatically write this when debugging is enabled
-						let fs = require('fs');
-						fs.writeFile(`debug/${url.split('/').join('')}.json`, JSON.stringify(res.data), (error) => {
-							if(error) throw error
-						}) /* */
+		this.number += 1;
 
-						return res.data
-					});
-					//if(!product.cached) this.number += 1;
-					//console.log(this.number, url)
-					resolve(product)
-			} catch (e) {
-				console.log("rejected", url)
-				console.log("error", e)
-				reject(e)
-			}
-
+		return await axios.get(url).then(result => {
+		//	console.log('size:', JSON.stringify(result.data).length)
+		//	console.log('data:', result.data)
+			return result.data
 		})
 	},
 	// requests: 300,

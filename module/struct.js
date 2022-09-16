@@ -57,7 +57,7 @@ module.exports = class Struct {
         this.type = type
         this.parentType = parentType
         this.movAvg = undefined;
-        this.VALUES = Promise.resolve({});
+        this.VALUES = {};
 
     }
     set "entry"(value) {
@@ -113,7 +113,10 @@ module.exports = class Struct {
     }
 
     get "y"() {
-        return this.entry.then(point => point.y)
+        return this.entry.then(point => {
+            if(undefined === point) return new Error('no point specified')
+            return point.y
+        })
     }
 
     get "count"() {
@@ -127,47 +130,35 @@ module.exports = class Struct {
      get "point" (){
 		return this.POINT[0]
 	}*/
-    async getValues(specs, key, k, values, type, f, full) {
+    getValues(specs, key, k, values, type, f, full) {
         specs.dates.start = k;
         specs.dates.end = k;
         values[k] = Struct.build(specs, k, type, f, full, specs.parentType);
         return values;
     }
     get "values"() {
+        // TODO remove embededed promises
         let genSpecs = JSON.parse(JSON.stringify(this.specs));
         let key = genSpecs.keys.shift();
         let type = this.type;
         let f = this.f;
         let full = this.full;
         let parentType = this.specs.parentType;
-        this.VALUES = this.VALUES.then(values => {
-            if (Object.keys(values).length > 0) {
-                return values
-            } else {
-                return (new Point(genSpecs))[`${key}s`].map(k => {
-                    return this.getValues(JSON.parse(JSON.stringify(genSpecs)), key, k, values, type, f, full, parentType)
-                }).reduce((a, b) => {
-                    return Object.assign(a, b)
-                })
-            }
-        })
-
-        return this.VALUES.then(values => {
-            return Promise.all(Object.values(values)).then(values => {
-                return values.map(each => {
-                    if (each instanceof Error) {
-                        return Promise.reject(each)
-                    } else {
-                        return Promise.resolve(each)
-                    }
-                })
-            }).then(v => {
-                return Promise.allSettled(v).then(res => {
-                    return res.filter(r => {
-                        return r.status === 'fulfilled'
-                    }).map(each => each.value)
-                })
+        if(Object.keys(this.VALUES).length == 0) {
+            let values = {};
+            this.VALUES = (new Point(genSpecs))[`${key}s`].map(k => {
+                return this.getValues(JSON.parse(JSON.stringify(genSpecs)), key, k, values, type, f, full, parentType)
+            }).reduce((a, b) => {
+                return Object.assign(a, b)
             })
+        }
+        return Object.values(this.VALUES).map(each => {
+            if (each instanceof Error) {
+                return Promise.reject(each)
+            } else {
+                return Promise.resolve(each)
+            }
+
         })
     }
 
@@ -317,14 +308,8 @@ module.exports = class Struct {
     }
 
     get "shortValues"() {
-        return this.values.then(vals => {
-            return vals.map(each => {
-                if (typeof each.short === 'function') {
-                    return each.short(this.y);
-                } else {
-                    return each.short
-                }
-            })
+        return this.values.map(each => {
+            return each.then(vals => vals.short())
         })
     }
 
@@ -332,7 +317,7 @@ module.exports = class Struct {
         return this.shortValues.map(each => each.y)
     }
 
-    "short"(y) {
+    "short"() {
         if (this.typeMeta !== undefined) return this.typeMeta
         return this.y.then(y => {
             return {
@@ -615,14 +600,12 @@ module.exports = class Struct {
         specs.type = type;
         specs.dates.start = new Date(specs.dates.start)
         specs.dates.end = new Date(specs.dates.end)
-        let entry = this.entry.then((entry) => {
+        let entry = this.entry.then()
+        entry = entry.then((entry) => {
             return entry.changeY(type)
-        }).then((result) => {
-            return result
         })
         return new Struct(entry, specs, this.x, this.type, this.f, this.full, this.parentType)
     }
-
     "reInit"(type = this.type, lower = baselineLower, upper = baselineUpper, color) {
         this.type = type;
         // TODO use color
