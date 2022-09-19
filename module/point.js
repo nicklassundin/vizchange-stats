@@ -45,20 +45,19 @@ class PointReq {
 		return Object.values(result).map(each => new PointReq(each))
 	}
 	constructor(request){
-		this.request = request;
-
 		request = replace(request,'glob_temp', 'temperature')
 		request = replace(request,'64n-90n_temp', 'temperature')
 		request = replace(request,'nhem_temp', 'temperature')
+		this.request = request;
 		Object.keys(request).forEach((key) => {
 			this[key] = request[key];
 		})
-		if(typeof this['avg_temperature'] === 'object'){
-
-		}else if(Object.keys(this).includes('avg_temperature') && Object.keys(this).includes('precipitation')){
-			this.snow = (this['avg_temperature'] > 0) ? 0 : Number(this['precipitation'])
-			this.rain = (this['avg_temperature'] <= 0) ? 0 : Number(this['precipitation'])
-		}
+	}
+	get 'snow_precipitation'() {
+		return ((Number(this.request['avg_temperature']) > 0) ? 0 : Number(this.request['precipitation']))
+	}
+	get 'rain_precipitation'() {
+		return ((Number(this.request['avg_temperature']) <= 0) ? 0 : Number(this.request['precipitation']))
 	}
 	get "keys" (){
 		if(Array.isArray(this.request)){
@@ -213,7 +212,6 @@ class Point {
 		this.req[`${this.subType}${this.type}`] = val
 	}
 	'getY'(req = this.req){
-		// TODO stream line this
 		let y = req[`${this.type}`]
 		switch (this.SUBTYPE){
 			case 'difference':
@@ -223,10 +221,15 @@ class Point {
 					return req[`avg_${this.type}`].difference
 				}
 				return req[`${this.specs.parentType}_${this.type}`].difference
+			case 'snow':
+			case 'rain':
+				y = req[`${this.subType}${this.type}`]
+				break;
 			default:
 		}
 		if(y === undefined) y = req[`${this.subType}${this.type}`];
 		if(y === undefined && this.SUBTYPE === 'sum') y = req[`avg_${this.type}`]
+		if(y === undefined) y = req[this.type];
 		if(typeof y == 'object') return Number(y[this.SUBTYPE])
 		return Number(y)
 	}
@@ -246,6 +249,11 @@ class Point {
 					return this.getY(this.req[0]);
 				case 'difference':
 					return this.difference
+				case 'snow':
+				case 'rain':
+					//return this.req.map(each => this.getY(each))
+					return this.req.map(each => this.getY(each)).filter(y => y !== undefined && !isNaN(y)).reduce((a,b) => a + b)
+					break
 				default:
 					return this.req.map(each => this.getY(each))
 
@@ -281,9 +289,15 @@ class Point {
 		return this.TYPE('sum')
 	}
 	"changeY" (type) {
+		console.log('type: ', type)
 		let specs = JSON.parse(JSON.stringify(this.specs));
 		specs.type = type
 		let req = JSON.parse(JSON.stringify(this.req));
+		if(type === 'snow'){
+			let point = Point.build(specs, true);
+			console.log(point)
+			return point
+		}
 		if(Array.isArray(req)){
 			return new Point(specs, req, this.full)
 		}

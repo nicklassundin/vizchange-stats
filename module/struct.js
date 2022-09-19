@@ -115,6 +115,7 @@ module.exports = class Struct {
     get "y"() {
         return this.entry.then(point => {
             if(undefined === point) return new Error('no point specified')
+      //      console.log('y: ', point.y)
             return point.y
         })
     }
@@ -228,7 +229,12 @@ module.exports = class Struct {
         }
 
     }
-
+    get "snow" () {
+        return this.TYPE('snow', undefined, true)
+    }
+    get "rain" () {
+        return this.TYPE('rain', undefined, true)
+    }
     get "min"() {
         return this.TYPE('min');
     }
@@ -316,7 +322,6 @@ module.exports = class Struct {
     get "yValues"() {
         return this.shortValues.map(each => each.y)
     }
-
     "short"() {
         if (this.typeMeta !== undefined) return this.typeMeta
         return this.y.then(y => {
@@ -335,8 +340,6 @@ module.exports = class Struct {
             }
         })
     }
-
-    // "subOccur" (type) {
     "occurrence"(type) {
         return (val) => {
             var f = type;
@@ -600,11 +603,12 @@ module.exports = class Struct {
         specs.type = type;
         specs.dates.start = new Date(specs.dates.start)
         specs.dates.end = new Date(specs.dates.end)
-        let entry = this.entry.then()
-        entry = entry.then((entry) => {
-            return entry.changeY(type)
-        })
-        return new Struct(entry, specs, this.x, this.type, this.f, this.full, this.parentType)
+
+                let entry = this.entry.then()
+                entry = entry.then((entry) => {
+                    return entry.changeY(type)
+                })
+                return new Struct(entry, specs, this.x, this.type, this.f, this.full, this.parentType)
     }
     "reInit"(type = this.type, lower = baselineLower, upper = baselineUpper, color) {
         this.type = type;

@@ -173,7 +173,7 @@ module.exports = {
 			return require('./'+path)
 		}
 		/* */
-	//	console.log('url', url)
+		//console.log('url', url)
 		this.number += 1;
 
 		return await axios.get(url).then(result => {
