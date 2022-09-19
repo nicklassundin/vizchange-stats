@@ -41,7 +41,7 @@
 			"start": 1910,
 			"end": 1920
 		},
-		"url": "staging-devop-deploy-vischange.k8s.glimworks.se/data/query/v1"
+		"url": "vischange.k8s.glimworks.se/data/query/v1"
 	},
 	"debug": {
 		"baseline": {

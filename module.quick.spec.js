@@ -292,7 +292,6 @@ describe(
                 })
             })
             it('Live - y', () => {
-                // TODO snow data need to be 'full' when using changeY
                 let params = ['precipitation', 'yrly', 'snow', 'shortValues', 1, 'y']
                 let config = Object.assign(configs['latest'], precipitation_specs)
                 return parser.getByParams(config, params).then(values => {
@@ -300,11 +299,18 @@ describe(
                 })
             })
             it('Live - y', () => {
-                // TODO snow data need to be 'full' when using changeY
                 let params = ['precipitation', 'yrly', 'rain', 'shortValues', 1, 'y']
                 let config = Object.assign(configs['latest'], precipitation_specs)
                 return parser.getByParams(config, params).then(values => {
                     return assert.ok(Math.abs(values - 266.49999) < 0.0001 )
+                })
+            })
+            it('empty - y', () => {
+                let params = ['precipitation', 'yrly', 'snow', 'shortValues', 1, 'y']
+                let config = Object.assign(configs['empty'], precipitation_specs)
+                return parser.getByParams(config, params).then(values => {
+                   // console.log(values)
+                    return assert.equal(values, undefined)
                 })
             })
         })

@@ -237,9 +237,9 @@ class Point {
 		if(this.full){
 			switch(this.SUBTYPE){
 				case 'sum':
-					return this.req.map(each => this.getY(each)).filter(y => y !== undefined && !isNaN(y)).reduce((a,b) => a + b)
+					return this.req.map(each => this.getY(each)).filter(y => y !== undefined && !isNaN(y)).push(0).reduce((a,b) => a + b)
 				case 'avg':
-					return this.req.map(each => this.getY(each)).filter(y => y !== undefined && !isNaN(y)).reduce((a,b) => a + b)/this.req.length
+					return this.req.map(each => this.getY(each)).filter(y => y !== undefined && !isNaN(y)).push(0).reduce((a,b) => a + b)/this.req.length
 				case 'min':
 					return Math.min(this.req.map(each => this.getY(each))).filter(y => y !== undefined && !isNaN(y))
 				case 'max':
@@ -252,7 +252,7 @@ class Point {
 				case 'snow':
 				case 'rain':
 					//return this.req.map(each => this.getY(each))
-					return this.req.map(each => this.getY(each)).filter(y => y !== undefined && !isNaN(y)).reduce((a,b) => a + b)
+					return this.req.map(each => this.getY(each)).filter(y => y !== undefined && !isNaN(y)).push(0).reduce((a,b) => a + b)
 					break
 				default:
 					return this.req.map(each => this.getY(each))
