@@ -11,8 +11,8 @@
 
 const axios = require('axios');
 // TODO this should work on client side FIXME
-const { setupCache } = require('axios-cache-interceptor');
-setupCache(axios)
+//const { setupCache } = require('axios-cache-interceptor');
+//setupCache(axios)
 //const fs = require("fs");
 
 let getSmhiStation = async function(id){
