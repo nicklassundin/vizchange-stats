@@ -330,6 +330,30 @@ describe(
                     return assert.equal(values, 57)
                 })
             })
+            it('Check snow and rain', () => {
+                let config = Object.assign(configs['latest'], precipitation_specs)
+                let params = ['precipitation', 'yrly', 'rain', 'y']
+
+                let rain = parser.getByParams(config, params).then(values => {
+                        return values
+                })
+                let params1 = ['precipitation', 'yrly', 'snow', 'y']
+                let config1 = Object.assign(configs['latest'], precipitation_specs)
+                let snow = parser.getByParams(config1, params1).then(values => {
+                    return values
+                })
+                let params2 = ['precipitation', 'yrly', 'y']
+                let config2 = Object.assign(configs['latest'], precipitation_specs)
+                return parser.getByParams(config2, params2).then(values => {
+                    return snow.then(value1 => {
+                        return rain.then(value2 => {
+                            console.log('snow:', value1)
+                            console.log('rain:', value2)
+                            assert.ok(Math.abs(values - (value1+value2)) < 10)
+                        })
+                    })
+                })
+            })
         })
     }
 )

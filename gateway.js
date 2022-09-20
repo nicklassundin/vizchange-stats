@@ -11,8 +11,8 @@
 
 const axios = require('axios');
 // TODO this should work on client side FIXME
-//const { setupCache } = require('axios-cache-interceptor');
-//setupCache(axios)
+const { setupCache } = require('axios-cache-interceptor');
+setupCache(axios)
 const fs = require("fs");
 
 let getSmhiStation = async function(id){
@@ -174,9 +174,11 @@ module.exports = {
 		}
 		/* */
 		//console.log('url', url)
-		this.number += 1;
-		//console.log('number', this.number)
 		return await axios.get(url).then(result => {
+			if(!result.cached){
+				this.number += 1;
+				console.log('number', this.number)
+			}
 		//	console.log('size:', JSON.stringify(result.data).length)
 		//	console.log('data:', result.data)
 			/*
@@ -185,7 +187,6 @@ module.exports = {
 			})
 
 			 */
-			this.number -= 1;
 			return result.data
 		}).catch(
 			function (error) {

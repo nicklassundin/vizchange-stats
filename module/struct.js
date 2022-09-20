@@ -162,23 +162,24 @@ module.exports = class Struct {
             let keys = (new Point(genSpecs))[`${key}s`]
             this.VALUES = {}
             for(let i = 0; i < keys.length; i++) {
-                if(i === 0){
-                    this.VALUES[keys[i]] = Promise.resolve().then(() => {
+                this.VALUES[keys[i]] = this.getValues(JSON.parse(JSON.stringify(genSpecs)), key, keys[i], type, f, full, parentType)
+
+                /*
+                if(i <= 0){
+                    this.VALUES[keys[i]] = this.getValues(JSON.parse(JSON.stringify(genSpecs)), key, keys[i], type, f, full, parentType)
+
+                }else if(i === 1){
+                    this.VALUES[keys[i]] = this.VALUES[keys[i-1]].y.then((previous) => {
                         return this.getValues(JSON.parse(JSON.stringify(genSpecs)), key, keys[i], type, f, full, parentType)
                     })
                 }else{
-                    this.VALUES[keys[i]] = this.VALUES[keys[i-1]].then(() => {
+                    this.VALUES[keys[i]] = this.VALUES[keys[i-1]].then(e => e.y).then((previous) => {
                         return this.getValues(JSON.parse(JSON.stringify(genSpecs)), key, keys[i], type, f, full, parentType)
                     })
                 }
+
+                 */
             }
-            /*
-            this.VALUES = (new Point(genSpecs))[`${key}s`].map(k => {
-                return this.getValues(JSON.parse(JSON.stringify(genSpecs)), key, k, values, type, f, full, parentType)
-            }).reduce((a, b) => {
-                return Object.assign(a, b)
-            })
-             */
         }
         return Object.values(this.VALUES).map(each => {
             if (each instanceof Error) {

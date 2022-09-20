@@ -26,14 +26,6 @@ module.exports = {
 		if(params.length - index === 1){
 			if(typeof data.then === 'function'){
 				return data.then(function(results){
-					if(Array.isArray(results)){
-						return results[params[index]]
-					}
-					return results[params[index]]
-				})
-			}
-			if(typeof data.then === 'function'){
-				return data.then(function(results){
 					return results[params[index]]
 				})
 			}
