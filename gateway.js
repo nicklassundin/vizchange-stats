@@ -175,7 +175,7 @@ module.exports = {
 		/* */
 		//console.log('url', url)
 		this.number += 1;
-		console.log('number', this.number)
+		//console.log('number', this.number)
 		return await axios.get(url).then(result => {
 		//	console.log('size:', JSON.stringify(result.data).length)
 		//	console.log('data:', result.data)
@@ -187,7 +187,12 @@ module.exports = {
 			 */
 			this.number -= 1;
 			return result.data
-		})
+		}).catch(
+			function (error) {
+				console.log('Show error notification!')
+				return Promise.reject(error)
+			}
+		)
 	},
 	// requests: 300,
 	curl: function(url) {
