@@ -27,6 +27,7 @@ module.exports = {
 			if(typeof data.then === 'function'){
 				return data.then(function(results){
 					if(Array.isArray(results)){
+						return values[params[index]]
 						return Promise.all(results).then(function(values){
 							return values[params[index]]
 						})

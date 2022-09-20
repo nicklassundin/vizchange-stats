@@ -87,6 +87,13 @@ describe(
                     return assert.equal(values, 6)
                 })
             })
+            it('values - type', () => {
+                let params = ['temperature', 'yrly', 'values']
+                let config = Object.assign(configs['latest'], specs)
+                return parser.getByParams(config, params).then(values => {
+                    return assert.ok(Array.isArray(values))
+                })
+            })
             it('valuesAll', () => {
                 let params = ['temperature', 'yrly', 'valuesAll', 'entry', 'req', 'length']
                 let config = Object.assign(configs['latest'], specs)
