@@ -13,7 +13,7 @@ const axios = require('axios');
 // TODO this should work on client side FIXME
 //const { setupCache } = require('axios-cache-interceptor');
 //setupCache(axios)
-//const fs = require("fs");
+const fs = require("fs");
 
 let getSmhiStation = async function(id){
 	return await new Promise((result, reject) => {
@@ -129,7 +129,7 @@ let parsePeriod = function(date){
 		let day = pad(date.getDate());
 		return `${year}${month}${day}`;
 	}catch(error){
-		console.log(typeof date)
+		console.log(typeof date, date)
 		throw error;
 	}
 
@@ -175,10 +175,17 @@ module.exports = {
 		/* */
 		//console.log('url', url)
 		this.number += 1;
-
+		console.log('number', this.number)
 		return await axios.get(url).then(result => {
 		//	console.log('size:', JSON.stringify(result.data).length)
 		//	console.log('data:', result.data)
+			/*
+			fs.writeFile(path, JSON.stringify(result.data), (err) => {
+				if (err) console.log(err);
+			})
+
+			 */
+			this.number -= 1;
 			return result.data
 		})
 	},

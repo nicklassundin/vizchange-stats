@@ -61,17 +61,16 @@ class PointReq {
 	}
 	get "keys" (){
 		if(Array.isArray(this.request)){
-			return Object.keys(this.request.reduce((a, b) => Object.assign(a, b)))
+			return Object.keys(this.request.reduce((a, b) => Object.assign(a, b))).push()
 		}else{
 			return Object.keys(this.request)
 		}
 	}
+
 }
 
-let queue = Promise.resolve({});
 class Point {
 	static build(specs, full=false){
-		return queue.then().then(() => {
 				return curl.proxRequest(specs, full).then(res => {
 					if (res.length < 1) return {
 						'ERROR': new Error('empty result'),
@@ -80,7 +79,6 @@ class Point {
 					if (!full) res = res.reduce((a, b) => Object.assign(a, b))
 					return new Point(specs, res, full);
 				})
-			})
 	}
 	constructor(specs, req = {}, full=false){
 		this.full = full;
@@ -165,6 +163,15 @@ class Point {
 		});
 		return new Point(this.specs, req, this.full)
 	}
+	'outside' (specs) {
+		let start = specs.dates.start
+		let end = specs.dates.end
+		let req = JSON.parse(JSON.stringify(this.req)).filter((x => {
+			let date = new Date(x.date).getTime()
+			return date > start && date < end;
+		}))
+		return new Point(specs, req, this.full)
+	}
 	get 'first'(){
 		let req = this.req.sort((a, b) => {
 			return (new Date(a.date).getTime()) - (new Date(b.date).getTime())
@@ -234,12 +241,13 @@ class Point {
 		return Number(y)
 	}
 	get 'y' (){
+		if(this.req.length === 0) return NaN
 		if(this.full){
 			switch(this.SUBTYPE){
 				case 'sum':
-					return this.req.map(each => this.getY(each)).filter(y => y !== undefined && !isNaN(y)).push(0).reduce((a,b) => a + b)
+					return this.req.map(each => this.getY(each)).filter(y => y !== undefined && !isNaN(y)).reduce((a,b) => a + b)
 				case 'avg':
-					return this.req.map(each => this.getY(each)).filter(y => y !== undefined && !isNaN(y)).push(0).reduce((a,b) => a + b)/this.req.length
+					return this.req.map(each => this.getY(each)).filter(y => y !== undefined && !isNaN(y)).reduce((a,b) => a + b)/this.req.length
 				case 'min':
 					return Math.min(this.req.map(each => this.getY(each))).filter(y => y !== undefined && !isNaN(y))
 				case 'max':
@@ -252,7 +260,9 @@ class Point {
 				case 'snow':
 				case 'rain':
 					//return this.req.map(each => this.getY(each))
-					return this.req.map(each => this.getY(each)).filter(y => y !== undefined && !isNaN(y)).push(0).reduce((a,b) => a + b)
+					let res = this.req.map(each => this.getY(each)).filter(y => y !== undefined && !isNaN(y))
+					if(res.length > 0) return res.reduce((a,b) => a + b)
+					return []
 					break
 				default:
 					return this.req.map(each => this.getY(each))
@@ -288,14 +298,13 @@ class Point {
 	get 'sum' (){
 		return this.TYPE('sum')
 	}
+	// TODO DEPRECATED: use 'snow' / 'rain'
 	"changeY" (type) {
-		console.log('type: ', type)
 		let specs = JSON.parse(JSON.stringify(this.specs));
 		specs.type = type
 		let req = JSON.parse(JSON.stringify(this.req));
 		if(type === 'snow'){
 			let point = Point.build(specs, true);
-			console.log(point)
 			return point
 		}
 		if(Array.isArray(req)){

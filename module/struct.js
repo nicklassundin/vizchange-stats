@@ -20,7 +20,7 @@ function ColorToHex(color) {
 
 
 module.exports = class Struct {
-    static build(specs, x, type, f = () => true, full = false, parentType) {
+    static build(specs, x, type, f = () => true, full = false, parentType, parentEntry) {
         switch (specs.key) {
             case 'month':
                 if (typeof specs.dates.start === 'number') {
@@ -44,7 +44,7 @@ module.exports = class Struct {
                     specs.dates.end = new Date(specs.dates.end)
                 }
         }
-        return new Struct(undefined, specs, x, type, f, full, parentType)
+        return new Struct(parentEntry, specs, x, type, f, full, parentType)
     }
     constructor(point = undefined, specs, x = undefined, type = "avg", f, full = false, parentType) {
     //   console.log('constructor', type)
@@ -61,7 +61,7 @@ module.exports = class Struct {
 
     }
     set "entry"(value) {
-        if (!isNaN(value) && value !== undefined) this.POINT = value
+        this.POINT = value
     }
     get "entry"() {
         if (this.POINT === undefined) {
@@ -88,6 +88,9 @@ module.exports = class Struct {
                         case 'last':
                             point = point[this.type];
                             break;
+                        case 'snow':
+                        case 'rain':
+                            break;
                         default:
                     }
                 } else {
@@ -113,11 +116,18 @@ module.exports = class Struct {
     }
 
     get "y"() {
+        try{
+
         return this.entry.then(point => {
             if(undefined === point) return new Error('no point specified')
       //      console.log('y: ', point.y)
             return point.y
         })
+
+        }catch(error){
+            console.log(this.entry)
+            throw error
+        }
     }
 
     get "count"() {
@@ -131,9 +141,12 @@ module.exports = class Struct {
      get "point" (){
 		return this.POINT[0]
 	}*/
-    getValues(specs, key, k, values, type, f, full) {
+    getValues(specs, key, k, type, f, full) {
         specs.dates.start = k;
         specs.dates.end = k;
+      //  console.log(specs)
+       // values[k] = Struct.build(specs, k, type, f, full, specs.parentType, this.entry.then(e => e.outside(specs)));
+        return Struct.build(specs, k, type, f, full, specs.parentType);
         values[k] = Struct.build(specs, k, type, f, full, specs.parentType);
         return values;
     }
@@ -146,12 +159,26 @@ module.exports = class Struct {
         let full = this.full;
         let parentType = this.specs.parentType;
         if(Object.keys(this.VALUES).length == 0) {
-            let values = {};
+            let keys = (new Point(genSpecs))[`${key}s`]
+            this.VALUES = {}
+            for(let i = 0; i < keys.length; i++) {
+                if(i === 0){
+                    this.VALUES[keys[i]] = Promise.resolve().then(() => {
+                        return this.getValues(JSON.parse(JSON.stringify(genSpecs)), key, keys[i], type, f, full, parentType)
+                    })
+                }else{
+                    this.VALUES[keys[i]] = this.VALUES[keys[i-1]].then(() => {
+                        return this.getValues(JSON.parse(JSON.stringify(genSpecs)), key, keys[i], type, f, full, parentType)
+                    })
+                }
+            }
+            /*
             this.VALUES = (new Point(genSpecs))[`${key}s`].map(k => {
                 return this.getValues(JSON.parse(JSON.stringify(genSpecs)), key, k, values, type, f, full, parentType)
             }).reduce((a, b) => {
                 return Object.assign(a, b)
             })
+             */
         }
         return Object.values(this.VALUES).map(each => {
             if (each instanceof Error) {
@@ -277,8 +304,11 @@ module.exports = class Struct {
             let seed = entry.getSeed();
             if (entry.subType.length > 0) {
                 seed.specs.type = `${entry.subType}${entry.type}`
+                seed.sub
             }
-            let nEntry = new Point(seed.specs, seed.req)
+            // for standard for entry in Struct
+            let nEntry = Promise.resolve(new Point(seed.specs, seed.req))
+            seed.specs.subType = type
             return new Struct(nEntry, seed.specs, this.x, type, f)
         })
 
@@ -290,6 +320,7 @@ module.exports = class Struct {
 
     "TYPE"(type, f = this.f, full = this.full) {
         let specs = JSON.parse(JSON.stringify(this.specs));
+        specs.subType = type;
         if (full) {
             let res = Struct.build(specs, this.x, type, f, full, this.type)
             res.colored = this.colored;
