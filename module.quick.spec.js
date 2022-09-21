@@ -1,4 +1,5 @@
 const parser = require('./module.js')
+const fs = require('fs');
 
 global.climateplots = {
     dev: true
@@ -161,6 +162,17 @@ describe(
         })
         describe('functions',
             function () {
+                it.skip('webpack test', function () {
+                    let params = ['temperature', 'yrly', 'values', 0, 'x'];
+                    let config = Object.assign(configs['latest'], specs)
+                    const webpack_parser = fs.readFile('./client/bundle.js', 'utf8', (result) => {
+                        console.log(result)
+                    })
+                    console.log(webpack_parser)
+                    return webpack_parser.getByParams(config, params).then(function (values) {
+                        return assert.equal(values, 2019)
+                    })
+                })
                 it('empty', () => {
                     let params = ['temperature', 'yrly', 'values', 4, 'y']
                     let config = Object.assign(configs['latest'], specs)
