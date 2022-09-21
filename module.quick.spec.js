@@ -54,7 +54,7 @@ describe(
                 let params = ['temperature', 'yrly', 'y'];
                 let config = Object.assign(configs['latest'], specs)
                 parser.getByParams(config, params)
-                return parser.cache['abisko']['temperature'].then(values => {
+                return parser.cache['abisko'][`temperature${config.dates.start}${config.dates.end}`].then(values => {
                     return values
                 })
             })
@@ -334,9 +334,6 @@ describe(
 
                 return parser.getByParams(config, params).then(values => {
                     return Promise.all(values).then(values => {
-                        console.log("values: ", values[0].y)
-                        console.log("specs: ", values[0])
-                        //return assert.ok(Math.abs(values[0].y - 87.59999999999991) < 0.00001)
                         return assert.ok(Math.abs(values[0].y - 92.2) < 0.00001)
                     })
                     return assert.equal(values, 57)
@@ -348,6 +345,9 @@ describe(
 
                 let rain = parser.getByParams(config, params).then(values => {
                         return values
+                })
+                let rain2 = parser.getByParams(config, params).then(values => {
+                    return values
                 })
                 let params1 = ['precipitation', 'yrly', 'snow', 'y']
                 let config1 = Object.assign(configs['latest'], precipitation_specs)

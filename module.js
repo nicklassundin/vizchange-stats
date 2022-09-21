@@ -49,11 +49,10 @@ module.exports = {
 		if(this.cache[specs.station] === undefined){
 			this.cache[specs.station] = {}
 		}
-		if(this.cache[specs.station][specs.type] === undefined){
-			this.cache[specs.station][specs.type] = {}
+		if(this.cache[specs.station][specs.type] === undefined) {
+			this.cache[specs.station][`${specs.type}${specs.dates.start}${specs.dates.end}`] = parseByDate(specs, type)
 		}
-		this.cache[specs.station][specs.type] = parseByDate(specs, type)
-		return this.cache[specs.station][specs.type].then((value) => { return value})
+		return this.cache[specs.station][`${specs.type}${specs.dates.start}${specs.dates.end}`].then((value) => { return value})
 	},
 	cache: {},
 	"temperature" (specs) {

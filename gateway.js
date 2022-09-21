@@ -166,6 +166,7 @@ module.exports = {
 		}
 	},
 	number: 0,
+	cached: {},
 	axios(url){
 		/*
 		let path = `debug/${url.split('/').join('')}.json`;
@@ -174,7 +175,9 @@ module.exports = {
 		}
 		/* */
 		//console.log('url', url)
-		return axios.get(url).then(result => {
+		if(this.cached[url] === undefined){
+
+		this.cached[url] = axios.get(url).then(result => {
 			if(!result.cached){
 				this.number += 1;
 				console.log('number', this.number)
@@ -194,6 +197,9 @@ module.exports = {
 				return Promise.reject(error)
 			}
 		)
+
+		}
+		return this.cached[url]
 	},
 	// requests: 300,
 	curl: function(url) {

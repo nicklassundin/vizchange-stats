@@ -46,12 +46,11 @@ module.exports = class Struct {
         }
         return new Struct(parentEntry, specs, x, type, f, full, parentType)
     }
-    constructor(point = undefined, specs, x = undefined, type = "avg", f, full = false, parentType) {
-    //   console.log('constructor', type)
+    constructor(values = undefined, specs, x = undefined, type = "avg", f, full = false, parentType) {
         this.full = full;
         this.specs = specs;
         this.specs.parentType = parentType;
-        this.entry = point
+        //this.VALUES = values;
         this.f = f;
         this.x = x;
         this.type = type
@@ -79,7 +78,7 @@ module.exports = class Struct {
                             break;
                         case "number":
                             if (typeof this.f == 'function' && this.values[0] instanceof Point) {
-                                // TODO check if works
+                                // TODO check if works could be array of promises
                                 this.values = this.values.then((value) => value.filter(this.f))
                             }
                             this.Y = this.values.then((value) => value.length);
@@ -120,12 +119,10 @@ module.exports = class Struct {
 
         return this.entry.then(point => {
             if(undefined === point) return new Error('no point specified')
-      //      console.log('y: ', point.y)
             return point.y
         })
 
         }catch(error){
-            console.log(this.entry)
             throw error
         }
     }
@@ -144,7 +141,6 @@ module.exports = class Struct {
     getValues(specs, key, k, type, f, full) {
         specs.dates.start = k;
         specs.dates.end = k;
-      //  console.log(specs)
        // values[k] = Struct.build(specs, k, type, f, full, specs.parentType, this.entry.then(e => e.outside(specs)));
         return Struct.build(specs, k, type, f, full, specs.parentType);
         values[k] = Struct.build(specs, k, type, f, full, specs.parentType);
@@ -268,7 +264,7 @@ module.exports = class Struct {
     }
 
     get "minAvg"() {
-        return this.AVGTYPE('min');
+        return this.AVGTYPE('minAvg');
     }
 
     get "max"() {
@@ -276,7 +272,7 @@ module.exports = class Struct {
     }
 
     get "maxAvg"() {
-        return this.AVGTYPE('max');
+        return this.AVGTYPE('maxAvg');
     }
 
     get "sum"() {
@@ -303,14 +299,11 @@ module.exports = class Struct {
         return this.entry.then((entry) => {
 
             let seed = entry.getSeed();
-            if (entry.subType.length > 0) {
-                seed.specs.type = `${entry.subType}${entry.type}`
-                seed.sub
-            }
+            seed.specs.subType = type;
+            seed.specs.parentType = this.type
             // for standard for entry in Struct
-            let nEntry = Promise.resolve(new Point(seed.specs, seed.req))
-            seed.specs.subType = type
-            return new Struct(nEntry, seed.specs, this.x, type, f)
+            let nEntry = new Point(seed.specs, seed.req)
+            return new Struct(nEntry, seed.specs, this.x, type, f, this.full, this.type)
         })
 
         // return res
@@ -322,13 +315,13 @@ module.exports = class Struct {
     "TYPE"(type, f = this.f, full = this.full) {
         let specs = JSON.parse(JSON.stringify(this.specs));
         specs.subType = type;
-        if (full) {
-            let res = Struct.build(specs, this.x, type, f, full, this.type)
+        if (full === this.full) {
+            let res = new Struct(this.VALUES, specs, this.x, type, f, full, this.type)
             res.colored = this.colored;
             res.color = this.color;
             return res
         } else {
-            let res = Struct.build(specs, this.x, type, f, this.full, this.type)
+            let res = Struct.build(specs, this.x, type, f, full, this.type)
             res.colored = this.colored;
             res.color = this.color;
             return res
@@ -629,7 +622,7 @@ module.exports = class Struct {
         return result;
 
     }
-
+/*
     "changeY"(type) {
         let specs = JSON.parse(JSON.stringify(this.specs));
         specs.type = type;
@@ -642,6 +635,8 @@ module.exports = class Struct {
                 })
                 return new Struct(entry, specs, this.x, this.type, this.f, this.full, this.parentType)
     }
+
+ */
     "reInit"(type = this.type, lower = baselineLower, upper = baselineUpper, color) {
         this.type = type;
         // TODO use color

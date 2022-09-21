@@ -89,7 +89,6 @@ class Point {
 		}
 		// this.subType = '';
 		this.type = specs.type;
-		this.subType = specs.subType
 		let type = this.type;
 		// this.pos = req.position
 		//req = replace(req,'glob_temp', 'temperature')
@@ -189,11 +188,6 @@ class Point {
 	get 'difference' (){
 		return baselineContain.getBaseline(this.specs).then(baseline => {
 			let req = Object.assign(Object.create(Object.getPrototypeOf(this.req)), this.req)
-		/*	console.log('req', req)
-			console.log('this.req', this.req)
-			console.log('baseline', baseline)
-
-		 */
 			Object.keys(baseline).forEach(key => {
 				try{
 					if(req[key] !== undefined){
@@ -206,9 +200,6 @@ class Point {
 						}
 					}
 				}catch(error){
-					console.log(key)
-					console.log(req)
-				//	console.log(req[key])
 					throw error
 				}
 			})
@@ -231,6 +222,12 @@ class Point {
 			case 'snow':
 			case 'rain':
 				y = req[`${this.subType}${this.type}`]
+				break;
+			case 'minAvg':
+				y = req[`${this.specs.parentType}_${this.type}`]['min']
+				break;
+			case 'maxAvg':
+				y = req[`${this.specs.parentType}_${this.type}`]['max']
 				break;
 			default:
 		}
@@ -278,6 +275,12 @@ class Point {
 		}else{
 			this.SUBTYPE = subType;
 		}
+	}
+	get 'SUBTYPE' () {
+		return this.specs.subType;
+	}
+	set 'SUBTYPE' (type) {
+		this.specs.subType = type;
 	}
 	get 'subType' (){
 		if(!this.SUBTYPE) return ''
