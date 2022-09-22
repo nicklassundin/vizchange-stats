@@ -71,6 +71,7 @@ class PointReq {
 
 class Point {
 	static build(specs, full=false){
+	//	console.log('Point.static build:', specs)
 				return curl.proxRequest(specs, full).then(res => {
 					if (res.length < 1) return {
 						'ERROR': new Error('empty result'),
@@ -83,6 +84,7 @@ class Point {
 	constructor(specs, req = {}, full=false){
 		this.full = full;
 		this.specs = specs;
+	//	console.log('Point.constructor:', this.specs.dates)
 		if(typeof this.specs.dates.start === 'string'){
 			this.specs.dates.start = new Date(this.specs.dates.start)
 			this.specs.dates.end = new Date(this.specs.dates.end)

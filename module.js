@@ -1,4 +1,17 @@
-const {parseByDate} = require('./module/parseByDate.js')
+const ByDateStruct = require('./module/parseByDateStruct.js');
+const parseByDate = function (specs, type = 'avg', custom) {
+	//specs = Object.assign(config.default, specs);
+	return new Promise((res,rej) => {
+		// console.log('parseByDate',specs)
+		try {
+			let struct = new ByDateStruct(type, custom, specs);
+			res(struct)
+		}catch(error) {
+			rej(error)
+		}
+	}).catch(() => [])
+
+};
 /*
  * Var R = require('r-script');
  * var python=require('python').shell;
@@ -44,6 +57,10 @@ module.exports = {
 		}else{
 			return module.exports.recursive(params, data[params[index]], index+1)
 		}
+	},
+	clear (){
+		this.cache = {};
+		return this;
 	},
 	getStruct: function(specs, type = undefined) {
 		if(this.cache[specs.station] === undefined){

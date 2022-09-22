@@ -20,33 +20,48 @@ function ColorToHex(color) {
 
 
 module.exports = class Struct {
-    static build(specs, x, type, f = () => true, full = false, parentType, parentEntry) {
-        switch (specs.key) {
-            case 'month':
-                if (typeof specs.dates.start === 'number') {
-                    specs.dates.start = new Date(specs.dates.start, 0, 1)
-                    specs.dates.end = new Date(specs.dates.end + 1, 0, 0)
-                }
-                if (typeof specs.end === 'string') {
-                    specs.dates.start = new Date(specs.dates.start)
-                    specs.dates.end = new Date(specs.dates.end)
-                }
+    static build(seedSpecs, x, type, f = () => true, full = false, parentType, parentEntry) {
+        let specs = JSON.parse(JSON.stringify(seedSpecs));
+        let y0 = 1;
+        let m1 = 0;
+        let d1 = 1;
+        let m2 = 0;
+        let d2 = 0;
+        //console.log('struct.static build:', specs.keys, x)
+        switch (specs.delimiter) {
+            case 'spring':
+                m1 = 3;
+                m2 = 6;
+                y0 = 0;
                 break;
-            case 'year':
-            case 'DOY':
+            case 'summer':
+                m1 = 6;
+                m2 = 9;
+                y0 = 0;
+                break;
+            case 'autumn':
+                m1 = 9;
+                m2 = 12;
+                y0 = 0;
+                break;
+            case 'winter':
+                m1 = 12;
+                m2 = 3;
+                y0 = 1;
+                break;
             default:
-                if (typeof specs.dates.start === 'number') {
-                    specs.dates.start = new Date(specs.dates.start, 0, 1)
-                    specs.dates.end = new Date(specs.dates.end + 1, 0, 0)
-                }
-                if (typeof specs.dates.end === 'string') {
-                    specs.dates.start = new Date(specs.dates.start)
-                    specs.dates.end = new Date(specs.dates.end)
-                }
+        }
+        if (typeof specs.dates.start === 'number') {
+            specs.dates.start = new Date(specs.dates.start, m1, d1)
+            specs.dates.end = new Date(specs.dates.end + y0, m2, d2)
+        }
+        if (typeof specs.dates.end === 'string') {
+            specs.dates.start = new Date(specs.dates.start)
+            specs.dates.end = new Date(specs.dates.end)
         }
         return new Struct(parentEntry, specs, x, type, f, full, parentType)
     }
-    constructor(values = undefined, specs, x = undefined, type = "avg", f, full = false, parentType) {
+    constructor(values = undefined, specs, x = undefined, type = "avg", f, full = false, parentType ) {
         this.full = full;
         this.specs = specs;
         this.specs.parentType = parentType;
