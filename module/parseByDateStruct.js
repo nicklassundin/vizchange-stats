@@ -11,30 +11,20 @@ module.exports = class ByDateStruct {
 	}
 	"insert"(full, kn, ...k) {
 		let specs = JSON.parse(JSON.stringify(this.specs));
-
 		specs.keys = k
 		let type = this.type;
-		switch (kn) {
-			case 'spring':
-			case 'summer':
-			case 'autumn':
-			case 'winter':
-				specs.delimiter = kn;
-				break;
-			default:
-		}
+		specs.delimiter = kn;
+
 		return Struct.build(specs, kn, type, undefined, full)
 	}
 	"request" (key) {
-		// console.log('parseByDateStruct - request key', key)
 		this.parse(key)
 		let type = this.type;
 		return this.values[key]
 	}
 	get "monthly" () {
-
+		// DEPRECATED remove TODO should be replaced with month jan example
 		return this.request("monthly");
-
 	}
 	get "weeks" () {
 
@@ -92,14 +82,10 @@ module.exports = class ByDateStruct {
 		return this.request("splitDecades");
 	}
 	get "30period" () {
-
 		return this.request("30period");
-
 	}
 	get "customPeriod" () {
-
 		return this.request("customPeriod");
-
 	}
 	get "meta" () {
 
@@ -107,29 +93,31 @@ module.exports = class ByDateStruct {
 
 	}
 	get "spring" () {
-
 		return this.request("spring");
-
 	}
 	get "summer" () {
-
 		return this.request("summer");
-
 	}
 	get "autumn" () {
-
 		return this.request("autumn");
-
 	}
 	get "winter" () {
-
 		return this.request("winter");
-
 	}
+	get "jan" () { return this.request("jan"); }
+	get "feb" () { return this.request("feb"); }
+	get "mar" () { return this.request("mar"); }
+	get "apr" () { return this.request("apr"); }
+	get "may" () { return this.request("may"); }
+	get "jun" () { return this.request("jun"); }
+	get "jul" () { return this.request("jul"); }
+	get "aug" () { return this.request("aug"); }
+	get "sep" () { return this.request("sep"); }
+	get "oct" () { return this.request("oct"); }
+	get "nov" () { return this.request("nov"); }
+	get "dec" () { return this.request("dec"); }
 	get "yrlyTest" () {
-
 		return this.request("yrlyTest");
-
 	}
 	////
 	//
@@ -154,7 +142,6 @@ module.exports = class ByDateStruct {
 		return this.request('all');
 	}
 "parse" (key) {
-	// console.log(key)
 	if(!this.values[key]){
 		(new Date()).getTime();
 		switch (key) {
@@ -170,32 +157,53 @@ module.exports = class ByDateStruct {
 			case 'spring':
 				this.values[key] = this.insert(false, key, 'year', 'DOY')
 				break;
-			case 'decades':
-				this.insert(false, "decades", 'decade', 'year')(entry);
+			case 'jan':
+			case 'feb':
+			case 'mar':
+			case 'apr':
+			case 'may':
+			case 'jun':
+			case 'jul':
+			case 'aug':
+			case 'sep':
+			case 'oct':
+			case 'nov':
+			case 'dec':
+				this.values[key] = this.insert(true, key, 'year')
 				break;
-			case 'splitDecades':
-				this.insert(false, key, 'allTime', 'splitMonth')(entry);
-				this.insert(false, key, 'splitDecade', 'splitMonth')(entry);
+			case 'weeks':
+				this.values[key] = this.insert(true, key, 'year', 'week')
+				//this.insert(false, "weeks", entry.year, entry.week)(entry);
+				break;
+			case 'monthly':
+				// deprecated TODO
+				this.values[key] = this.insert(false, key, 'month', 'year')
+				break;
+			case 'months':
+				this.values[key] = this.insert(true, key, "year", "month")
+				//this.insert(false, "months", entry.year, entry.monthName)(entry);
+				break;
+			case 'decades':
+				this.values[key] = this.insert(false, key, 'decade', 'year')
+				//this.insert(false, "decades", 'decade', 'year')(entry);
 				break;
 			case '30period':
-				this.insert(false, key, 'allTime', 'splitMonth')(entry)
-				this.insert(false, key, '30periodyear', 'splitMonth')(entry)
+				this.values[key] = {
+					'allTime': this.insert(false, 'allTime', 'splitMonth'),
+					'30Periodyear': this.insert(false, key, '30periodyear', 'splitMonth')
+				}
+				break;
+			case 'splitDecades':
+				this.values[key] = {
+					'allTime': this.insert(false, 'allTime', 'splitMonth'),
+					'splitDecade': this.insert(false, key, 'splitDecade', 'splitMonth')
+				}
 				break;
 			case 'yrlySplit':
-				var splitDOY = ((year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0)) ? 366 : 365) + entry.DOY;
-				this.insert(false, "yrlySplit", entry.splitYear, (entry.splitYear === entry.year ? entry.DOY : splitDOY))(entry);
+				this.values[key] = this.insert(false, key, 'splitYear', 'DOY')
 				break;
 			case 'yrlyFull':
 				this.values[key] = this.insert(true, "yrlyFull", "year");
-				break;
-			case 'monthly':
-				this.insert(false, "monthly", entry.monthName, entry.year)(entry);
-				break
-			case 'weeks':
-				this.insert(false, "weeks", entry.year, entry.week)(entry);
-				break;
-			case 'months':
-				this.insert(false, "months", entry.year, entry.monthName)(entry);
 				break;
 			case 'custom':
 				if (this.custom) {
@@ -226,7 +234,6 @@ module.exports = class ByDateStruct {
 			case 'default':
 				break;
 		}
-		// console.log("time",(new Date()).getTime()-startTime)
 	}
 }
 };

@@ -129,7 +129,7 @@ let parsePeriod = function(date){
 		let day = pad(date.getDate());
 		return `${year}${month}${day}`;
 	}catch(error){
-		console.log(typeof date, date)
+		//console.log(typeof date, date)
 		throw error;
 	}
 
@@ -180,7 +180,7 @@ module.exports = {
 		this.cached[url] = axios.get(url).then(result => {
 			if(!result.cached){
 				this.number += 1;
-				console.log('number', this.number)
+				//console.log('number', this.number)
 			}
 		//	console.log('size:', JSON.stringify(result.data).length)
 		//	console.log('data:', result.data)

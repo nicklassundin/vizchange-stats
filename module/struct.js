@@ -14,6 +14,11 @@ function ColorToHex(color) {
     return hexadecimal.length === 1 ? "0" + hexadecimal : hexadecimal;
 }
 
+function getDateOfWeek(w, y) {
+    var d = (1 + (w - 1) * 7); // 1st of January + 7 days for each week
+
+    return new Date(y, 0, d);
+}
 //function ConvertRGBtoHex(red, green, blue) {
 //	return "#" + ColorToHex(red) + ColorToHex(green) + ColorToHex(blue);
 //}
@@ -22,43 +27,95 @@ function ColorToHex(color) {
 module.exports = class Struct {
     static build(seedSpecs, x, type, f = () => true, full = false, parentType, parentEntry) {
         let specs = JSON.parse(JSON.stringify(seedSpecs));
-        let y0 = 1;
+        let y1 = 0;
+        let y2 = 1;
         let m1 = 0;
         let d1 = 1;
         let m2 = 0;
         let d2 = 0;
+        //console.log('seedSpecs:', seedSpecs.keys)
         //console.log('struct.static build:', specs.keys, x)
         switch (specs.delimiter) {
+            case 'month':
+                y2 = 0;
+                m1 = help.months().indexOf(x);
+                m2 = help.months().indexOf(x) + 1;
+                break;
+            case 'week':
+                specs.dates.start = getDateOfWeek(seedSpecs.x, (new Date(specs.dates.start)).getFullYear())
+                specs.dates.end = specs.dates.start.addDays(7)
+                break;
+            case 'jan':
+            case 'feb':
+            case 'mar':
+            case 'apr':
+            case 'may':
+            case 'jun':
+            case 'jul':
+            case 'aug':
+            case 'sep':
+            case 'oct':
+            case 'nov':
+            case 'dec':
+                y2 = 0;
+                m1 = help.months().indexOf(specs.delimiter);
+                m2 = m1+1;
+                break;
             case 'spring':
                 m1 = 3;
                 m2 = 6;
-                y0 = 0;
+                y2 = 0;
                 break;
             case 'summer':
                 m1 = 6;
                 m2 = 9;
-                y0 = 0;
+                y2 = 0;
                 break;
             case 'autumn':
                 m1 = 9;
                 m2 = 12;
-                y0 = 0;
+                y2 = 0;
                 break;
             case 'winter':
                 m1 = 12;
                 m2 = 3;
-                y0 = 1;
+                y2 = 1;
+                break;
+            case 'decades':
+                y2 = 10;
+                break;
+            case '30period':
+                y1 = -1;
+                y2 = 30;
+                m1 = 7
+                m2 = 7
+                break;
+            case 'splitMonth':
+            //    console.log('x',x)
+             //   y1 = (x < 12) ? + -1 : 0;
+              //  y2 = 0;
+               // m1 = (x > 12) ? x -12 : x
+               // m2 = (x > 12) ? x -12 : x
+               // break;
+            case 'monthly':
+                break;
+            case 'yrlySplit':
+                y1 = -1;
+                y2 = 0;
+                m1 = 7
+                m2 = 7
                 break;
             default:
         }
         if (typeof specs.dates.start === 'number') {
-            specs.dates.start = new Date(specs.dates.start, m1, d1)
-            specs.dates.end = new Date(specs.dates.end + y0, m2, d2)
+            specs.dates.start = new Date(specs.dates.start + y1, m1, 1)
+            specs.dates.end = new Date(specs.dates.end + y2, m2, d2)
         }
         if (typeof specs.dates.end === 'string') {
             specs.dates.start = new Date(specs.dates.start)
             specs.dates.end = new Date(specs.dates.end)
         }
+     //   console.log('after:', specs.dates)
         return new Struct(parentEntry, specs, x, type, f, full, parentType)
     }
     constructor(values = undefined, specs, x = undefined, type = "avg", f, full = false, parentType ) {
@@ -131,7 +188,6 @@ module.exports = class Struct {
 
     get "y"() {
         try{
-
         return this.entry.then(point => {
             if(undefined === point) return new Error('no point specified')
             return point.y
@@ -153,13 +209,31 @@ module.exports = class Struct {
      get "point" (){
 		return this.POINT[0]
 	}*/
-    getValues(specs, key, k, type, f, full) {
-        specs.dates.start = k;
-        specs.dates.end = k;
+    getValues(genSpecs, key, k, type, f, full) {
+        let specs = JSON.parse(JSON.stringify(genSpecs))
+        specs.x = k;
+        switch (key) {
+            case "month":
+                specs.delimiter = k
+                specs.dates.start = new Date(specs.dates.start).getFullYear()
+                specs.dates.end = new Date(specs.dates.end).getFullYear()
+                break;
+            case "week":
+                specs.delimiter = key
+                break;
+            case "splitMonth":
+                specs.delimiter = key;
+                specs.dates.start = new Date(specs.dates.start).getFullYear()
+                specs.dates.end = new Date(specs.dates.end).getFullYear()
+                break;
+            default:
+                specs.dates.start = k;
+                specs.dates.end = k;
+        }
+        let result = Struct.build(specs, k, type, f, full, specs.parentType);
+       // console.log(result)
        // values[k] = Struct.build(specs, k, type, f, full, specs.parentType, this.entry.then(e => e.outside(specs)));
-        return Struct.build(specs, k, type, f, full, specs.parentType);
-        values[k] = Struct.build(specs, k, type, f, full, specs.parentType);
-        return values;
+        return result
     }
     get "values"() {
         // TODO remove embededed promises
@@ -169,27 +243,14 @@ module.exports = class Struct {
         let f = this.f;
         let full = this.full;
         let parentType = this.specs.parentType;
-        if(Object.keys(this.VALUES).length == 0) {
+        if(key === undefined){
+            this.VALUES = this.entry;
+        }else if(Object.keys(this.VALUES).length == 0) {
             let keys = (new Point(genSpecs))[`${key}s`]
             this.VALUES = {}
+            //console.log(`${key}s`, keys)
             for(let i = 0; i < keys.length; i++) {
-                this.VALUES[keys[i]] = this.getValues(JSON.parse(JSON.stringify(genSpecs)), key, keys[i], type, f, full, parentType)
-
-                /*
-                if(i <= 0){
-                    this.VALUES[keys[i]] = this.getValues(JSON.parse(JSON.stringify(genSpecs)), key, keys[i], type, f, full, parentType)
-
-                }else if(i === 1){
-                    this.VALUES[keys[i]] = this.VALUES[keys[i-1]].y.then((previous) => {
-                        return this.getValues(JSON.parse(JSON.stringify(genSpecs)), key, keys[i], type, f, full, parentType)
-                    })
-                }else{
-                    this.VALUES[keys[i]] = this.VALUES[keys[i-1]].then(e => e.y).then((previous) => {
-                        return this.getValues(JSON.parse(JSON.stringify(genSpecs)), key, keys[i], type, f, full, parentType)
-                    })
-                }
-
-                 */
+                this.VALUES[keys[i]] = this.getValues(genSpecs, key, keys[i], type, f, full, parentType)
             }
         }
         return Object.values(this.VALUES).map(each => {
@@ -198,7 +259,6 @@ module.exports = class Struct {
             } else {
                 return Promise.resolve(each)
             }
-
         })
     }
 

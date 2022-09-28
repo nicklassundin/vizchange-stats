@@ -36,15 +36,24 @@ class Baseline {
 let baselineContain = new Baseline();
 
 class PointReq {
-	static build(requests){
+	static build(requests, specs){
 		let result = {}
 		requests.forEach(req => {
 			if(typeof result[`${req.date}${req.position}`] !== 'object') result[`${req.date}${req.position}`] = {}
 			Object.assign(result[`${req.date}${req.position}`], req)
 		})
-		return Object.values(result).map(each => new PointReq(each))
+		return Object.values(result).filter(each => {
+			switch(specs.description) {
+				case 'splitMonth':
+				case 'splitDecades':
+					let x = (specs.x > 12) ? specs.x - 7 : specs.x
+					return !((new Date(each.date)).getMonth()+1 === x)
+				default:
+					return true
+			}
+		}).map(each => new PointReq(each, specs))
 	}
-	constructor(request){
+	constructor(request, specs){
 		request = replace(request,'glob_temp', 'temperature')
 		request = replace(request,'64n-90n_temp', 'temperature')
 		request = replace(request,'nhem_temp', 'temperature')
@@ -71,15 +80,33 @@ class PointReq {
 
 class Point {
 	static build(specs, full=false){
-	//	console.log('Point.static build:', specs)
-				return curl.proxRequest(specs, full).then(res => {
-					if (res.length < 1) return {
-						'ERROR': new Error('empty result'),
-						'specs': specs
-					}
-					if (!full) res = res.reduce((a, b) => Object.assign(a, b))
-					return new Point(specs, res, full);
-				})
+		switch (specs.delimiter){
+			case 'weeks':
+			case 'splitMonth':
+			case 'splitDecades':
+			case 'jan':
+			case 'feb':
+			case 'mar':
+			case 'apr':
+			case 'may':
+			case 'jun':
+			case 'jul':
+			case 'aug':
+			case 'sep':
+			case 'oct':
+			case 'nov':
+			case 'dec':
+				full = true;
+			default:
+		}
+		return curl.proxRequest(specs, full).then(res => {
+			if (res.length < 1) return {
+				'ERROR': new Error('empty result'),
+				'specs': specs
+			}
+			if (!full) res = res.reduce((a, b) => Object.assign(a, b))
+			return new Point(specs, res, full);
+		})
 	}
 	constructor(specs, req = {}, full=false){
 		this.full = full;
@@ -89,6 +116,7 @@ class Point {
 			this.specs.dates.start = new Date(this.specs.dates.start)
 			this.specs.dates.end = new Date(this.specs.dates.end)
 		}
+		//console.log(this.specs)
 		// this.subType = '';
 		this.type = specs.type;
 		let type = this.type;
@@ -98,9 +126,9 @@ class Point {
 		//req = replace(req,'nhem_temp', 'temperature')
 		if(typeof req[type] == 'string' && req[type].length < 1) req[type] = undefined
 		if(full){
-			this.req = PointReq.build(req);
+			this.req = PointReq.build(req, specs);
 		}else{
-			this.req = new PointReq(req);
+			this.req = new PointReq(req, specs);
 		}
 		if(['breakup', 'freezeup'].includes(type)){
 			let date = new Date(req[type]);
@@ -213,6 +241,7 @@ class Point {
 	}
 	'getY'(req = this.req){
 		let y = req[`${this.type}`]
+		//console.log('old:', y)
 		switch (this.SUBTYPE){
 			case 'difference':
 				if(typeof y == 'object'){
@@ -226,45 +255,53 @@ class Point {
 				y = req[`${this.subType}${this.type}`]
 				break;
 			case 'minAvg':
-				y = req[`${this.specs.parentType}_${this.type}`]['min']
-				break;
+				y = req[`${'avg'}_${this.type}`]
+				if(typeof y == 'object'){
+					return Number(y.min)
+				}
 			case 'maxAvg':
-				y = req[`${this.specs.parentType}_${this.type}`]['max']
-				break;
+				y = req[`${'avg'}_${this.type}`]
+				if(typeof y == 'object'){
+					return Number(y.max)
+				}
+				return Number(req[`avg_${this.type}`])
 			default:
+				// TODO generalize
 		}
 		if(y === undefined) y = req[`${this.subType}${this.type}`];
 		if(y === undefined && this.SUBTYPE === 'sum') y = req[`avg_${this.type}`]
 		if(y === undefined) y = req[this.type];
-		if(typeof y == 'object') return Number(y[this.SUBTYPE])
+		if(typeof y == 'object') y = y[this.SUBTYPE]
 		return Number(y)
 	}
 	get 'y' (){
+		let result = NaN;
 		if(this.req.length === 0) return NaN
 		if(this.full){
+			result = this.req.map(each => this.getY(each)).filter(y => y !== undefined && !isNaN(y))
+			if(result.length === 0) return NaN
 			switch(this.SUBTYPE){
 				case 'sum':
-					return this.req.map(each => this.getY(each)).filter(y => y !== undefined && !isNaN(y)).reduce((a,b) => a + b)
+					return result.reduce((a,b) => a + b)
 				case 'avg':
-					return this.req.map(each => this.getY(each)).filter(y => y !== undefined && !isNaN(y)).reduce((a,b) => a + b)/this.req.length
+					return result.reduce((a,b) => a + b)/this.req.length
 				case 'min':
-					return Math.min(this.req.map(each => this.getY(each))).filter(y => y !== undefined && !isNaN(y))
 				case 'max':
-					return Math.max(this.req.map(each => this.getY(each))).filter(y => y !== undefined && !isNaN(y))
+					return Math[this.SUBTYPE](...result)
+				case 'maxAvg':
+				case 'minAvg':
+					return result.reduce((a,b) => a + b)/this.req.length;
+				case 'snow':
+				case 'rain':
+					return result.reduce((a,b) => a + b)
 				case 'last':
 				case 'first':
 					return this.getY(this.req[0]);
 				case 'difference':
 					return this.difference
-				case 'snow':
-				case 'rain':
-					//return this.req.map(each => this.getY(each))
-					let res = this.req.map(each => this.getY(each)).filter(y => y !== undefined && !isNaN(y))
-					if(res.length > 0) return res.reduce((a,b) => a + b)
-					return []
-					break
+
 				default:
-					return this.req.map(each => this.getY(each))
+					return result
 
 			}
 		}else{
@@ -331,6 +368,45 @@ class Point {
 		let end = this.specs.dates.end.getFullYear();
 		return Array.from({length: (end - start)}, (v, k) => k + start)
 	}
+	get 'months' () {
+		return help.months()
+	}
+	get 'weeks' () {
+		let start = this.specs.dates.start.getWeekNumber();
+		let end = this.specs.dates.end.getWeekNumber();
+		return Array.from({length: (end - start)}, (v, k) => k + start)
+	}
+	get 'decades' (){
+		let start = this.decade
+		let end = this.specs.dates.end.getFullYear();
+		end = (end - end % 10)
+		return Array.from({length: (end - start)/10+1}, (v, k) => k*10 + start)
+	}
+	get 'splitYears' (){
+		let start = this.splitYear
+		let end = this.specs.dates.end.getFullYear();
+		return Array.from({length: (end - start)}, (v, k) => k + start)
+	}
+	get 'splitMonths' (){
+		let start = 7
+		let end = start + 12;
+		return Array.from({length: (end - start)}, (v, k) => k + start)
+	}
+	get 'splitDecades' (){
+		let start = this.splitDecade
+		let end = this.specs.dates.end.getFullYear();
+		return Array.from({length: (end - start)/10}, (v, k) => k*10 + start)
+	}
+	get '30periodyears'() {
+		let start = this['30periodyear']
+		let end = this.specs.dates.end.getFullYear();
+		return Array.from({length: (end - start)/30}, (v, k) => k*30 + start)
+		let decades = this.splitDecades
+		return decades.map((v) => {
+			console.log(v)
+			return v - v % 30 +1
+		})
+	}
 	get 'month' (){
 		return this.x.getMonth();
 	}
@@ -346,7 +422,7 @@ class Point {
 		return [...Array(end-start).keys()].map(v => (v+start));
 	}
 	get '30periodyear' (){
-		return `${this.splitDecade - (this.splitDecade-1900) % 30 + 1}` 
+		return this.splitDecade - (this.splitDecade-1900) % 30 + 1
 	}
 	get '30period' (){
 		return `${this['30periodyear']-this.century}-${this['30periodyear']-this.century+29}`
@@ -383,6 +459,5 @@ class Point {
 		}
 	}
 }
-
 // module.exports.Entry = Entry;
 module.exports.Point = Point

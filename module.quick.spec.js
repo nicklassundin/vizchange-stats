@@ -24,6 +24,7 @@ let configs = require('./config.json')
 let cache = {}
 
 const assert = require('assert');
+const help = require("climate-plots-helper");
 describe(
     'Requests',
     function () {
@@ -160,19 +161,166 @@ describe(
                 })
             })
             describe('type test', function() {
-                it('precipitation - spring', () => {
+                it('spring', () => {
                     let params = ['precipitation', 'spring', 'values', 0, 'y']
                     let config = Object.assign(configs['latest'], precipitation_specs)
                     return parser.getByParams(config, params).then(values => {
+                        console.log(values)
                         return assert.ok(Math.abs(values - 74.2) < 0.0001 )
                         // return assert.equal(values, 132.8)
                     })
                 })
-                it('precipitation - summer', () => {
+                it('summer', () => {
                     let params = ['precipitation', 'summer', 'values', 0, 'y']
                     let config = Object.assign(configs['latest'], precipitation_specs)
                     return parser.getByParams(config, params).then(values => {
+                        console.log(values)
                         return assert.ok(Math.abs(values - 95.3) < 0.0001 )
+                    })
+                })
+                it('decade', () => {
+                    let params = ['precipitation', 'decades', 'values', 1, 'y']
+                    let config = Object.assign(configs['liveHalf'], precipitation_specs)
+                    return parser.getByParams(config, params).then(values => {
+                        console.log(values)
+                        return assert.ok(Math.abs(values - 2923.2) < 0.0001 )
+                    })
+                })
+                it('yrlySplit', () => {
+                    let params = ['precipitation', 'yrlySplit', 'values', 1, 'y']
+                    let config = Object.assign(configs['latest'], precipitation_specs)
+                    return parser.getByParams(config, params).then(values => {
+                        console.log(values)
+                        return assert.ok(Math.abs(values - 338.5) < 0.0001 )
+                    })
+                })
+                it('30period - allTime', () => {
+                    let params = ['precipitation', '30period', 'allTime', 'values', 1, 'y']
+                    let config = Object.assign(configs['liveHalf'], precipitation_specs)
+                    return parser.getByParams(config, params).then(values => {
+                        console.log(values)
+                        return assert.ok(Math.abs(values - 16900.0000000003) < 0.0001 )
+                    })
+                })
+                it('30period - 30periodyear', () => {
+                    let params = ['precipitation', '30period', '30Periodyear', 'values', 1, 'y']
+                    let config = Object.assign(configs['liveHalf'], precipitation_specs)
+                    return parser.getByParams(config, params).then(values => {
+                        console.log(values)
+                        return assert.ok(Math.abs(values - 9391.9) < 0.0001 )
+                    })
+                })
+                it('splitDecades - alltimes - months', () => {
+                    let params = ['precipitation', 'splitDecades', 'allTime', 'values']
+                    let config = Object.assign(configs['liveHalf'], precipitation_specs)
+                    return parser.getByParams(config, params).then(values => {
+                        return Promise.all(values).then(resolved => {
+                            return Promise.all(resolved.map(each => {
+                                return each.x
+                            })).then(ys => {
+                                let expected = [7,8,9,10,11,12,13,14,15,16,17,18]
+                                return assert.ok(ys+"" == expected+"")
+                            })
+                        })
+                    })
+                })
+                it('splitDecades - splitDecade - decades', () => {
+                    let params = ['precipitation', 'splitDecades', 'splitDecade', 'values']
+                    let config = Object.assign(configs['liveHalf'], precipitation_specs)
+                    return parser.getByParams(config, params).then(values => {
+                        return Promise.all(values).then(resolved => {
+                            return Promise.all(resolved.map(each => {
+                                return each.x
+                            })).then(ys => {
+                                let expected = [1911, 1921, 1931, 1941, 1951]
+                                return assert.ok(ys+"" == expected+"")
+                            })
+                        })
+                    })
+                })
+                it('splitDecades - splitDecade - months', () => {
+                    let params = ['precipitation', 'splitDecades', 'splitDecade', 'values', 3, 'values']
+                    let config = Object.assign(configs['liveHalf'], precipitation_specs)
+                    return parser.getByParams(config, params).then(values => {
+                        return Promise.all(values).then(resolved => {
+                            return Promise.all(resolved.map(each => {
+                                return each.x
+                            })).then(ys => {
+                                let expected = [7,8,9,10,11,12,13,14,15,16,17,18]
+                                return assert.ok(ys+"" == expected+"")
+                            })
+                        })
+                    })
+                })
+                it('monthly', () => {
+                    let params = ['precipitation', 'jan', 'values', 1, 'entry', 'monthName']
+                    let config = Object.assign(configs['liveHalf'], precipitation_specs)
+                    return parser.getByParams(config, params).then(values => {
+                        return assert.equal(values, 'jan')
+                    })
+                })
+                it('monthly - shortValues', () => {
+                    let help = require('climate-plots-helper')
+                    let months = help.months()
+                    months.push('yrly')
+                    return Promise.all(months.map(month => {
+                        let params = ['precipitation', month, 'shortValues', 1, 'y']
+                        let config = Object.assign(configs['latest'], precipitation_specs)
+                        return parser.getByParams(config, params)
+                    })).then(values => {
+                        let total = values.pop()
+                        values = values.reduce((a,b) => a + b)
+                        return assert.ok(Math.abs(total - values) < 0.0001)
+                    })
+                })
+                describe('weeks', function() {
+                    it('weeks', () => {
+                        let help = require('climate-plots-helper')
+                        let weeks = [['temperature', 'weeks', 'values', 1, 'y'],['temperature', 'yrly', 'shortValues', 1, 'y']]
+                        return Promise.all(weeks.map(params => {
+                            let config = Object.assign(configs['latest'], specs)
+                            return parser.getByParams(config, params)
+                        })).then(values => {
+                            let total = values.pop()
+                            values = values[0]
+                            return assert.ok(Math.abs(total - values) < 0.0001)
+                        })
+                    })
+                    it('weeks - minAvg', () => {
+                        let params = ['temperature', 'weeks', 'minAvg', 'values', 1, 'values', 1, 'y']
+                        let config = Object.assign(configs['latest'], specs)
+                        return parser.getByParams(config, params).then(values => {
+                            //console.log(values.req)
+                            //console.log(values.y)
+                            return assert.equal(values, -2.4875)
+                        })
+                    })
+                    it('weeks - maxAvg', () => {
+                        let params = ['temperature', 'weeks', 'maxAvg', 'values', 1, 'values', 1, 'y']
+                        let config = Object.assign(configs['latest'], specs)
+                        return parser.getByParams(config, params).then(values => {
+                            //console.log(values.req)
+                            //console.log(values.y)
+                            return assert.equal(values, -2.4875)
+                        })
+                    })
+                })
+                describe('months', function() {
+                    it('months - shortValues', () => {
+                        let help = require('climate-plots-helper')
+                        let months = Object.keys(help.months()).map(key => {
+                            return ['precipitation', 'months', 'values', 1, 'values', key, 'y']
+                        })
+                        months.push(['precipitation', 'yrly', 'shortValues', 1, 'y'])
+                        return Promise.all(months.map(params => {
+                            let config = Object.assign(configs['latest'], precipitation_specs)
+                            return parser.getByParams(config, params)
+                        })).then(values => {
+                            let total = values.pop()
+                            values = values.reduce((a,b) => a + b)
+                            console.log(values, '==', total)
+                            return assert.ok(Math.abs(total - values) < 0.0001)
+                        })
                     })
                 })
             })
@@ -318,7 +466,7 @@ describe(
                 let params = ['precipitation', 'yrly', 'snow', 'shortValues', 2, 'y']
                 let config = Object.assign(configs['latest'], precipitation_specs)
                 return parser.getByParams(config, params).then(values => {
-                    return assert.equal(values.length, 0)
+                    return assert.equal(values.length, undefined)
                 })
             })
             it('latest - snow - y', () => {
