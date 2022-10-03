@@ -15,14 +15,13 @@ function ColorToHex(color) {
 }
 
 function getDateOfWeek(w, y) {
-    var d = (1 + (w - 1) * 7); // 1st of January + 7 days for each week
+    let d = (1 + (w - 1) * 7); // 1st of January + 7 days for each week
 
     return new Date(y, 0, d);
 }
 //function ConvertRGBtoHex(red, green, blue) {
 //	return "#" + ColorToHex(red) + ColorToHex(green) + ColorToHex(blue);
 //}
-
 
 module.exports = class Struct {
     static build(seedSpecs, x, type, f = () => true, full = false, parentType, parentEntry) {
@@ -365,8 +364,43 @@ module.exports = class Struct {
     get "number"() {
         return this.TYPE("number", this.f)
     }
+    get "baseline"() {
+        let {start} = this.specs.baseline
+        let {end} = this.specs.baseline
 
+        // TODO remove embededed promises
+        let genSpecs = JSON.parse(JSON.stringify(this.specs));
+        genSpecs.dates.start = (new Date(genSpecs.dates.start))
+        genSpecs.dates.start = new Date(genSpecs.baseline.start, genSpecs.dates.start.getMonth(), genSpecs.dates.start.getDate())
+        genSpecs.dates.end = (new Date(genSpecs.dates.end))
+        genSpecs.dates.end = new Date(genSpecs.baseline.end, genSpecs.dates.end.getMonth(), genSpecs.dates.end.getDate())
+        let key = genSpecs.keys.shift();
+        let type = this.type;
+        let f = this.f;
+        let full = this.full;
+        let parentType = this.specs.parentType;
+        let keys = (new Point(genSpecs))[`${key}s`]
+        let values = {}
+        //console.log(`${key}s`, keys)
+        for(let i = 0; i < keys.length; i++) {
+            values[keys[i]] = this.getValues(genSpecs, key, keys[i], type, f, full, parentType).short()
+        }
+
+        return Promise.all(Object.values(values).map(value => value)).then(values => values.reduce((a, b) => {
+            a.y = (a.y + b.y)/2
+            return a
+        })).then(value => value.y)
+
+    }
     get "difference"() {
+        return this.baseline.then(baseline => {
+            return this.shortValues.map(value => {
+                return value.then(value => {
+                    value.y -= baseline;
+                    return value
+                })
+            })
+        })
         return this.TYPE("difference", this.f)
     }
 

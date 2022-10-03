@@ -14,10 +14,11 @@ class Baseline {
 		this.cache = {};
 	}
 	getBaseline(specs){
+		//console.log(specs)
 		let start = specs.baseline.start;
 		let end = specs.baseline.end;
-		if(undefined === this.cache[`${start}${end}`]){
-			this.cache[`${start}${end}`] = curl.proxRequest({
+		if(undefined === this.cache[`${start}${end}${specs.type}`]){
+			this.cache[`${start}${end}${specs.type}`] = curl.proxRequest({
 				dates: {
 					start: new Date(specs.baseline.start,1,1),
 					end: new Date(specs.baseline.end,1,1),
@@ -29,7 +30,7 @@ class Baseline {
 				return baseline.reduce((a,b) => Object.assign(a, b));
 			})
 		}
-		return this.cache[`${start}${end}`]
+		return this.cache[`${start}${end}${specs.type}`]
 	}
 }
 
@@ -221,8 +222,12 @@ class Point {
 			Object.keys(baseline).forEach(key => {
 				try{
 					if(req[key] !== undefined){
+						console.log('--------------------------------')
+						//console.log(baseline)
+						console.log(`${this.req[key].avg} - ${baseline[key].avg}`)
 						req[key].baseline = baseline[key].avg
 						req[key].difference = this.req[key].avg - baseline[key].avg
+						console.log(req[key].difference)
 					}else{
 						req[key] = {
 							baseline: NaN,

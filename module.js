@@ -32,9 +32,9 @@ global.baselineUpper = constant.baselineUpper;
 
 module.exports = {
 	getByParams: function (specs, params){
-		return this.recursive(params, this[params[0]](specs))
+		return this.recursive(params, this[params[0]](specs).then(result => result.request(params[1])))
 	},
-	"recursive": function(params, data, index = 1){
+	"recursive": function(params, data, index = 2){
 		if(params.length - index === 1){
 			if(typeof data.then === 'function'){
 				return data.then(function(results){
