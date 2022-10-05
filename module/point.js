@@ -281,7 +281,6 @@ class Point {
 				if(typeof y == 'object'){
 					return Number(y.min)
 				}
-				console.log(req[`avg_${this.type}`])
 				return Number(req[`avg_${this.type}`])
 			case 'maxAvg':
 				y = req[`${'avg'}_${this.type}`]
