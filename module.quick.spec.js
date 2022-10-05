@@ -194,12 +194,20 @@ describe(
                             return assert.equal(values, 22)
                         })
                     })
-                    it('days', () => {
-                        let params = ['temperature', 'yrlyFull', 'growingSeason', 1, 'y']
+                    it('days - shortValues', () => {
+                        let params = ['temperature', 'yrlyFull', 'growingSeason', 0]
                         let config = Object.assign(configs['latest'], specs)
                         return parser.getByParams(config, params).then(values => {
                             console.log('values', values)
-                            return assert.equal(values, 154)
+                            return assert.equal(values.y, 149)
+                        })
+                    })
+                    it('days', () => {
+                        let params = ['temperature', 'yrlyFull', 'growingSeason', 1]
+                        let config = Object.assign(configs['latest'], specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log('values', values)
+                            return assert.equal(values.y, 154)
                         })
                     })
                 })
@@ -525,7 +533,7 @@ describe(
                 //let config = Object.assign(configs['latest'], precipitation_specs)
                 return parser.getByParams(config, params).then(values => {
                     console.log('values', values)
-                    return assert.ok(Math.abs(values - 171.29999999999978) < 0.00001)
+                    return assert.ok(Math.abs(values - 171.29999999999978) < 0.1)
                 })
             })
             it('Check snow and rain', () => {
