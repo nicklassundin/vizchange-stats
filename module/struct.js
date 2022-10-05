@@ -405,6 +405,7 @@ module.exports = class Struct {
         return this.baseline.then(baseline => {
             return this.shortValues.map(value => {
                 return value.then(value => {
+                    if(value === undefined) return undefined
                     value.y -= baseline;
                     return value
                 })
@@ -461,23 +462,26 @@ module.exports = class Struct {
     "numberReq"() {
         return this;
     }
-
     get "shortValues"() {
         return this.values.map(each => {
             return each.then(vals => vals.short())
         })
     }
-
     get "yValues"() {
         return this.shortValues.map(each => each.y)
     }
     "short"() {
         if (this.typeMeta !== undefined) return this.typeMeta
-        /*
+
         return this.entry.then(entry => {
-            return entry.short()
+            try {
+                return entry.short()
+            }catch(error) {
+                //console.log(entry)
+               // throw error
+            }
         })
-        */
+
         return this.y.then(y => {
             return {
                 compressed: true,

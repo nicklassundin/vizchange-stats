@@ -162,6 +162,17 @@ describe(
                 })
             })
             describe('type test', function() {
+                describe('precipitation', function() {
+                    it('difference', () => {
+                        let params = ['precipitation', 'yrly', 'difference'];
+                        let config = Object.assign(configs['latest'], precipitation_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            return Promise.all(values).then(array => {
+                                return assert.equal(array.length, 7)
+                            })
+                        })
+                    })
+                })
                 describe('season', function() {
                     it('spring', () => {
                         let params = ['precipitation', 'spring', 'values', 0, 'y']
@@ -440,15 +451,6 @@ describe(
                         return assert.equal(values, 1.0946784014248185)
                         // TODO OLD?! test validity
                         // return assert.equal(values, 1.4913425661630546)
-                    })
-                })
-                it('precipitation - difference', () => {
-                    let params = ['precipitation', 'yrly', 'difference'];
-                    let config = Object.assign(configs['latest'], precipitation_specs)
-                    return parser.getByParams(config, params).then(values => {
-                        return Promise.all(values).then(array => {
-                            return assert.equal(array.length, 7)
-                        })
                     })
                 })
             })

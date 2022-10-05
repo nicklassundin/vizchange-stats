@@ -106,10 +106,8 @@ class Point {
 			default:
 		}
 		return curl.proxRequest(specs, full).then(res => {
-			if (res.length < 1) return {
-				'ERROR': new Error('empty result'),
-				'specs': specs
-			}
+			if (res.length < 1) return new Error('empty result', specs)
+
 			if (!full) res = res.reduce((a, b) => Object.assign(a, b))
 			return new Point(specs, res, full);
 		})
@@ -470,11 +468,6 @@ class Point {
 		return new Point(this.specs, this.req, this.full)
 	}
 	'short' (){
-		//let next = {}
-		//next.y = this.y
-		//Object.keys(this).forEach(key => {
-			//next[key] = this[key];
-		//})
 		let y = this.y
 		return {
 			compressed: true,
@@ -485,7 +478,7 @@ class Point {
 				blue: ColorToHex(55 + Math.floor(y * 200 / (this.y - y)), 255, 0)
 			},
 //			type: this.type,
-//			xInterval: this.xInterval,
+			xInterval: this.specs.dates,
 //			typeMeta: this.typeMeta,
 			date: this.date
 		}
