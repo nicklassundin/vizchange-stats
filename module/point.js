@@ -1,6 +1,11 @@
 const help = require('climate-plots-helper');
 const curl = require('../gateway.js')
 
+function ColorToHex(color) {
+	let hexadecimal = color.toString();
+	return hexadecimal.length === 1 ? "0" + hexadecimal : hexadecimal;
+}
+
 let replace = (req, a, b) => {
 	if(req[a]){
 		req[b] = req[a];
@@ -160,8 +165,14 @@ class Point {
 	}
 	'dateSlice' (start, end) {
 		let req = this.req;
+		//console.log(start, end)
 		if(Array.isArray(req)){
+			// TODO test case for this individually
 			req = req.filter((e) => {
+				//console.log(typeof e.date, typeof start)
+				e.date = new Date(e.date)
+				//console.log(e.date, '>', start, '&&', e.date, '<', end)
+				//console.log((e.date > start) && (e.date < end))
 				return (e.date > start) && (e.date < end)
 			})
 			return new Point(this.specs, req, this.full)
@@ -173,6 +184,7 @@ class Point {
 			}
 		}
 	}
+
 	get 'x'(){
 		let date = this.req.date
 		if(date === undefined){
@@ -202,17 +214,23 @@ class Point {
 		}))
 		return new Point(specs, req, this.full)
 	}
-	get 'first'(){
+	'first'(f){
 		let req = this.req.sort((a, b) => {
 			return (new Date(a.date).getTime()) - (new Date(b.date).getTime())
-		})[0]
+		}).filter((e) => {
+			e.y = e[`${this.specs.parentType}_${this.type}`]
+			return f(e)
+		}).pop()
 		req[`${this.subType}${this.type}`] = req[`${this.specs.parentType}_${this.type}`]
 		return new Point(this.specs, req, false)
 	}
-	get 'last'(){
+	'last'(f){
 		let req = this.req.sort((a, b) => {
 			return (new Date(a.date).getTime()) - (new Date(b.date).getTime())
-		})[this.req.length-1]
+		}).filter((e) => {
+			e.y = e[`${this.specs.parentType}_${this.type}`]
+			return f(e)
+		}).shift()
 		req[`${this.subType}${this.type}`] = req[`${this.specs.parentType}_${this.type}`]
 		return new Point(this.specs, req, false)
 	}
@@ -222,12 +240,12 @@ class Point {
 			Object.keys(baseline).forEach(key => {
 				try{
 					if(req[key] !== undefined){
-						console.log('--------------------------------')
+						//console.log('--------------------------------')
 						//console.log(baseline)
-						console.log(`${this.req[key].avg} - ${baseline[key].avg}`)
+						//console.log(`${this.req[key].avg} - ${baseline[key].avg}`)
 						req[key].baseline = baseline[key].avg
 						req[key].difference = this.req[key].avg - baseline[key].avg
-						console.log(req[key].difference)
+						//console.log(req[key].difference)
 					}else{
 						req[key] = {
 							baseline: NaN,
@@ -246,7 +264,6 @@ class Point {
 	}
 	'getY'(req = this.req){
 		let y = req[`${this.type}`]
-		//console.log('old:', y)
 		switch (this.SUBTYPE){
 			case 'difference':
 				if(typeof y == 'object'){
@@ -264,6 +281,8 @@ class Point {
 				if(typeof y == 'object'){
 					return Number(y.min)
 				}
+				console.log(req[`avg_${this.type}`])
+				return Number(req[`avg_${this.type}`])
 			case 'maxAvg':
 				y = req[`${'avg'}_${this.type}`]
 				if(typeof y == 'object'){
@@ -294,8 +313,9 @@ class Point {
 				case 'max':
 					return Math[this.SUBTYPE](...result)
 				case 'maxAvg':
+					return Math.min(...result)
 				case 'minAvg':
-					return result.reduce((a,b) => a + b)/this.req.length;
+					return Math.max(...result);
 				case 'snow':
 				case 'rain':
 					return result.reduce((a,b) => a + b)
@@ -310,7 +330,10 @@ class Point {
 
 			}
 		}else{
-			return this.getY()
+			switch(this.SUBTYPE){
+				default:
+					return this.getY()
+			}
 		}
 	}
 	set 'subType' (subType){
@@ -423,7 +446,7 @@ class Point {
 	}
 	get 'DOYs' (){
 		let start = help.dayOfYear(this.specs.dates.start)
-		let end = help.dayOfYear(this.specs.dates.end)
+		let end = help.dayOfYear(this.specs.dates.end.addDays(-1))
 		return [...Array(end-start).keys()].map(v => (v+start));
 	}
 	get '30periodyear' (){
@@ -448,12 +471,25 @@ class Point {
 		return new Point(this.specs, this.req, this.full)
 	}
 	'short' (){
-		let next = {}
-		next.y = this.y
-		Object.keys(this).forEach(key => {
-			next[key] = this[key];
-		})
-		return next
+		//let next = {}
+		//next.y = this.y
+		//Object.keys(this).forEach(key => {
+			//next[key] = this[key];
+		//})
+		let y = this.y
+		return {
+			compressed: true,
+			y: y,
+			x: this.x,
+			colors: {
+				red: ColorToHex(255, 55 + Math.floor(y * 200 / (this.y - y)), 0),
+				blue: ColorToHex(55 + Math.floor(y * 200 / (this.y - y)), 255, 0)
+			},
+//			type: this.type,
+//			xInterval: this.xInterval,
+//			typeMeta: this.typeMeta,
+			date: this.date
+		}
 	}
 	'getSeed' () {
 		let specs = this.specs;

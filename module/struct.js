@@ -31,7 +31,7 @@ module.exports = class Struct {
         let m1 = 0;
         let d1 = 1;
         let m2 = 0;
-        let d2 = 0;
+        let d2 = 1;
         //console.log('seedSpecs:', seedSpecs.keys)
         //console.log('struct.static build:', specs.keys, x)
         switch (specs.delimiter) {
@@ -40,7 +40,12 @@ module.exports = class Struct {
                 m1 = help.months().indexOf(x);
                 m2 = help.months().indexOf(x) + 1;
                 break;
+            case 'months':
+                y2 = 0;
+                break;
             case 'week':
+                d2 = 0;
+                y2 = -1;
                 specs.dates.start = getDateOfWeek(seedSpecs.x, (new Date(specs.dates.start)).getFullYear())
                 specs.dates.end = specs.dates.start.addDays(7)
                 break;
@@ -56,29 +61,29 @@ module.exports = class Struct {
             case 'oct':
             case 'nov':
             case 'dec':
-                y2 = 0;
+                y2 = -1;
                 m1 = help.months().indexOf(specs.delimiter);
                 m2 = m1+1;
                 break;
             case 'spring':
                 m1 = 3;
                 m2 = 6;
-                y2 = 0;
+                y2 = -1;
                 break;
             case 'summer':
                 m1 = 6;
                 m2 = 9;
-                y2 = 0;
+                y2 = -1;
                 break;
             case 'autumn':
                 m1 = 9;
                 m2 = 12;
-                y2 = 0;
+                y2 = -1;
                 break;
             case 'winter':
                 m1 = 12;
                 m2 = 3;
-                y2 = 1;
+                y2 = 0;
                 break;
             case 'decades':
                 y2 = 10;
@@ -106,6 +111,7 @@ module.exports = class Struct {
                 break;
             default:
         }
+        //console.log(specs.delimiter, specs.dates)
         if (typeof specs.dates.start === 'number') {
             specs.dates.start = new Date(specs.dates.start + y1, m1, 1)
             specs.dates.end = new Date(specs.dates.end + y2, m2, d2)
@@ -114,7 +120,7 @@ module.exports = class Struct {
             specs.dates.start = new Date(specs.dates.start)
             specs.dates.end = new Date(specs.dates.end)
         }
-     //   console.log('after:', specs.dates)
+        //console.log(specs.delimiter, specs.dates)
         return new Struct(parentEntry, specs, x, type, f, full, parentType)
     }
     constructor(values = undefined, specs, x = undefined, type = "avg", f, full = false, parentType ) {
@@ -156,7 +162,8 @@ module.exports = class Struct {
                             break;
                         case 'first':
                         case 'last':
-                            point = point[this.type];
+                            //point.f = this.f
+                            point = point[this.type](this.f);
                             break;
                         case 'snow':
                         case 'rain':
@@ -180,27 +187,22 @@ module.exports = class Struct {
         }
         return this.POINT
     }
-
     set "y"(val) {
         this.Y = val;
     }
-
     get "y"() {
         try{
-        return this.entry.then(point => {
-            if(undefined === point) return new Error('no point specified')
-            return point.y
-        })
-
+            return this.entry.then(point => {
+                if(undefined === point) return new Error('no point specified')
+                return point.y
+            })
         }catch(error){
             throw error
         }
     }
-
     get "count"() {
         return this.values.length
     }
-
     /**
      set "point" (val){
 		this.POINT.push(val)
@@ -225,12 +227,26 @@ module.exports = class Struct {
                 specs.dates.start = new Date(specs.dates.start).getFullYear()
                 specs.dates.end = new Date(specs.dates.end).getFullYear()
                 break;
+            case "DOY":
+                specs.dates.start = new Date(this.x, 0, 0).addDays(k);
+                specs.dates.end = new Date(this.x, 0, 0).addDays(k+1);
+                break;
+            case "year":
+                specs.dates.start = k;
+                specs.dates.end = k+1;
+                break;
             default:
                 specs.dates.start = k;
                 specs.dates.end = k;
         }
         let result = Struct.build(specs, k, type, f, full, specs.parentType);
-       // console.log(result)
+        if(this.full){
+            result.entry = this.entry.then(entry => {
+                //console.log(result.specs.dates)
+                return entry.dateSlice(result.specs.dates.start, result.specs.dates.end)
+            })
+        }
+        // console.log(result)
        // values[k] = Struct.build(specs, k, type, f, full, specs.parentType, this.entry.then(e => e.outside(specs)));
         return result
     }
@@ -336,31 +352,24 @@ module.exports = class Struct {
     get "min"() {
         return this.TYPE('min');
     }
-
     get "minAvg"() {
         return this.AVGTYPE('minAvg');
     }
-
     get "max"() {
         return this.TYPE('max');
     }
-
     get "maxAvg"() {
         return this.AVGTYPE('maxAvg');
     }
-
     get "sum"() {
         return this.TYPE('sum');
     }
-
     get "first"() {
-        return this.TYPE('first', (e) => e <= 0, true)
+        return this.TYPE('first', (e) => e.y <= 0, true)
     }
-
     get "last"() {
         return this.TYPE('last', (e) => e.y <= 0, true)
     }
-
     get "number"() {
         return this.TYPE("number", this.f)
     }
@@ -401,9 +410,16 @@ module.exports = class Struct {
                 })
             })
         })
-        return this.TYPE("difference", this.f)
+        //return this.TYPE("difference", this.f)
     }
-
+    get "growingSeason" () {
+        this.y
+        return Promise.all(this.values).then(values => {
+            return values.map((value) => {
+                return value.sequence()
+            })
+        })
+    }
     "AVGTYPE"(type, f) {
         return this.entry.then((entry) => {
 
@@ -420,7 +436,6 @@ module.exports = class Struct {
         // res.values = this.values.map(each => each.short())
         // return res.build(type)
     }
-
     "TYPE"(type, f = this.f, full = this.full) {
         let specs = JSON.parse(JSON.stringify(this.specs));
         specs.subType = type;
@@ -458,6 +473,11 @@ module.exports = class Struct {
     }
     "short"() {
         if (this.typeMeta !== undefined) return this.typeMeta
+        /*
+        return this.entry.then(entry => {
+            return entry.short()
+        })
+        */
         return this.y.then(y => {
             return {
                 compressed: true,
@@ -492,17 +512,11 @@ module.exports = class Struct {
             return this.number
         }
     }
-
-    "sequence"(f = (e) => e > 0) {
-
-        const values = this.values.map((each) => {
-
-                const res = {};
-                this.keys.forEach((key) => {
-
-                    res[key] = each[key];
-
-                });
+    "sequence" (f = (e) => e > 0) {
+        return Promise.all(this.shortValues).then((values => {
+            //console.log(values)
+            values = values.map(each => {
+                let res = {};
                 res.y = f(each.y)
                     ? 1
                     : 0;
@@ -510,53 +524,32 @@ module.exports = class Struct {
                 res.start = each.x;
                 res.end = each.x;
                 return res;
-
-            }),
-            max = values.reduce(
+            })
+            values.unshift([])
+            let sequence = values.reduce(
                 (a, b) => {
-
+                    //console.log(a, b)
                     if (b.y > 0) {
-
                         if (a.length > 0) {
-
                             const i = a.length - 1;
                             if (a[i].y > 0) {
                                 a[i].y += b.y;
                                 a[i].end = b.end;
-
                             } else {
-
                                 a.push(b);
-
                             }
-
                         } else {
-
                             a.push(b);
-
                         }
-
                     } else {
-
                         a.push(b);
-
                     }
                     return a;
-
                 },
             );
-
-        /*
-         * Console.log(max)
-         * Fsdfsd
-         */
-        let res = new Struct(
-            [],
-            this.x,
-            'max'
-        )
-        res.values = max;
-        return res.build("max");
+            let max = Math.max(...sequence.map(e => e.y));
+            return sequence.filter(e => e.y === max)[0]
+        }))
 
     }
 
