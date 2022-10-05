@@ -85,6 +85,7 @@ module.exports = class ByDateStruct {
 			case 'yrlyFull':
 				this.values[key] = this.insert(true, "yrlyFull", "year", 'DOY');
 				break;
+			/*
 			case 'custom':
 				if (this.custom) {
 
@@ -111,6 +112,7 @@ module.exports = class ByDateStruct {
 
 				}
 				break;
+				 */
 			case 'default':
 				break;
 		}

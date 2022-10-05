@@ -182,14 +182,6 @@ module.exports = {
 				this.number += 1;
 				//console.log('number', this.number)
 			}
-		//	console.log('size:', JSON.stringify(result.data).length)
-		//	console.log('data:', result.data)
-			/*
-			fs.writeFile(path, JSON.stringify(result.data), (err) => {
-				if (err) console.log(err);
-			})
-
-			 */
 			return result.data
 		}).catch(
 			function (error) {
