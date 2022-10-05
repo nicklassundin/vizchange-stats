@@ -319,7 +319,7 @@ describe(
                         })).then(values => {
                             let total = values.pop()
                             let sum = values.reduce((a, b) => a + b)
-                            //console.log('values', total, 'sum', sum)
+                            console.log('values', total, 'sum', sum)
                             return assert.ok(Math.abs(total - sum) < 0.0001)
                         })
                     })
@@ -337,15 +337,15 @@ describe(
                             return assert.ok(Math.abs(total - values) < 0.01)
                         })
                     })
-                    it('weeks - minAvg', () => {
+                    it('minAvg', () => {
                         let params = ['temperature', 'weeks', 'minAvg', 'values', 1, 'values', 1, 'y']
                         let config = Object.assign(configs['latest'], specs)
                         return parser.getByParams(config, params).then(values => {
-                            //console.log('values', values)
+                            console.log('values', values)
                             return assert.ok(Math.abs(values - 0.1) < 0.01)
                         })
                     })
-                    it('weeks - maxAvg', () => {
+                    it('maxAvg', () => {
                         let params = ['temperature', 'weeks', 'maxAvg', 'values', 1, 'values', 1, 'y']
                         let config = Object.assign(configs['latest'], specs)
                         return parser.getByParams(config, params).then(values => {
@@ -354,7 +354,7 @@ describe(
                     })
                 })
                 describe('months', function() {
-                    it('months - shortValues', () => {
+                    it('shortValues', () => {
                         let help = require('climate-plots-helper')
                         let months = Object.keys(help.months()).map(key => {
                             return ['precipitation', 'months', 'values', 1, 'values', key, 'y']
@@ -368,7 +368,7 @@ describe(
                         })).then(values => {
                             let total = values.pop()
                             values = values.reduce((a,b) => a + b)
-                            //console.log("total", total, "values", values)
+                            console.log("total", total, "values", values)
                             return assert.ok(Math.abs(total - values) < 0.0001)
                         })
                     })
