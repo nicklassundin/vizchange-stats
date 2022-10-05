@@ -292,7 +292,7 @@ describe(
                             return assert.equal(values, 'jan')
                         })
                     })
-                    it('monthly - values', () => {
+                    it('values', () => {
                         let params = ['precipitation', 'jan', 'shortValues', 1, 'y']
                         let config = Object.assign(configs['liveHalf'], precipitation_specs)
                         return parser.getByParams(config, params).then(values => {
@@ -306,21 +306,6 @@ describe(
                                 //console.log('values', values, 'all', all)
                                 return assert.ok(Math.abs(values-all) < 0.0001)
                             })
-                        })
-                    })
-                    it('monthly - shortValues', () => {
-                        let help = require('climate-plots-helper')
-                        let months = help.months()
-                        months.push('yrlyFull')
-                        return Promise.all(months.map(month => {
-                            let params = ['precipitation', month, 'shortValues', 1, 'y']
-                            let config = Object.assign(configs['latest'], precipitation_specs)
-                            return parser.getByParams(config, params)
-                        })).then(values => {
-                            let total = values.pop()
-                            let sum = values.reduce((a, b) => a + b)
-                            console.log('values', total, 'sum', sum)
-                            return assert.ok(Math.abs(total - sum) < 0.0001)
                         })
                     })
                 })
@@ -338,11 +323,11 @@ describe(
                         })
                     })
                     it('minAvg', () => {
-                        let params = ['temperature', 'weeks', 'minAvg', 'values', 1, 'values', 1, 'y']
+                        let params = ['temperature', 'weeks', 'minAvg', 'values', 1, 'shortValues', 1]
                         let config = Object.assign(configs['latest'], specs)
                         return parser.getByParams(config, params).then(values => {
                             console.log('values', values)
-                            return assert.ok(Math.abs(values - 0.1) < 0.01)
+                            return assert.ok(Math.abs(values.y - 0.1) < 0.01)
                         })
                     })
                     it('maxAvg', () => {
