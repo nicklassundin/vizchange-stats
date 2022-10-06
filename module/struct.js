@@ -46,7 +46,7 @@ module.exports = class Struct {
             case 'week':
                 d2 = 0;
                 y2 = -1;
-                specs.dates.start = getDateOfWeek(seedSpecs.x, (new Date(specs.dates.start)).getFullYear())
+                specs.dates.start = getDateOfWeek(specs.x, (new Date(specs.dates.start)).getFullYear())
                 specs.dates.end = specs.dates.start.addDays(7)
                 break;
             case 'jan':

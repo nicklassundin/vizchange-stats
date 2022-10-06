@@ -163,6 +163,9 @@ class Point {
 	}
 	'dateSlice' (start, end) {
 		let req = this.req;
+		let specs = JSON.parse(JSON.stringify(this.specs));
+		specs.dates.start = start;
+		specs.dates.end = end;
 		//console.log(start, end)
 		if(Array.isArray(req)){
 			// TODO test case for this individually
@@ -173,7 +176,7 @@ class Point {
 				//console.log((e.date > start) && (e.date < end))
 				return (e.date > start) && (e.date < end)
 			})
-			return new Point(this.specs, req, this.full)
+			return new Point(specs, req, this.full)
 		}else{
 			if((this.specs.dates.start > start) && (this.specs.dates.end < end)){
 				return this
@@ -184,12 +187,16 @@ class Point {
 	}
 
 	get 'x'(){
+		//console.log(this.specs.delimiter)
+		return this[this.specs.delimiter][0]
+		/*
 		let date = this.req.date
 		if(date === undefined){
 			date = this.specs.dates.start;
 		}
 		if(typeof date === 'string') return new Date(date);
 		return date
+		 */
 	}
 	'filter' (f){
 		let req = JSON.parse(JSON.stringify(this.req)).filter((x) => {
@@ -383,10 +390,10 @@ class Point {
 		return new Point(specs, req, this.full)
 	}
 	get 'year' (){
-		return this.x.getFullYear();
+		return this.startDate.getFullYear();
 	}
 	get 'strDate'(){
-		return `${this.year}-${this.x.month+1}-${this.x.getDate()}`
+		return `${this.year}-${this.startDate.month+1}-${this.startDate.getDate()}`
 	}
 	get 'years' (){
 		let start = this.specs.dates.start.getFullYear();
@@ -432,14 +439,17 @@ class Point {
 			return v - v % 30 +1
 		})
 	}
+	get 'startDate'() {
+		return this.specs.dates.start;
+	}
 	get 'month' (){
-		return this.x.getMonth();
+		return this.startDate.getMonth();
 	}
 	get 'week' (){
-		return this.x.getWeekNumber();
+		return this.startDate.getWeekNumber();
 	}
 	get 'DOY' (){
-		return help.dayOfYear(this.x)
+		return help.dayOfYear(this.startDate)
 	}
 	get 'DOYs' (){
 		let start = help.dayOfYear(this.specs.dates.start)
