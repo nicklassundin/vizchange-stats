@@ -81,12 +81,20 @@ class PointReq {
 			return Object.keys(this.request)
 		}
 	}
-
+	get 'month' (){
+		return this.date.getMonth();
+	}
+	get 'season' () {
+		return help.getSeasonByIndex(this.month)
+	}
+	get 'dayOfMonth' () {
+		return this.date.getDate()
+	}
 }
 
 class Point {
 	static build(specs, full=false){
-		switch (specs.delimiter){
+		switch (specs.keys[0]){
 			case 'weeks':
 			case 'splitMonth':
 			case 'splitDecades':
@@ -105,6 +113,7 @@ class Point {
 				full = true;
 			default:
 		}
+		//console.log(specs)
 		return curl.proxRequest(specs, full).then(res => {
 			if (res.length < 1) return new Error('empty result', specs)
 
@@ -146,8 +155,8 @@ class Point {
 		}else{
 			this.date = this.x;
 		}
-		this.monthName = help.monthByIndex(this.month);
-		this.season = help.getSeasonByIndex(this.month)
+		//this.monthName = help.monthByIndex(this.month);
+		//this.season = help.getSeasonByIndex(this.month)
 		this.decade = this.year - this.year % 10;
 		this.decade = this.year - this.year % 10;
 		// this.DOY = help.dayOfYear(this.x)
@@ -164,18 +173,45 @@ class Point {
 	'dateSlice' (start, end) {
 		let req = this.req;
 		let specs = JSON.parse(JSON.stringify(this.specs));
+		//specs.keys.shift()
 		specs.dates.start = start;
 		specs.dates.end = end;
 		//console.log(start, end)
 		if(Array.isArray(req)){
 			// TODO test case for this individually
-			req = req.filter((e) => {
-				//console.log(typeof e.date, typeof start)
-				e.date = new Date(e.date)
-				//console.log(e.date, '>', start, '&&', e.date, '<', end)
-				//console.log((e.date > start) && (e.date < end))
-				return (e.date > start) && (e.date < end)
-			})
+			switch(specs.keys[0]){
+				case 'spring':
+				case 'summer':
+				case 'winter':
+				case 'autumn':
+					req = req.filter((e) => {
+						e.date = new Date(e.date)
+						let season = help.getSeasonByIndex(e.date.getMonth())
+						return season == specs.keys[0]
+					})
+					break;
+				case 'month':
+					req = req.filter((e) => {
+						e.date = new Date(e.date)
+						return e.date.getMonth()
+					})
+					break;
+				case 'weeks':
+					req = req.filter((e) => {
+						e.date = new Date(e.date)
+						return e.date.getWeekNumber()
+					})
+					break;
+				default:
+					req = req.filter((e) => {
+						//console.log(typeof e.date, typeof start)
+						e.date = new Date(e.date)
+						//console.log(e.date, '>', start, '&&', e.date, '<', end)
+						//console.log((e.date > start) && (e.date < end))
+						return (e.date > start) && (e.date < end)
+					})
+			}
+			//console.log(new Point(specs, req, this.full))
 			return new Point(specs, req, this.full)
 		}else{
 			if((this.specs.dates.start > start) && (this.specs.dates.end < end)){
@@ -185,10 +221,27 @@ class Point {
 			}
 		}
 	}
-
 	get 'x'(){
-		//console.log(this.specs.delimiter)
-		return this[this.specs.delimiter][0]
+
+	//	console.log(this.specs.dates, this.specs.keys[0])
+	//	console.log('Point.get x:', this[this.specs.keys[0]])
+		if(this[this.specs.keys[0]]){
+			return this[this.specs.keys[0]]
+		}else{
+			switch(this.specs.keys[0]){
+				case 'autumn':
+				case 'spring':
+				case 'summer':
+				case 'winter':
+					return this.specs.keys[0]
+					break;
+				case 'weekly':
+					return this.week
+				default:
+					return this.specs.dates
+			}
+			//return this.specs.dates.start
+		}
 		/*
 		let date = this.req.date
 		if(date === undefined){
@@ -400,6 +453,9 @@ class Point {
 		let end = this.specs.dates.end.getFullYear();
 		return Array.from({length: (end - start)}, (v, k) => k + start)
 	}
+	get 'seasons' (){
+		return Object.keys(help.seasons)
+	}
 	get 'months' () {
 		return help.months()
 	}
@@ -445,6 +501,9 @@ class Point {
 	get 'month' (){
 		return this.startDate.getMonth();
 	}
+	get 'monthName'() {
+		return help.monthByIndex(this.month);
+	}
 	get 'week' (){
 		return this.startDate.getWeekNumber();
 	}
@@ -478,6 +537,8 @@ class Point {
 		return new Point(this.specs, this.req, this.full)
 	}
 	'short' (){
+		//console.log('point.short', this.y)
+		//console.log(this.specs)
 		let y = this.y
 		return {
 			compressed: true,

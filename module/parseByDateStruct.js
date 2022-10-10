@@ -9,13 +9,13 @@ module.exports = class ByDateStruct {
 		this.parsed = {};
 		this.years = {};
 	}
-	"insert"(full, kn, ...k) {
+	//insert"(full, kn, ...k) {
+	"insert"(full, ...k) {
 		let specs = JSON.parse(JSON.stringify(this.specs));
 		specs.keys = k
 		let type = this.type;
-		specs.delimiter = kn;
-
-		return Struct.build(specs, kn, type, undefined, full)
+//		return Struct.build(specs, kn, type, undefined, full)
+		return Struct.build(specs, k[0], type, undefined, full)
 	}
 	"request" (key) {
 		this.parse(key)
@@ -36,7 +36,7 @@ module.exports = class ByDateStruct {
 			case 'winter':
 			case 'autumn':
 			case 'spring':
-				this.values[key] = this.insert(false, key, 'year', 'DOY')
+				this.values[key] = this.insert(true, key, 'year')
 				break;
 			case 'jan':
 			case 'feb':
@@ -52,7 +52,7 @@ module.exports = class ByDateStruct {
 			case 'dec':
 				this.values[key] = this.insert(true, key, 'year')
 				break;
-			case 'weeks':
+			case 'weekly':
 				this.values[key] = this.insert(true, key, 'year', 'week')
 				break;
 			case 'monthly':

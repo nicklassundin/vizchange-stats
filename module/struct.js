@@ -32,18 +32,17 @@ module.exports = class Struct {
         let d1 = 1;
         let m2 = 0;
         let d2 = 1;
-        //console.log('seedSpecs:', seedSpecs.keys)
-        //console.log('struct.static build:', specs.keys, x)
-        switch (specs.delimiter) {
+        switch (specs.keys[0]) {
             case 'month':
-                y2 = 0;
+                y2 = -2;
                 m1 = help.months().indexOf(x);
                 m2 = help.months().indexOf(x) + 1;
                 break;
             case 'months':
-                y2 = 0;
+                //y2 = 0;
                 break;
             case 'week':
+                //console.log(specs)
                 d2 = 0;
                 y2 = -1;
                 specs.dates.start = getDateOfWeek(specs.x, (new Date(specs.dates.start)).getFullYear())
@@ -62,7 +61,7 @@ module.exports = class Struct {
             case 'nov':
             case 'dec':
                 y2 = -1;
-                m1 = help.months().indexOf(specs.delimiter);
+                m1 = help.months().indexOf(specs.keys[0]);
                 m2 = m1+1;
                 break;
             case 'spring':
@@ -85,17 +84,17 @@ module.exports = class Struct {
                 m2 = 3;
                 y2 = 0;
                 break;
-            case 'decades':
+            case 'decade':
                 y2 = 10;
                 break;
             case '30period':
+            case '30periodyear':
                 y1 = -1;
                 y2 = 30;
                 m1 = 7
                 m2 = 7
                 break;
             case 'splitMonth':
-            //    console.log('x',x)
              //   y1 = (x < 12) ? + -1 : 0;
               //  y2 = 0;
                // m1 = (x > 12) ? x -12 : x
@@ -103,24 +102,23 @@ module.exports = class Struct {
                // break;
             case 'monthly':
                 break;
-            case 'yrlySplit':
+            case 'splitYear':
                 y1 = -1;
                 y2 = 0;
                 m1 = 7
                 m2 = 7
                 break;
             default:
+                if (typeof specs.dates.end === 'string') {
+                    specs.dates.start = new Date(specs.dates.start)
+                    specs.dates.end = new Date(specs.dates.end)
+                    return new Struct(parentEntry, specs, x, type, f, full, parentType)
+                }
         }
-        //console.log(specs.delimiter, specs.dates)
         if (typeof specs.dates.start === 'number') {
             specs.dates.start = new Date(specs.dates.start + y1, m1, 1)
             specs.dates.end = new Date(specs.dates.end + y2, m2, d2)
         }
-        if (typeof specs.dates.end === 'string') {
-            specs.dates.start = new Date(specs.dates.start)
-            specs.dates.end = new Date(specs.dates.end)
-        }
-        //console.log(specs.delimiter, specs.dates)
         return new Struct(parentEntry, specs, x, type, f, full, parentType)
     }
     constructor(values = undefined, specs, x = undefined, type = "avg", f, full = false, parentType ) {
@@ -215,15 +213,12 @@ module.exports = class Struct {
         specs.x = k;
         switch (key) {
             case "month":
-                specs.delimiter = k
                 specs.dates.start = new Date(specs.dates.start).getFullYear()
                 specs.dates.end = new Date(specs.dates.end).getFullYear()
                 break;
             case "week":
-                specs.delimiter = key
                 break;
             case "splitMonth":
-                specs.delimiter = key;
                 specs.dates.start = new Date(specs.dates.start).getFullYear()
                 specs.dates.end = new Date(specs.dates.end).getFullYear()
                 break;
@@ -239,10 +234,10 @@ module.exports = class Struct {
                 specs.dates.start = k;
                 specs.dates.end = k;
         }
-        let result = Struct.build(specs, k, type, f, full, specs.parentType);
+        let result = Struct.build(specs, k, type, f, full);
         if(this.full){
             result.entry = this.entry.then(entry => {
-                //console.log(result.specs.dates)
+                // TODO date wrong conversion
                 return entry.dateSlice(result.specs.dates.start, result.specs.dates.end)
             })
         }
@@ -253,19 +248,19 @@ module.exports = class Struct {
     get "values"() {
         // TODO remove embededed promises
         let genSpecs = JSON.parse(JSON.stringify(this.specs));
-        let key = genSpecs.keys.shift();
+        genSpecs.keys.shift();
         let type = this.type;
         let f = this.f;
         let full = this.full;
         let parentType = this.specs.parentType;
-        if(key === undefined){
+        if(genSpecs.keys[0] === undefined){
             this.VALUES = this.entry;
         }else if(Object.keys(this.VALUES).length == 0) {
-            let keys = (new Point(genSpecs))[`${key}s`]
+            let keys = (new Point(genSpecs))[`${genSpecs.keys[0]}s`]
             this.VALUES = {}
-            //console.log(`${key}s`, keys)
+         //   console.log(`${genSpecs.keys[0]}s`, keys)
             for(let i = 0; i < keys.length; i++) {
-                this.VALUES[keys[i]] = this.getValues(genSpecs, key, keys[i], type, f, full, parentType)
+                this.VALUES[keys[i]] = this.getValues(genSpecs, genSpecs.keys[0], keys[i], type, f, full, parentType)
             }
         }
         return Object.values(this.VALUES).map(each => {
@@ -383,6 +378,7 @@ module.exports = class Struct {
         genSpecs.dates.start = new Date(genSpecs.baseline.start, genSpecs.dates.start.getMonth(), genSpecs.dates.start.getDate())
         genSpecs.dates.end = (new Date(genSpecs.dates.end))
         genSpecs.dates.end = new Date(genSpecs.baseline.end, genSpecs.dates.end.getMonth(), genSpecs.dates.end.getDate())
+        genSpecs.keys.shift()
         let key = genSpecs.keys.shift();
         let type = this.type;
         let f = this.f;
@@ -403,6 +399,7 @@ module.exports = class Struct {
     }
     get "difference"() {
         return this.baseline.then(baseline => {
+            //console.log(baseline)
             return this.shortValues.map(value => {
                 return value.then(value => {
                     if(value === undefined) return undefined
@@ -475,6 +472,7 @@ module.exports = class Struct {
 
         return this.entry.then(entry => {
             try {
+               // console.log(entry.x, entry.specs.dates)
                 return entry.short()
             }catch(error) {
                 //console.log(entry)
@@ -518,7 +516,6 @@ module.exports = class Struct {
     }
     "sequence" (f = (e) => e > 0) {
         return Promise.all(this.shortValues).then((values => {
-            //console.log(values)
             values = values.map(each => {
                 let res = {};
                 res.y = f(each.y)
@@ -528,7 +525,7 @@ module.exports = class Struct {
                 res.start = each.x;
                 res.end = each.x;
                 return res;
-            })
+            }).filter(each => each.start !== undefined)
             values.unshift([])
             let sequence = values.reduce(
                 (a, b) => {

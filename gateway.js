@@ -129,7 +129,7 @@ let parsePeriod = function(date){
 		let day = pad(date.getDate());
 		return `${year}${month}${day}`;
 	}catch(error){
-		//console.log(typeof date, date)
+		console.log(typeof date, date)
 		throw error;
 	}
 
