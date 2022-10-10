@@ -19,7 +19,6 @@ class Baseline {
 		this.cache = {};
 	}
 	getBaseline(specs){
-		//console.log(specs)
 		let start = specs.baseline.start;
 		let end = specs.baseline.end;
 		if(undefined === this.cache[`${start}${end}${specs.type}`]){
@@ -113,7 +112,6 @@ class Point {
 				full = true;
 			default:
 		}
-		//console.log(specs)
 		return curl.proxRequest(specs, full).then(res => {
 			if (res.length < 1) return new Error('empty result', specs)
 
@@ -124,12 +122,10 @@ class Point {
 	constructor(specs, req = {}, full=false){
 		this.full = full;
 		this.specs = specs;
-	//	console.log('Point.constructor:', this.specs.dates)
 		if(typeof this.specs.dates.start === 'string'){
 			this.specs.dates.start = new Date(this.specs.dates.start)
 			this.specs.dates.end = new Date(this.specs.dates.end)
 		}
-		//console.log(this.specs)
 		// this.subType = '';
 		this.type = specs.type;
 		let type = this.type;
@@ -176,7 +172,6 @@ class Point {
 		//specs.keys.shift()
 		specs.dates.start = start;
 		specs.dates.end = end;
-		//console.log(start, end)
 		if(Array.isArray(req)){
 			// TODO test case for this individually
 			switch(specs.keys[0]){
@@ -204,14 +199,10 @@ class Point {
 					break;
 				default:
 					req = req.filter((e) => {
-						//console.log(typeof e.date, typeof start)
 						e.date = new Date(e.date)
-						//console.log(e.date, '>', start, '&&', e.date, '<', end)
-						//console.log((e.date > start) && (e.date < end))
 						return (e.date > start) && (e.date < end)
 					})
 			}
-			//console.log(new Point(specs, req, this.full))
 			return new Point(specs, req, this.full)
 		}else{
 			if((this.specs.dates.start > start) && (this.specs.dates.end < end)){
@@ -222,34 +213,25 @@ class Point {
 		}
 	}
 	get 'x'(){
-
-	//	console.log(this.specs.dates, this.specs.keys[0])
-	//	console.log('Point.get x:', this[this.specs.keys[0]])
-		if(this[this.specs.keys[0]]){
-			return this[this.specs.keys[0]]
-		}else{
-			switch(this.specs.keys[0]){
-				case 'autumn':
-				case 'spring':
-				case 'summer':
-				case 'winter':
-					return this.specs.keys[0]
-					break;
-				case 'weekly':
-					return this.week
-				default:
-					return this.specs.dates
-			}
-			//return this.specs.dates.start
+		//console.log(this.specs.keys[0])
+		switch(this.specs.keys[0]){
+			case 'autumn':
+			case 'spring':
+			case 'summer':
+			case 'winter':
+				return this.specs.keys[0]
+			case 'weekly':
+				return this.week
+			case 'yrly':
+			case 'year':
+				return this.year
+			case 'months':
+				return this.monthName
+			case 'decade':
+				return this.decade
+			default:
+				return this.specs.dates
 		}
-		/*
-		let date = this.req.date
-		if(date === undefined){
-			date = this.specs.dates.start;
-		}
-		if(typeof date === 'string') return new Date(date);
-		return date
-		 */
 	}
 	'filter' (f){
 		let req = JSON.parse(JSON.stringify(this.req)).filter((x) => {
@@ -298,12 +280,8 @@ class Point {
 			Object.keys(baseline).forEach(key => {
 				try{
 					if(req[key] !== undefined){
-						//console.log('--------------------------------')
-						//console.log(baseline)
-						//console.log(`${this.req[key].avg} - ${baseline[key].avg}`)
 						req[key].baseline = baseline[key].avg
 						req[key].difference = this.req[key].avg - baseline[key].avg
-						//console.log(req[key].difference)
 					}else{
 						req[key] = {
 							baseline: NaN,
@@ -537,8 +515,6 @@ class Point {
 		return new Point(this.specs, this.req, this.full)
 	}
 	'short' (){
-		//console.log('point.short', this.y)
-		//console.log(this.specs)
 		let y = this.y
 		return {
 			compressed: true,

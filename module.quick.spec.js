@@ -62,19 +62,55 @@ describe(
             })
         })
         describe('functionality', function () {
+            describe('shortValues', function () {
+                describe('x', function () {
+                    it('year', () => {
+                        let params = ['temperature', 'yrly', 'shortValues', 1]
+                        let config = Object.assign(configs['latest'], specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values)
+                            return assert.equal(values.x, 2020)
+                        })
+                    })
+                    it('monthly', () => {
+                        let params = ['temperature', 'monthly', 'values', 1]
+                        let config = Object.assign(configs['latest'], specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values)
+                            return assert.equal(values.x, 'feb')
+                        })
+                    })
+                    it('months', () => {
+                        let params = ['temperature', 'months', 'values', 1]
+                        let config = Object.assign(configs['latest'], specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values)
+                            return assert.equal(values.x, 2020)
+                        })
+                    })
+                    it('months', () => {
+                        let params = ['temperature', 'months', 'values', 1, 'shortValues', 1]
+                        let config = Object.assign(configs['latest'], specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values)
+                            return assert.equal(values.x, 'feb')
+                        })
+                    })
+                    it('snow', () => {
+                        let params = ['precipitation', 'yrly', 'snow', 'shortValues', 1]
+                        let config = Object.assign(configs['latest'], precipitation_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values)
+                            return assert.equal(values.x, 2020)
+                        })
+                    })
+                })
+            })
             it('y', () => {
                 let params = ['temperature', 'yrly', 'y']
                 let config = Object.assign(configs['latest'], specs)
                 return parser.getByParams(config, params).then(values => {
                     return typeof values === 'number'
-                })
-            })
-            it('shortValues', () => {
-                let params = ['temperature', 'yrly', 'shortValues', 0, ]
-                let config = Object.assign(configs['latest'], specs)
-                return parser.getByParams(config, params).then(values => {
-                    //console.log(values)
-                    return assert.equal(values.compressed, true)
                 })
             })
             it('short', () => {
@@ -176,6 +212,14 @@ describe(
                     })
                 })
                 describe('season', function() {
+                    it('x', () => {
+                        let params = ['precipitation', 'spring', 'shortValues', 0, 'x']
+                        let config = Object.assign(configs['latest'], precipitation_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            //console.log(values)
+                            return assert.equal(values, 'spring')
+                        })
+                    })
                     it('spring', () => {
                         let params = ['precipitation', 'spring', 'shortValues', 0]
                         let config = Object.assign(configs['latest'], precipitation_specs)
