@@ -246,7 +246,6 @@ module.exports = class Struct {
         return result
     }
     get "values"() {
-        // TODO remove embededed promises
         let genSpecs = JSON.parse(JSON.stringify(this.specs));
         genSpecs.keys.shift();
         let type = this.type;
