@@ -12,7 +12,7 @@ let specs = {
         'end': 1980
     }
 }
-//console.log("Date:", new Date())
+////console.log("Date:", new Date())
 let precipitation_specs = {
     type: 'precipitation',
     station: 'abisko',
@@ -73,7 +73,7 @@ describe(
                 let params = ['temperature', 'yrly', 'shortValues', 0, ]
                 let config = Object.assign(configs['latest'], specs)
                 return parser.getByParams(config, params).then(values => {
-                    console.log(values)
+                    //console.log(values)
                     return assert.equal(values.compressed, true)
                 })
             })
@@ -169,7 +169,7 @@ describe(
                         let config = Object.assign(configs['latest'], precipitation_specs)
                         return parser.getByParams(config, params).then(values => {
                             return Promise.all(values).then(array => {
-                                console.log(values)
+                                //console.log(values)
                                 return assert.equal(array.length, 7)
                             })
                         })
@@ -180,7 +180,7 @@ describe(
                         let params = ['precipitation', 'spring', 'shortValues', 0]
                         let config = Object.assign(configs['latest'], precipitation_specs)
                         return parser.getByParams(config, params).then(values => {
-                            console.log(values)
+                            //console.log(values)
                             return assert.ok(Math.abs(values.y - 80.7) < 0.0001 )
                             // return assert.equal(values, 132.8)
                         })
@@ -189,7 +189,7 @@ describe(
                         let params = ['precipitation', 'summer', 'shortValues', 0]
                         let config = Object.assign(configs['latest'], precipitation_specs)
                         return parser.getByParams(config, params).then(values => {
-                            console.log(values)
+                            //console.log(values)
                             return assert.ok(Math.abs(values.y - 205.7) < 0.0001 )
                         })
                     })
@@ -197,14 +197,14 @@ describe(
                         let params = ['precipitation', 'autumn', 'shortValues', 1]
                         let config = Object.assign(configs['latest'], precipitation_specs)
                         return parser.getByParams(config, params).then(values => {
-                            console.log(values)
+                            //console.log(values)
                             return assert.ok(Math.abs(values.y - 172.89999999999998) < 0.0001 )
                         })
                     })
                     it.skip('shortValues', () => {
                         let help = require('climate-plots-helper')
                         let seasons = Object.keys(help.seasons).map(key => {
-                            console.log(key)
+                            //console.log(key)
                             return ['precipitation', key, 'shortValues', 1]
                             //return ['precipitation', 'months', 'values', 1, 'values', key, 'entry', 'req']
                         })
@@ -215,9 +215,9 @@ describe(
                             return parser.getByParams(config, params)
                         })).then(values => {
                             let total = values.pop().y
-                            console.log(values)
+                            //console.log(values)
                             values = values.map(each => each.y).reduce((a,b) => a + b)
-                            console.log("total", total, "values", values)
+                            //console.log("total", total, "values", values)
                             return assert.ok(Math.abs(total - values) < 0.0001)
                         })
                     })
@@ -225,7 +225,7 @@ describe(
                         let params = ['temperature', 'summer', 'difference', 10]
                         let config = Object.assign(configs['live'], specs)
                         return parser.getByParams(config, params).then(values => {
-                            console.log(values)
+                            //console.log(values)
                             return assert.ok(Math.abs(values.y - 0.8613948739984973) < 0.0001 )
                         })
                     })
@@ -235,7 +235,7 @@ describe(
                         let params = ['temperature', 'weekly', 'growingSeason', 0]
                         let config = Object.assign(configs['latest'], specs)
                         return parser.getByParams(config, params).then(values => {
-                            console.log('values', values)
+                            //console.log('values', values)
                             return assert.equal(values.y, 22)
                         })
                     })
@@ -243,7 +243,7 @@ describe(
                         let params = ['temperature', 'yrlyFull', 'growingSeason', 0]
                         let config = Object.assign(configs['latest'], specs)
                         return parser.getByParams(config, params).then(values => {
-                            //console.log('values', values)
+                            ////console.log('values', values)
                             return assert.equal(values.y, 149)
                         })
                     })
@@ -252,7 +252,7 @@ describe(
                         let params = ['temperature', 'yrlyFull', 'growingSeason', 1]
                         let config = Object.assign(configs['latest'], specs)
                         return parser.getByParams(config, params).then(values => {
-                            //console.log('values', values)
+                            ////console.log('values', values)
                             return assert.equal(values.y, 154)
                         })
                     })
@@ -262,7 +262,7 @@ describe(
                         let params = ['precipitation', 'decades', 'shortValues', 4, 'x']
                         let config = Object.assign(configs['liveHalf'], precipitation_specs)
                         return parser.getByParams(config, params).then(values => {
-                            console.log('values', values)
+                            //console.log('values', values)
                             return assert.equal(values, 1950)
                         })
                     })
@@ -270,7 +270,7 @@ describe(
                         let params = ['precipitation', 'decades', 'values', 1, 'y']
                         let config = Object.assign(configs['liveHalf'], precipitation_specs)
                         return parser.getByParams(config, params).then(values => {
-                            console.log('values', values)
+                            //console.log('values', values)
                             return assert.ok(Math.abs(values - 2923.2) < 0.0001 )
                         })
                     })
@@ -280,7 +280,7 @@ describe(
                         let params = ['precipitation', 'yrlySplit', 'shortValues', 1, 'y']
                         let config = Object.assign(configs['latest'], precipitation_specs)
                         return parser.getByParams(config, params).then(values => {
-                            console.log('values', values)
+                            //console.log('values', values)
                             return assert.ok(Math.abs(values - 338.5) < 0.0001 )
                         })
                     })
@@ -290,7 +290,7 @@ describe(
                         let params = ['precipitation', '30period', 'allTime', 'values', 1, 'y']
                         let config = Object.assign(configs['liveHalf'], precipitation_specs)
                         return parser.getByParams(config, params).then(values => {
-                            //console.log('values', values)
+                            ////console.log('values', values)
                             return assert.ok(Math.abs(values - 17200.20000000039) < 0.0001 )
                         })
                     })
@@ -298,7 +298,7 @@ describe(
                         let params = ['precipitation', '30period', '30Periodyear', 'shortValues', 1]
                         let config = Object.assign(configs['liveHalf'], precipitation_specs)
                         return parser.getByParams(config, params).then(values => {
-                            console.log(values)
+                            //console.log(values)
                             return assert.ok(Math.abs(values.y - 9392.9) < 0.0001 )
                         })
                     })
@@ -358,13 +358,13 @@ describe(
                         let config = Object.assign(configs['liveHalf'], precipitation_specs)
                         return parser.getByParams(config, params).then(values => {
                             return parser.getByParams(config, ['precipitation', 'jan', 'values', 1, 'entry', 'req']).then(all => {
-                                //console.log(all[0])
+                                ////console.log(all[0])
                                 all = all.map(entry => {
                                     entry = Number(entry.precipitation);
                                     if(isNaN(entry)) return 0;
                                     return entry
                                 }).reduce((acc, entry) => acc + entry);
-                                //console.log('values', values, 'all', all)
+                                ////console.log('values', values, 'all', all)
                                 return assert.ok(Math.abs(values-all) < 0.0001)
                             })
                         })
@@ -377,7 +377,7 @@ describe(
                         return parser.getByParams(config, params).then(values => {
                             return Promise.all(values).then(all => {
                                 return assert.ok(all.map((entry, i) => {
-                                  //  console.log(entry.x, i + 1)
+                                  //  //console.log(entry.x, i + 1)
                                     return entry.x === i + 1;
                                 }).reduce((a, b) => a && b))
                             })
@@ -391,9 +391,9 @@ describe(
                             return parser.getByParams(config, params)
                         })).then(values => {
                             let total = values.pop()
-                            console.log(values)
+                            //console.log(values)
                             values = values[0]
-                            console.log('total', total, 'values', values)
+                            //console.log('total', total, 'values', values)
                             return assert.ok(Math.abs(total - values) < 0.01)
                         })
                     })
@@ -426,11 +426,11 @@ describe(
                             return parser.getByParams(config, params)
                         })).then(values => {
                             let total = values.pop()
-                            //console.log(values[2].xInterval)
-                            //console.log(values[0].xInterval)
+                            ////console.log(values[2].xInterval)
+                            ////console.log(values[0].xInterval)
                             values = values.map(each => each.y)
                             values = values.reduce((a,b) => a + b)
-                            console.log("total", total, "values", values)
+                            //console.log("total", total, "values", values)
                             return assert.ok(Math.abs(total - values) < 0.0001)
                         })
                     })
@@ -594,7 +594,7 @@ describe(
                 let params = ['precipitation', 'yrly', 'snow', 'shortValues', 0, 'y']
                 //let config = Object.assign(configs['latest'], precipitation_specs)
                 return parser.getByParams(config, params).then(values => {
-                    //console.log('values', values)
+                    ////console.log('values', values)
                     return assert.ok(Math.abs(values - 171.29999999999978) < 0.1)
                 })
             })
