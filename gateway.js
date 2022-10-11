@@ -176,20 +176,21 @@ module.exports = {
 		/* */
 		//console.log('url', url)
 		if(this.cached[url] === undefined){
-
-		this.cached[url] = axios.get(url).then(result => {
-			if(!result.cached){
-				this.number += 1;
-				//console.log('number', this.number)
-			}
-			return result.data
-		}).catch(
-			function (error) {
-				console.log('Show error notification!')
-				return Promise.reject(error)
-			}
-		)
-
+			// TODO nicer solution to individual requests
+			//console.log('start', (new Date()).getTime(), this.number)
+			this.cached[url] = axios.get(url).then(result => {
+				//console.log((new Date()).getTime(), this.number)
+				if(!result.cached){
+					this.number += 1;
+					//console.log('number', this.number)
+				}
+				return result.data
+			}).catch(
+				function (error) {
+					console.log('Show error notification!')
+					return Promise.reject(error)
+				}
+			)
 		}
 		return this.cached[url]
 	},

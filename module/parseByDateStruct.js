@@ -30,7 +30,7 @@ module.exports = class ByDateStruct {
 				this.insert(false, 'all')(entry)
 				break;
 			case 'yrly': 
-				this.values[key] = this.insert(false, "yrly", 'year', 'DOY')
+				this.values[key] = this.insert(true, "yrly", 'year', 'DOY')
 				break
 			case 'summer':
 			case 'winter':

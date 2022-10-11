@@ -274,6 +274,7 @@ class Point {
 		req[`${this.subType}${this.type}`] = req[`${this.specs.parentType}_${this.type}`]
 		return new Point(this.specs, req, false)
 	}
+	/*
 	get 'difference' (){
 		return baselineContain.getBaseline(this.specs).then(baseline => {
 			let req = Object.assign(Object.create(Object.getPrototypeOf(this.req)), this.req)
@@ -295,6 +296,8 @@ class Point {
 			return new Point(this.specs, req, this.full)
 		})
 	}
+
+	 */
 	set 'y' (val){
 		this.req[`${this.subType}${this.type}`] = val
 	}
@@ -348,9 +351,9 @@ class Point {
 				case 'max':
 					return Math[this.SUBTYPE](...result)
 				case 'maxAvg':
-					return Math.min(...result)
+					return Math.max(...result)
 				case 'minAvg':
-					return Math.max(...result);
+					return Math.min(...result);
 				case 'snow':
 				case 'rain':
 					return result.reduce((a,b) => a + b)
@@ -514,7 +517,7 @@ class Point {
 	clone(){
 		return new Point(this.specs, this.req, this.full)
 	}
-	'short' (){
+	get 'short' (){
 		let y = this.y
 		return {
 			compressed: true,

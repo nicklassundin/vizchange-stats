@@ -27,24 +27,25 @@ module.exports = class Struct {
     static build(seedSpecs, x, type, f = () => true, full = false, parentType, parentEntry) {
         let specs = JSON.parse(JSON.stringify(seedSpecs));
         let y1 = 0;
-        let y2 = 1;
+        let y2 = 0;
         let m1 = 0;
         let d1 = 1;
         let m2 = 0;
         let d2 = 1;
+        //console.log(specs.keys[0])
         switch (specs.keys[0]) {
             case 'month':
-                y2 = -2;
+                y2 = -1;
                 m1 = help.months().indexOf(x);
                 m2 = help.months().indexOf(x) + 1;
                 break;
             case 'months':
-                //y2 = 0;
+                y2 = 2;
                 break;
             case 'week':
                 //console.log(specs)
                 d2 = 0;
-                y2 = -1;
+                y2 = 2;
                 specs.dates.start = getDateOfWeek(specs.x, (new Date(specs.dates.start)).getFullYear())
                 specs.dates.end = specs.dates.start.addDays(7)
                 break;
@@ -60,7 +61,7 @@ module.exports = class Struct {
             case 'oct':
             case 'nov':
             case 'dec':
-                y2 = -1;
+                y2 = 1;
                 m1 = help.months().indexOf(specs.keys[0]);
                 m2 = m1+1;
                 break;
@@ -132,7 +133,7 @@ module.exports = class Struct {
         this.parentType = parentType
         this.movAvg = undefined;
         this.VALUES = {};
-
+        this.queque = Promise.resolve()
     }
     set "entry"(value) {
         this.POINT = value
@@ -238,6 +239,8 @@ module.exports = class Struct {
         if(this.full){
             result.entry = this.entry.then(entry => {
                 // TODO date wrong conversion
+                //console.log(result.specs.dates.start, result.specs.dates.end)
+                //console.log(entry.dateSlice(result.specs.dates.start, result.specs.dates.end))
                 return entry.dateSlice(result.specs.dates.start, result.specs.dates.end)
             })
         }
@@ -378,31 +381,37 @@ module.exports = class Struct {
         genSpecs.dates.end = (new Date(genSpecs.dates.end))
         genSpecs.dates.end = new Date(genSpecs.baseline.end, genSpecs.dates.end.getMonth(), genSpecs.dates.end.getDate())
         genSpecs.keys.shift()
-        let key = genSpecs.keys.shift();
+        //let key = genSpecs.keys.shift();
         let type = this.type;
         let f = this.f;
-        let full = this.full;
+        let full = true;
         let parentType = this.specs.parentType;
-        let keys = (new Point(genSpecs))[`${key}s`]
+        let keys = (new Point(genSpecs))[`${genSpecs.keys[0]}s`]
         let values = {}
-        //console.log(`${key}s`, keys)
         for(let i = 0; i < keys.length; i++) {
-            values[keys[i]] = this.getValues(genSpecs, key, keys[i], type, f, full, parentType).short()
+            values[keys[i]] = this.getValues(genSpecs, genSpecs.keys[0], keys[i], type, f, full, parentType).short
         }
-
-        return Promise.all(Object.values(values).map(value => value)).then(values => values.reduce((a, b) => {
-            a.y = (a.y + b.y)/2
-            return a
-        })).then(value => value.y)
+        return Promise.all(Object.values(values).map(value => value)).then(values => {
+            let length = values.length;
+            let value = values.reduce((a, b) => {
+                a.y = (a.y + b.y)
+                //console.log(a)
+                return a
+            })
+            value.y = value.y/length;
+            return value
+        }).then(value => value.y)
 
     }
     get "difference"() {
         return this.baseline.then(baseline => {
-            //console.log(baseline)
             return this.shortValues.map(value => {
                 return value.then(value => {
                     if(value === undefined) return undefined
+                 //   console.log(`----- ${value.x} ------`)
+                  //  console.log("values:", value.y)
                     value.y -= baseline;
+                  //  console.log("diff:", value.y)
                     return value
                 })
             })
@@ -419,19 +428,12 @@ module.exports = class Struct {
     }
     "AVGTYPE"(type, f) {
         return this.entry.then((entry) => {
-
             let seed = entry.getSeed();
             seed.specs.subType = type;
-            seed.specs.parentType = this.type
-            // for standard for entry in Struct
+            seed.specs.parentType = this.type;
             let nEntry = new Point(seed.specs, seed.req)
             return new Struct(nEntry, seed.specs, this.x, type, f, this.full, this.type)
         })
-
-        // return res
-        // let res = new Struct([], this.x, type)
-        // res.values = this.values.map(each => each.short())
-        // return res.build(type)
     }
     "TYPE"(type, f = this.f, full = this.full) {
         let specs = JSON.parse(JSON.stringify(this.specs));
@@ -460,19 +462,19 @@ module.exports = class Struct {
     }
     get "shortValues"() {
         return this.values.map(each => {
-            return each.then(vals => vals.short())
+            return each.then(vals => vals.short)
         })
     }
-    get "yValues"() {
+    get "yValues" () {
         return this.shortValues.map(each => each.y)
     }
-    "short"() {
+    get "short" () {
         if (this.typeMeta !== undefined) return this.typeMeta
 
         return this.entry.then(entry => {
             try {
                // console.log(entry.x, entry.specs.dates)
-                return entry.short()
+                return entry.short
             }catch(error) {
                 //console.log(entry)
                // throw error
@@ -491,7 +493,7 @@ module.exports = class Struct {
                 type: this.type,
                 xInterval: this.xInterval,
                 typeMeta: this.typeMeta,
-                date: (this.values.length === 1 ? this.values[0].short().date : null),
+                date: (this.values.length === 1 ? this.values[0].short.date : null),
             }
         })
     }

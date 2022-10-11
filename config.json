@@ -2,7 +2,7 @@
 	"live": {
 		"baseline": {
 			"start": 1961,
-			"end": 1980
+			"end": 1991
 		},
 		"dates": {
 			"start": 1910,
@@ -13,7 +13,7 @@
 	"liveHalf": {
 		"baseline": {
 			"start": 1961,
-			"end": 1980
+			"end": 1991
 		},
 		"dates": {
 			"start": 1913,
@@ -24,7 +24,7 @@
 	"xsLive": {
 		"baseline": {
 			"start": 1961,
-			"end": 1980
+			"end": 1991
 		},
 		"dates": {
 			"start": 2018,
@@ -35,7 +35,7 @@
 	"empty": {
 		"baseline": {
 			"start": 1961,
-			"end": 1980
+			"end": 1991
 		},
 		"dates": {
 			"start": 1910,
@@ -46,7 +46,7 @@
 	"debug": {
 		"baseline": {
 			"start": 1961,
-			"end": 1980
+			"end": 1991
 		},
 		"dates": {
 			"start": 1961,
@@ -58,7 +58,7 @@
 	"multi": {
 		"baseline": {
 			"start": 1961,
-			"end": 1980
+			"end": 1991
 		},
 		"dates": {
 			"start": 1961,
@@ -69,7 +69,7 @@
 	"xsProduction": {
 		"baseline": {
 			"start": 1961,
-			"end": 1980
+			"end": 1991
 		},
 		"dates": {
 			"start": 2018,
@@ -80,7 +80,7 @@
 	"production": {
 		"baseline": {
 			"start": 1961,
-			"end": 1980
+			"end": 1991
 		},
 		"dates": {
 			"start": 1910,
@@ -91,7 +91,7 @@
 	"productionRedirect": {
 		"baseline": {
 			"start": 1961,
-			"end": 1980
+			"end": 1991
 		},
 		"dates": {
 			"start": 1910,
@@ -106,7 +106,7 @@
 		},
 		"baseline": {
 			"start": 1961,
-			"end": 1980
+			"end": 1991
 		},
 		"url": "vischange.k8s.glimworks.se/data/query/v1"
 	}
