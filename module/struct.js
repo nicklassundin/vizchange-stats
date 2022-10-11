@@ -420,10 +420,25 @@ module.exports = class Struct {
     }
     get "growingSeason" () {
         this.y
+        let specs = JSON.parse(JSON.stringify(this.specs));
         return Promise.all(this.values).then(values => {
-            return values.map((value) => {
-                return value.sequence()
-            })
+            return {
+                shortValues: values.map((value) => {
+                    return value.sequence()
+                }),
+                specs,
+                get "difference" () {
+                    let start = this.specs.baseline.start;
+                    let end = this.specs.baseline.end;
+                    return Promise.all(this.shortValues).then(values => {
+                        let baseline = values.filter(value => (value.x >= start && value.x <= end)).map(each => each.y).reduce((a,b) => a + b)/(end - start)
+                        return values.map(each => {
+                            each.y -= baseline;
+                            return each
+                        })
+                    })
+                }
+            }
         })
     }
     "AVGTYPE"(type, f) {

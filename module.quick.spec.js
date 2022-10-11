@@ -277,19 +277,27 @@ describe(
                 })
                 describe('growing Season', function() {
                     it('weeks', () => {
-                        let params = ['temperature', 'weekly', 'growingSeason', 1]
+                        let params = ['temperature', 'weekly', 'growingSeason', 'shortValues', 1]
                         let config = Object.assign(configs['latest'], specs)
                         return parser.getByParams(config, params).then(values => {
                             //console.log('values', values)
                             return assert.equal(values.y, 22)
                         })
                     })
-                    it('days - shortValues', () => {
-                        let params = ['temperature', 'yrlyFull', 'growingSeason', 0]
+                    it('days', () => {
+                        let params = ['temperature', 'yrlyFull', 'growingSeason', 'shortValues', 0]
                         let config = Object.assign(configs['latest'], specs)
                         return parser.getByParams(config, params).then(values => {
                             //console.log('values', values)
                             return assert.equal(values.y, 149)
+                        })
+                    })
+                    it('difference', () => {
+                        let params = ['temperature', 'yrlyFull', 'growingSeason', 'difference', 90]
+                        let config = Object.assign(configs['live'], specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log('values', values)
+                            return assert.ok(Math.abs(values.y - 21.286666666) < 0.0001)
                         })
                     })
                     it.skip('days', () => {
