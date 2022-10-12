@@ -139,17 +139,21 @@ class Point {
 		}else{
 			this.req = new PointReq(req, specs);
 		}
-		if(['breakup', 'freezeup'].includes(type)){
-			let date = new Date(req[type]);
-			this.y = help.dayOfYear(date)
-			this.date = date;
-			if(help.isFirstHalfYear(date.getMonth())){
-				this.y += (((this.year-1) % 4 === 0 && (this.year-1) % 100 > 0) || (this.year) %400 === 0) ? 366 : 365;
-			}
-		}else if(['co2_weekly'].includes(type) && this.y !== undefined && !isNaN(this.y)){
-			this.req[type] = this.req[type].replace(' ', '')
-		}else{
-			this.date = this.x;
+		switch (type) {
+			case 'breakup':
+			case 'freezeup':
+				let date = new Date(req[type]);
+				this.y = help.dayOfYear(date)
+				this.date = date;
+				if(help.isFirstHalfYear(date.getMonth())){
+					this.y += (((this.year-1) % 4 === 0 && (this.year-1) % 100 > 0) || (this.year) %400 === 0) ? 366 : 365;
+				}
+				break;
+			case 'co2_weekly':
+				if(this.y !== undefined && !isNaN(this.y)){
+					this.req[type] = this.req[type].replace(' ', '')
+				}
+			default:
 		}
 		//this.monthName = help.monthByIndex(this.month);
 		//this.season = help.getSeasonByIndex(this.month)
@@ -165,6 +169,16 @@ class Point {
 			this.splitYear = this.year
 		}
 		this.splitDecade = this.splitYear - this.splitYear % 10 +1;
+	}
+	get 'date' () {
+		switch (this.specs.subType){
+			case 'last':
+				return this.req[this.req.length - 1].date
+			case 'first':
+				return this.req[0].date
+			default:
+				return this.x;
+		}
 	}
 	'dateSlice' (start, end) {
 		let req = this.req;
@@ -217,6 +231,7 @@ class Point {
 			case 'weekly':
 			case 'week':
 				return this.week
+			case 'splitYear':
 			case 'yrly':
 			case 'year':
 				return this.year
@@ -255,21 +270,21 @@ class Point {
 		let req = this.req.sort((a, b) => {
 			return (new Date(a.date).getTime()) - (new Date(b.date).getTime())
 		}).filter((e) => {
-			e.y = e[`${this.specs.parentType}_${this.type}`]
-			return f(e)
-		}).pop()
-		req[`${this.subType}${this.type}`] = req[`${this.specs.parentType}_${this.type}`]
-		return new Point(this.specs, req, false)
+			return f({
+				'y': this.getY(e)
+			})
+		})
+		return new Point(this.specs, req, true)
 	}
 	'last'(f){
 		let req = this.req.sort((a, b) => {
 			return (new Date(a.date).getTime()) - (new Date(b.date).getTime())
 		}).filter((e) => {
-			e.y = e[`${this.specs.parentType}_${this.type}`]
-			return f(e)
-		}).shift()
-		req[`${this.subType}${this.type}`] = req[`${this.specs.parentType}_${this.type}`]
-		return new Point(this.specs, req, false)
+			return f({
+				'y': this.getY(e)
+			})
+		})
+		return new Point(this.specs, req, true)
 	}
 	/*
 	get 'difference' (){
@@ -301,6 +316,10 @@ class Point {
 	'getY'(req = this.req){
 		let y = req[`${this.type}`]
 		switch (this.SUBTYPE){
+			case 'last':
+			case 'first':
+				return req[`${this.specs.parentType}_${this.type}`]
+				break;
 			case 'difference':
 				if(typeof y == 'object'){
 					return y.difference
@@ -355,6 +374,7 @@ class Point {
 				case 'rain':
 					return result.reduce((a,b) => a + b)
 				case 'last':
+					return this.getY(this.req[this.req.length - 1])
 				case 'first':
 					return this.getY(this.req[0]);
 				case 'difference':

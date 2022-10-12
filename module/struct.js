@@ -32,6 +32,7 @@ module.exports = class Struct {
         let d1 = 1;
         let m2 = 0;
         let d2 = 1;
+        //console.log(specs.keys[0])
         switch (specs.keys[0]) {
             case 'month':
                 y2 = -1;
@@ -106,6 +107,7 @@ module.exports = class Struct {
                // break;
             case 'monthly':
                 break;
+            case 'yrlySplit':
             case 'splitYear':
                 y1 = -1;
                 y2 = 0;
@@ -164,8 +166,7 @@ module.exports = class Struct {
                             break;
                         case 'first':
                         case 'last':
-                            //point.f = this.f
-                            point = point[this.type](this.f);
+                            return point[this.type](this.f);
                             break;
                         case 'snow':
                         case 'rain':

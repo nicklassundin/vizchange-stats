@@ -212,6 +212,24 @@ describe(
                         })
                     })
                 })
+                describe('frost', function() {
+                    it('first', () => {
+                        let params = ['temperature', 'yrlySplit', 'min', 'first', 'shortValues', 10];
+                        let config = Object.assign(configs['liveHalf'], specs)
+                        return parser.getByParams(config, params).then(values => {
+                            return assert.equal(values.date.getDate(), 30)
+                        })
+                    })
+                    it('last', () => {
+                        let params = ['temperature', 'yrlySplit', 'min', 'last', 'shortValues', 10]
+                        let config = Object.assign(configs['liveHalf'], specs)
+                        parser.temperature.f = (e) => e <= 0;
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values)
+                            return assert.equal(values.date.getDate(), 4)
+                        })
+                    })
+                })
                 describe('season', function() {
                     it('x', () => {
                         let params = ['precipitation', 'spring', 'shortValues', 0, 'x']
@@ -560,25 +578,6 @@ describe(
                         return assert.ok(Math.abs(values - 519.1) < 0.00001)
                     })
                 })
-                describe('frost', () => {
-                    it('last', () => {
-                        let params = ['temperature', 'yrly', 'values', 1, 'last', 'y']
-                        let config = Object.assign(configs['latest'], specs)
-                        parser.temperature.f = (e) => e <= 0;
-                        return parser.getByParams(config, params).then(values => {
-                            return assert.equal(values, -4.6)
-                        })
-                    })
-                    it('first', () => {
-                        let params = ['temperature', 'yrly', 'values', 1, 'first', 'y']
-                        let config = Object.assign(configs['latest'], specs)
-                        parser.temperature.f = (e) => e <= 0;
-                        return parser.getByParams(config, params).then(values => {
-                            return assert.equal(values, -4.5)
-                        })
-                    })
-                })
-
                 it('number', () => {
                     let params = ['temperature', 'yrly', 'values', 1, 'values', 'length']
                     let config = Object.assign(configs['latest'], specs)
