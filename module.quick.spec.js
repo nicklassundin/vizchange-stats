@@ -20,6 +20,23 @@ let precipitation_specs = {
         'end': 1991
     }
 }
+let freezeup_specs = {
+    type: 'freezeup',
+    station: 'abisko',
+    baseline: {
+        'start': 1961,
+        'end': 1991
+    }
+}
+let breakup_specs = {
+    type: 'breakup',
+    station: 'abisko',
+    baseline: {
+        'start': 1961,
+        'end': 1991
+    }
+}
+
 let configs = require('./config.json')
 let cache = {}
 
@@ -200,6 +217,24 @@ describe(
                 })
             })
             describe('type test', function() {
+                describe('lake', function() {
+                    it('freeze-up', () => {
+                        let params = ['freezeup', 'yrly', 'shortValues', 0];
+                        let config = Object.assign(configs['latest'], freezeup_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            //console.log(values)
+                            return assert.equal(values.y, 25)
+                        })
+                    })
+                    it('break-up', () => {
+                        let params = ['breakup', 'yrly', 'shortValues', 0];
+                        let config = Object.assign(configs['latest'], breakup_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            //console.log(values)
+                            return assert.equal(values.y, 156)
+                        })
+                    })
+                })
                 describe('precipitation', function() {
                     it('difference', () => {
                         let params = ['precipitation', 'yrly', 'difference'];
@@ -334,7 +369,7 @@ describe(
                         let config = Object.assign(configs['live'], specs)
                         return parser.getByParams(config, params).then(values => {
                             console.log('values', values)
-                            return assert.ok(Math.abs(values.y - 21.5444) < 0.001)
+                            return assert.ok(Math.abs(values.y - 21.2) < 0.1)
                         })
                     })
                     it.skip('days', () => {

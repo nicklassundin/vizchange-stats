@@ -144,7 +144,6 @@ class Point {
 			case 'freezeup':
 				let date = new Date(req[type]);
 				this.y = help.dayOfYear(date)
-				this.date = date;
 				if(help.isFirstHalfYear(date.getMonth())){
 					this.y += (((this.year-1) % 4 === 0 && (this.year-1) % 100 > 0) || (this.year) %400 === 0) ? 366 : 365;
 				}
@@ -176,6 +175,8 @@ class Point {
 				return this.req[this.req.length - 1].date
 			case 'first':
 				return this.req[0].date
+			case 'lakeice':
+				return new Date(this.req[0][this.type])
 			default:
 				return this.x;
 		}
@@ -221,7 +222,6 @@ class Point {
 		}
 	}
 	get 'x'(){
-		//console.log(this.specs.keys[0])
 		switch(this.specs.keys[0]){
 			case 'autumn':
 			case 'spring':
@@ -316,6 +316,8 @@ class Point {
 	'getY'(req = this.req){
 		let y = req[`${this.type}`]
 		switch (this.SUBTYPE){
+			case 'lakeice':
+				return help.dayOfYear(new Date(req[this.type]))
 			case 'last':
 			case 'first':
 				return req[`${this.specs.parentType}_${this.type}`]
@@ -355,6 +357,7 @@ class Point {
 	get 'y' (){
 		let result = NaN;
 		if(this.req.length === 0) return NaN
+
 		if(this.full){
 			result = this.req.map(each => this.getY(each)).filter(y => y !== undefined && !isNaN(y))
 			if(result.length === 0) return NaN
@@ -379,7 +382,8 @@ class Point {
 					return this.getY(this.req[0]);
 				case 'difference':
 					return this.difference
-
+				case 'lakeice':
+					return result[0]
 				default:
 					return result
 

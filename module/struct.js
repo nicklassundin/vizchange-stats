@@ -25,6 +25,15 @@ function getDateOfWeek(w, y) {
 
 module.exports = class Struct {
     static build(seedSpecs, x, type, f = () => true, full = false, parentType, parentEntry) {
+        switch (seedSpecs.type) {
+            case 'freezeup':
+            case 'breakup':
+            case 'lakeice':
+                type = 'lakeice'
+                full = true;
+                break;
+            default:
+        }
         let specs = JSON.parse(JSON.stringify(seedSpecs));
         let y1 = 0;
         let y2 = 0;
