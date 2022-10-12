@@ -169,7 +169,7 @@ class Point {
 	'dateSlice' (start, end) {
 		let req = this.req;
 		let specs = JSON.parse(JSON.stringify(this.specs));
-		//specs.keys.shift()
+		specs.keys.shift()
 		specs.dates.start = start;
 		specs.dates.end = end;
 		if(Array.isArray(req)){
@@ -185,18 +185,12 @@ class Point {
 						return season == specs.keys[0]
 					})
 					break;
-				case 'month':
-					req = req.filter((e) => {
-						e.date = new Date(e.date)
-						return e.date.getMonth()
-					})
-					break;
 				case 'weeks':
 					req = req.filter((e) => {
-						e.date = new Date(e.date)
 						return e.date.getWeekNumber()
 					})
 					break;
+				case 'month':
 				default:
 					req = req.filter((e) => {
 						e.date = new Date(e.date)
@@ -221,11 +215,14 @@ class Point {
 			case 'winter':
 				return this.specs.keys[0]
 			case 'weekly':
+			case 'week':
 				return this.week
 			case 'yrly':
 			case 'year':
 				return this.year
 			case 'months':
+				return this.monthName
+			case 'month':
 				return this.monthName
 			case 'decade':
 				return this.decade
@@ -441,9 +438,7 @@ class Point {
 		return help.months()
 	}
 	get 'weeks' () {
-		let start = this.specs.dates.start.getWeekNumber();
-		let end = this.specs.dates.end.getWeekNumber();
-		return Array.from({length: (end - start)}, (v, k) => k + start)
+		return Array.from({length: (53 - 1)}, (v, k) => k + 1)
 	}
 	get 'decades' (){
 		let start = this.decade
