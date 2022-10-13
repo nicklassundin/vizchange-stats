@@ -409,7 +409,7 @@ describe(
                         let config = Object.assign(configs['live'], specs)
                         return parser.getByParams(config, params).then(values => {
                             console.log('values', values)
-                            return assert.ok(Math.abs(values.y - 21.2) < 0.1)
+                            return assert.ok(Math.abs(values.y - 21) < 1)
                         })
                     })
                     it.skip('days', () => {
