@@ -36,6 +36,14 @@ let breakup_specs = {
         'end': 1991
     }
 }
+let icetime_specs = {
+    type: 'icetime',
+    station: 'abisko',
+    baseline: {
+        'start': 1961,
+        'end': 1991
+    }
+}
 
 let configs = require('./config.json')
 let cache = {}
@@ -118,7 +126,7 @@ describe(
                         let params = ['precipitation', 'yrly', 'snow', 'shortValues', 1]
                         let config = Object.assign(configs['latest'], precipitation_specs)
                         return parser.getByParams(config, params).then(values => {
-                            //console.log(values)
+                            console.log(values)
                             return assert.equal(values.x, 2020)
                         })
                     })
@@ -218,20 +226,52 @@ describe(
             })
             describe('type test', function() {
                 describe('lake', function() {
-                    it('freeze-up', () => {
-                        let params = ['freezeup', 'yrly', 'shortValues', 0];
-                        let config = Object.assign(configs['latest'], freezeup_specs)
-                        return parser.getByParams(config, params).then(values => {
-                            //console.log(values)
-                            return assert.equal(values.y, 25)
-                        })
-                    })
-                    it('break-up', () => {
+                    it('breakup', () => {
                         let params = ['breakup', 'yrly', 'shortValues', 0];
                         let config = Object.assign(configs['latest'], breakup_specs)
                         return parser.getByParams(config, params).then(values => {
-                            //console.log(values)
+                            console.log(values)
                             return assert.equal(values.y, 156)
+                        })
+                    })
+                    it('breakup - difference', () => {
+                        let params = ['breakup', 'yrly', 'difference', 60];
+                        let config = Object.assign(configs['live'], breakup_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values)
+                            return assert.ok(Math.abs(values.y - 5) < 0.1)
+                        })
+                    })
+                    it('freeze-up - 1971', () => {
+                        let params = ['freezeup', 'yrly', 'shortValues', 60];
+                        let config = Object.assign(configs['live'], freezeup_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values)
+                            return assert.equal(values.y, 364)
+                        })
+                    })
+                    it('freeze-up - 1972', () => {
+                        let params = ['freezeup', 'yrly', 'shortValues', 61];
+                        let config = Object.assign(configs['live'], freezeup_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values)
+                            return assert.equal(values.y, 370)
+                        })
+                    })
+                    it('freezeup - difference', () => {
+                        let params = ['freezeup', 'yrly', 'difference', 60];
+                        let config = Object.assign(configs['live'], freezeup_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values)
+                            return assert.ok(Math.abs(values.y - 12) < 0.1)
+                        })
+                    })
+                    it('icetime', () => {
+                        let params = ['icetime', 'yrly', 'shortValues', 60];
+                        let config = Object.assign(configs['live'], icetime_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values)
+                            return assert.ok(Math.abs(values.y - 170) < 0.1)
                         })
                     })
                 })

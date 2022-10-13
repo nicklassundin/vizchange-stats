@@ -28,9 +28,11 @@ module.exports = class Struct {
         switch (seedSpecs.type) {
             case 'freezeup':
             case 'breakup':
-            case 'lakeice':
-                type = 'lakeice'
+                type = 'breakfreeze'
                 full = true;
+                break;
+            case 'lakeice':
+                full = true
                 break;
             default:
         }
@@ -42,6 +44,7 @@ module.exports = class Struct {
         let m2 = 0;
         let d2 = 1;
         //console.log(specs.keys[0])
+        specs.dates.type = specs.type
         switch (specs.keys[0]) {
             case 'month':
                 y2 = -1;
@@ -288,7 +291,7 @@ module.exports = class Struct {
             this.VALUES = {}
 
             //console.log("get values", keys.length, genSpecs.keys, genSpecs.dates)
-           // console.log(`${genSpecs.keys[0]}s`, keys)
+       //     console.log(`${genSpecs.keys[0]}s`, keys)
             for(let i = 0; i < keys.length; i++) {
                 this.VALUES[keys[i]] = this.getValues(genSpecs, genSpecs.keys[0], keys[i], type, f, full, parentType)
             }
@@ -421,9 +424,11 @@ module.exports = class Struct {
         }
         return Promise.all(Object.values(values).map(value => value)).then(values => {
             let length = values.length;
+            //console.log(values)
             let value = values.reduce((a, b) => {
+                //console.log(a.y)
                 a.y = (a.y + b.y)
-                //console.log(a)
+                //console.log(a.y)
                 return a
             })
             value.y = value.y/length;
@@ -518,11 +523,12 @@ module.exports = class Struct {
 
         return this.entry.then(entry => {
             try {
+
                // console.log(entry.x, entry.specs.dates)
                 return entry.short
             }catch(error) {
                 //console.log(entry)
-               // throw error
+                throw error
             }
         })
 

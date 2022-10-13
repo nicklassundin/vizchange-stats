@@ -140,14 +140,6 @@ class Point {
 			this.req = new PointReq(req, specs);
 		}
 		switch (type) {
-			case 'breakup':
-			case 'freezeup':
-				let date = new Date(req[type]);
-				this.y = help.dayOfYear(date)
-				if(help.isFirstHalfYear(date.getMonth())){
-					this.y += (((this.year-1) % 4 === 0 && (this.year-1) % 100 > 0) || (this.year) %400 === 0) ? 366 : 365;
-				}
-				break;
 			case 'co2_weekly':
 				if(this.y !== undefined && !isNaN(this.y)){
 					this.req[type] = this.req[type].replace(' ', '')
@@ -175,7 +167,7 @@ class Point {
 				return this.req[this.req.length - 1].date
 			case 'first':
 				return this.req[0].date
-			case 'lakeice':
+			case 'breakfreeze':
 				return new Date(this.req[0][this.type])
 			default:
 				return this.x;
@@ -234,7 +226,12 @@ class Point {
 			case 'splitYear':
 			case 'yrly':
 			case 'year':
-				return this.year
+				switch(this.SUBTYPE) {
+					case 'breakfreeze':
+						return this.year + 1;
+					default:
+						return this.year
+				}
 			case 'months':
 				return this.monthName
 			case 'month':
@@ -316,8 +313,14 @@ class Point {
 	'getY'(req = this.req){
 		let y = req[`${this.type}`]
 		switch (this.SUBTYPE){
-			case 'lakeice':
-				return help.dayOfYear(new Date(req[this.type]))
+			case 'breakfreeze':
+				let date = new Date(req[this.type]);
+				y = help.dayOfYear(date)
+				if(help.isFirstHalfYear(date.getMonth()) && this.specs.type === 'freezeup'){
+					y += (((this.year-1) % 4 === 0 && (this.year-1) % 100 > 0) || (this.year) %400 === 0) ? 366 : 365;
+				}
+
+				return y
 			case 'last':
 			case 'first':
 				return req[`${this.specs.parentType}_${this.type}`]
@@ -357,7 +360,6 @@ class Point {
 	get 'y' (){
 		let result = NaN;
 		if(this.req.length === 0) return NaN
-
 		if(this.full){
 			result = this.req.map(each => this.getY(each)).filter(y => y !== undefined && !isNaN(y))
 			if(result.length === 0) return NaN
@@ -382,7 +384,7 @@ class Point {
 					return this.getY(this.req[0]);
 				case 'difference':
 					return this.difference
-				case 'lakeice':
+				case 'breakfreeze':
 					return result[0]
 				default:
 					return result

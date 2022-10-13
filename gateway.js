@@ -95,7 +95,7 @@ const preset = {
 		rain: 'precipitation,avg_temperature',
 		growingSeason: 'temperature',
 		perma: 'perma',
-		lakeice: 'freezeup,breakup',
+		lakeice: 'icetime',
 		'breakup': 'freezeup,breakup',
 		'freezeup': 'freezeup,breakup',
 		'snowdepth_single': 'snowdepth_single',
