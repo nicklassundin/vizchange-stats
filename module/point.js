@@ -317,9 +317,8 @@ class Point {
 				let date = new Date(req[this.type]);
 				y = help.dayOfYear(date)
 				if(help.isFirstHalfYear(date.getMonth()) && this.specs.type === 'freezeup'){
-					y += (((this.year-1) % 4 === 0 && (this.year-1) % 100 > 0) || (this.year) %400 === 0) ? 366 : 365;
+					y += (((date.getFullYear()-1) % 4 === 0 && (date.getFullYear()-1) % 100 > 0) || (date.getFullYear()) %400 === 0) ? 366 : 365;
 				}
-
 				return y
 			case 'last':
 			case 'first':

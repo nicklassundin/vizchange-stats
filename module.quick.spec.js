@@ -250,6 +250,14 @@ describe(
                             return assert.equal(values.y, 364)
                         })
                     })
+                    it('freeze-up - 2021', () => {
+                        let params = ['freezeup', 'yrly', 'shortValues', 9];
+                        let config = Object.assign(configs['live'], freezeup_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values)
+                            return assert.equal(values.y, 320)
+                        })
+                    })
                     it('freeze-up - 1972', () => {
                         let params = ['freezeup', 'yrly', 'shortValues', 61];
                         let config = Object.assign(configs['live'], freezeup_specs)
