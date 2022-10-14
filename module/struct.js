@@ -310,7 +310,7 @@ module.exports = class Struct {
             this.VALUES = {}
 
             //console.log("get values", keys.length, genSpecs.keys, genSpecs.dates)
-       //     console.log(`${genSpecs.keys[0]}s`, keys)
+            //console.log(`${genSpecs.keys[0]}s`, keys)
             for(let i = 0; i < keys.length; i++) {
                 this.VALUES[keys[i]] = this.getValues(genSpecs, genSpecs.keys[0], keys[i], type, f, full, parentType)
             }
@@ -474,6 +474,7 @@ module.exports = class Struct {
         return this.baseline.then(baseline => {
             return this.shortValues.map(value => {
                 return value.then(value => {
+
                     if(value === undefined) return undefined
                  //   console.log(`----- ${value.x} ------`)
                   //  console.log("values:", value.y)
@@ -542,11 +543,23 @@ module.exports = class Struct {
         return this;
     }
     get "shortValues" () {
-        return this.values.map(each => {
-            return each.then(vals => {
-                return vals.short
-            })
-        })
+        switch (this.specs.keys[0]){
+            case 'all':
+                return this.entry.then((entry) => {
+                    if(entry instanceof Point){
+                        return entry.splinter.map(each => each.short)
+                    }else{
+                        return NaN
+                    }
+                })
+            default:
+                return this.values.map(each => {
+                    return each.then(vals => {
+                        return vals.short
+                    })
+                })
+        }
+
     }
     get "yValues" () {
         return this.shortValues.map(each => each.y)

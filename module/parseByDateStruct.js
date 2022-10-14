@@ -27,7 +27,7 @@ module.exports = class ByDateStruct {
 		(new Date()).getTime();
 		switch (key) {
 			case 'all':
-				this.insert(false, 'all')(entry)
+				this.values[key] = this.insert(true, 'all')
 				break;
 			case 'yrly': 
 				this.values[key] = this.insert(true, "yrly", 'year', 'DOY')

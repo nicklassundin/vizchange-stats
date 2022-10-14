@@ -84,6 +84,13 @@ class PointReq {
 		}).map(each => new PointReq(each, specs))
 	}
 	constructor(request, specs){
+		switch (specs.type) {
+			case 'co2_weekly':
+				if(this.y !== undefined && !isNaN(this.y)){
+					this.req[specs.type] = this.req[specs.type].replace(' ', '')
+				}
+			default:
+		}
 		request = replace(request,'glob_temp', 'temperature')
 		request = replace(request,'64n-90n_temp', 'temperature')
 		request = replace(request,'nhem_temp', 'temperature')
@@ -147,6 +154,7 @@ class Point {
 	constructor(specs, req = {}, full=false){
 		this.full = full;
 		this.specs = specs;
+		//console.log(this.specs)
 		if(typeof this.specs.dates.start === 'string'){
 			this.specs.dates.start = new Date(this.specs.dates.start)
 			this.specs.dates.end = new Date(this.specs.dates.end)
@@ -163,13 +171,6 @@ class Point {
 			this.req = PointReq.build(req, specs);
 		}else{
 			this.req = new PointReq(req, specs);
-		}
-		switch (type) {
-			case 'co2_weekly':
-				if(this.y !== undefined && !isNaN(this.y)){
-					this.req[type] = this.req[type].replace(' ', '')
-				}
-			default:
 		}
 		//this.monthName = help.monthByIndex(this.month);
 		//this.season = help.getSeasonByIndex(this.month)
@@ -248,6 +249,8 @@ class Point {
 			case 'weekly':
 			case 'week':
 				return this.week
+			case 'all':
+				return (new Date(this.req.date).getTime())
 			case 'splitYear':
 			case 'yrly':
 			case 'year':
@@ -320,7 +323,6 @@ class Point {
 				'y': this.getY(e)
 			})
 		})
-		//console.log(req)
 		return new Point(this.specs, req, true)
 	}
 	/*
@@ -604,6 +606,13 @@ class Point {
 			specs,
 			req
 		}
+	}
+	get 'splinter' () {
+		return this.req.map(req => {
+			return new Point(this.specs, req)
+		}).sort((a, b) => {
+			return (a.date - b.date)
+		})
 	}
 }
 // module.exports.Entry = Entry;

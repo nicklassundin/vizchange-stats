@@ -55,6 +55,14 @@ let icetime_specs = {
         'end': 1991
     }
 }
+let co2_weekly_specs = {
+    type: 'co2_weekly',
+    station: 'glob',
+    baseline: {
+        'start': 1961,
+        'end': 1991
+    }
+}
 
 let configs = require('./config.json')
 let cache = {}
@@ -235,7 +243,17 @@ describe(
                     })
                 })
             })
-            describe('type test', function() {
+            describe('type', function() {
+                describe('co2_weekly', function() {
+                    it('value', () => {
+                        let params = ['co2_weekly', 'all', 'shortValues', 0]
+                        let config = Object.assign(configs['latest'], co2_weekly_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            //console.log(values)
+                            return assert.equal(values.y, 410.25)
+                        })
+                    })
+                })
                 describe('lake', function() {
                     it('breakup', () => {
                         let params = ['breakup', 'yrly', 'shortValues', 0];
