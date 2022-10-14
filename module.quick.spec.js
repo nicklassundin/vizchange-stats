@@ -3,6 +3,17 @@ const fs = require('fs');
 global.climateplots = {
     dev: true
 }
+
+class Specs  {
+    constructor(config, type) {
+        this.config = config
+        this.type = type;
+    }
+    'getConfig' (type, station = 'abisko') {
+        let config = Object.assign({type: type, station: station}, this.config)
+        return Object.assign(configs[this.type], config)
+    }
+}
 let specs = {
     type: 'temperature',
     station: 'abisko',
@@ -302,6 +313,14 @@ describe(
                         return parser.getByParams(config, params).then(values => {
                             //console.log(values)
                             return assert.equal(values.y, 22)
+                        })
+                    })
+                    it('high full', () => {
+                        let params = ['temperature', 'yrly', 'max', 'high', 20, 'shortValues', 104]
+                        let config = Object.assign(configs['live'], specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values)
+                            return assert.equal(values.y, 29)
                         })
                     })
                     it('low', () => {

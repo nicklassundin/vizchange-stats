@@ -43,10 +43,35 @@ let baselineContain = new Baseline();
 class PointReq {
 	static build(requests, specs){
 		let result = {}
-		requests.forEach(req => {
-			if(typeof result[`${req.date}${req.position}`] !== 'object') result[`${req.date}${req.position}`] = {}
-			Object.assign(result[`${req.date}${req.position}`], req)
-		})
+		switch (specs.subType) {
+			case 'high':
+				requests.forEach(req => {
+					let date = new Date(req.date)
+					let key = `${date.getFullYear()}${help.dayOfYear(date)}${req.position}`
+					if(typeof result[key] !== 'object'){
+						result[key] = req
+					}else if(Number(req[`${specs.parentType}_${specs.type}`]) < Number(result[key][`${specs.parentType}_${specs.type}`])){
+						result[key] = req
+					}
+				});
+				break
+			case 'low':
+				requests.forEach(req => {
+					let date = new Date(req.date)
+					let key = `${date.getFullYear()}${help.dayOfYear(date)}${req.position}`
+					if(typeof result[key] !== 'object'){
+						result[key] = req
+					}else if(req[`${specs.parentType}_${specs.type}`] > result[key][`${specs.parentType}_${specs.type}`]){
+						result[key] = req
+					}
+				})
+				break;
+			default:
+				requests.forEach(req => {
+					if(typeof result[`${req.date}${req.position}`] !== 'object') result[`${req.date}${req.position}`] = {}
+					Object.assign(result[`${req.date}${req.position}`], req)
+				})
+		}
 		return Object.values(result).filter(each => {
 			switch(specs.description) {
 				case 'splitMonth':
@@ -325,7 +350,7 @@ class Point {
 	set 'y' (val){
 		this.req[`${this.subType}${this.type}`] = val
 	}
-	'getY'(req = this.req){
+	'getY'(req = this.req, number = false){
 		let y = req[`${this.type}`]
 		switch (this.SUBTYPE){
 			case 'breakfreeze':
@@ -340,7 +365,6 @@ class Point {
 			case 'high':
 			case 'low':
 				return req[`${this.specs.parentType}_${this.type}`]
-				break;
 			case 'difference':
 				if(typeof y == 'object'){
 					return y.difference
