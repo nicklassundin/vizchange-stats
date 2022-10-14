@@ -295,6 +295,24 @@ describe(
                         })
                     })
                 })
+                describe('extreme', function() {
+                    it('high', () => {
+                        let params = ['temperature', 'yrly', 'max', 'high', 20, 'shortValues', 11]
+                        let config = Object.assign(configs['liveHalf'], specs)
+                        return parser.getByParams(config, params).then(values => {
+                            //console.log(values)
+                            return assert.equal(values.y, 22)
+                        })
+                    })
+                    it('low', () => {
+                        let params = ['temperature', 'yrly', 'min', 'low', -10, 'shortValues', 11]
+                        let config = Object.assign(configs['liveHalf'], specs)
+                        return parser.getByParams(config, params).then(values => {
+                            //console.log(values)
+                            return assert.equal(values.y, 100)
+                        })
+                    })
+                })
                 describe('frost', function() {
                     it('first', () => {
                         let params = ['temperature', 'yrlySplit', 'min', 'first', 'shortValues', 10];

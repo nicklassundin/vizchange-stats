@@ -283,6 +283,21 @@ class Point {
 		})
 		return new Point(this.specs, req, true)
 	}
+	'high' (f){
+		return this.occurrence(f)
+	}
+	'low' (f) {
+		return this.occurrence(f)
+	}
+	'occurrence'(f){
+		let req = this.req.filter((e) => {
+			return f({
+				'y': this.getY(e)
+			})
+		})
+		//console.log(req)
+		return new Point(this.specs, req, true)
+	}
 	/*
 	get 'difference' (){
 		return baselineContain.getBaseline(this.specs).then(baseline => {
@@ -322,6 +337,8 @@ class Point {
 				return y
 			case 'last':
 			case 'first':
+			case 'high':
+			case 'low':
 				return req[`${this.specs.parentType}_${this.type}`]
 				break;
 			case 'difference':
@@ -385,6 +402,9 @@ class Point {
 					return this.difference
 				case 'breakfreeze':
 					return result[0]
+				case 'high':
+				case 'low':
+					return result.length
 				default:
 					return result
 

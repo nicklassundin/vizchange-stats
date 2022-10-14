@@ -7,7 +7,22 @@ const help = require('climate-plots-helper')
  * const $ = require( "jquery" )( window );
  */
 const {Point} = require('./point.js')
-
+class Extreme {
+    constructor(struct, type) {
+        this.parent = struct;
+        this.type = type
+    }
+    'getValue' (lim) {
+        switch (this.type) {
+            case 'high':
+                return this.parent.TYPE(this.type, (e) => e.y >= lim, true)
+            case 'low':
+                return this.parent.TYPE(this.type, (e) => e.y <= lim, true)
+            default:
+                return this.parent
+        }
+    }
+}
 
 function ColorToHex(color) {
     let hexadecimal = color.toString();
@@ -182,6 +197,10 @@ module.exports = class Struct {
                             break;
                         case 'snow':
                         case 'rain':
+                            break;
+                        case 'low':
+                        case 'high':
+                            return point[this.type](this.f)
                             break;
                         default:
                     }
@@ -398,6 +417,21 @@ module.exports = class Struct {
     get "last"() {
         return this.TYPE('last', (e) => e.y <= 0, true)
     }
+    "extreme" (type) {
+        return new Extreme(this, type)
+    }
+    get "high" () {
+        let extreme = this.extreme('high')
+        return (lim) => {
+            return extreme.getValue(lim)
+        }
+    }
+    get "low"() {
+        let extreme = this.extreme('low')
+        return (lim) => {
+            return extreme.getValue(lim)
+        }
+    }
     get "number"() {
         return this.TYPE("number", this.f)
     }
@@ -452,7 +486,6 @@ module.exports = class Struct {
         //return this.TYPE("difference", this.f)
     }
     get "growingSeason" () {
-        this.y
         let specs = JSON.parse(JSON.stringify(this.specs));
         return Promise.all(this.values).then(values => {
             return {
@@ -490,6 +523,7 @@ module.exports = class Struct {
             let res = new Struct(this.VALUES, specs, this.x, type, f, full, this.type)
             res.colored = this.colored;
             res.color = this.color;
+            //console.log(res)
             return res
         } else {
             let res = Struct.build(specs, this.x, type, f, full, this.type)
@@ -504,7 +538,6 @@ module.exports = class Struct {
         // }
         // return res.build(type)
     }
-
     "numberReq"() {
         return this;
     }
@@ -531,7 +564,6 @@ module.exports = class Struct {
                 throw error
             }
         })
-
         return this.y.then(y => {
             return {
                 compressed: true,
@@ -548,23 +580,21 @@ module.exports = class Struct {
             }
         })
     }
-    "occurrence"(type) {
-        return (val) => {
-            var f = type;
-            if (typeof f != 'function') {
-                switch (type) {
-                    case 'high':
-                        f = (e) => e.y > val
-                        break;
-                    case 'low':
-                        f = (e) => e.y < val
-                        break;
-                    default:
-                }
-            }
-            this.f = f;
-            return this.number
+    get "occurrence" () {
+
+        /*
+        let high = {
+            '20': this.sequence((e) => e.y > 20),
+            '25': this.sequence((e) => e.y > 25),
+            '30': this.sequence( (e) => e.y > 30),
+            '33': this.sequence((e) => e.y > 33)
         }
+        let low = this.TYPE('low', (e) => e.y < val)
+        return {
+            high,
+            low
+        }
+         */
     }
     "sequence" (f = (e) => e > 0) {
        // console.log(this.x, this.shortValues)
