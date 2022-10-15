@@ -168,12 +168,10 @@ module.exports = {
 	number: 0,
 	cached: {},
 	axios(url){
-		/*
 		let path = `debug/${url.split('/').join('')}.json`;
 		if(fs.existsSync(path)){
 			return require('./'+path)
 		}
-		/* */
 		//console.log('url', url)
 		if(this.cached[url] === undefined){
 			// TODO nicer solution to individual requests

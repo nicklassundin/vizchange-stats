@@ -55,6 +55,9 @@ module.exports = class ByDateStruct {
 			case 'weekly':
 				this.values[key] = this.insert(true, key, 'year', 'week')
 				break;
+			//case 'weeks':
+			//	this.values[key] = this.insert(true, key, 'year', 'week')
+			//	break;
 			case 'monthly':
 				// deprecated TODO
 				this.values[key] = this.insert(false, key, 'month', 'year')
@@ -74,9 +77,14 @@ module.exports = class ByDateStruct {
 				}
 				break;
 			case 'splitDecades':
+				this.values[key] = this.insert(true, key, 'splitMonth', 'decade')
+				break;
 				this.values[key] = {
-					'allTime': this.insert(false, 'allTime', 'splitMonth'),
-					'splitDecade': this.insert(false, key, 'splitDecade', 'splitMonth')
+					'allTime': this.insert(true, 'allTime', 'splitMonth', 'decade'),
+					get '2021' () {
+						return this.allTime
+					},
+					'splitDecade': this.insert(true, key, 'splitMonth', 'decade')
 				}
 				break;
 			case 'yrlySplit':

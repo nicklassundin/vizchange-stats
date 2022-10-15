@@ -63,6 +63,14 @@ let co2_weekly_specs = {
         'end': 1991
     }
 }
+let snowdepth_single_specs = {
+    type: 'snowdepth_single',
+    station: 'abisko',
+    baseline: {
+        'start': 1961,
+        'end': 1991
+    },
+}
 
 let configs = require('./config.json')
 let cache = {}
@@ -244,6 +252,49 @@ describe(
                 })
             })
             describe('type', function() {
+                describe('snowdepth', function() {
+                    it('snow depth', () => {
+                        let params = ['snowdepth_single', 'yrly', 'shortValues', 60]
+                        let config = Object.assign(configs['live'], snowdepth_single_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            //console.log(values)
+                            return assert.ok(Math.abs(values.y - 27.37) < 1)
+                        })
+                    })
+                    describe.only('decades', function() {
+                        it('allTime', () => {
+                            let params = ['snowdepth_single', 'splitDecades', 'shortValues', 4]
+                            let config = Object.assign(configs['live'], snowdepth_single_specs)
+                            return parser.getByParams(config, params).then(values => {
+                                console.log(values)
+                                return assert.ok(Math.abs(values.y - 28) < 1)
+                            })
+                        })
+                        it('decades', () => {
+                            let params = ['snowdepth_single', 'splitDecades', 'shortValues', 3]
+                            let config = Object.assign(configs['liveHalf'], snowdepth_single_specs)
+                            return parser.getByParams(config, params).then(values => {
+                                console.log(values)
+                                return assert.ok(Math.abs(values.y - 14) < 1)
+                            })
+                        })
+                        it('decades - year', () => {
+                            let params = ['snowdepth_single', 'splitDecades', 'values', 2, 'shortValues']
+                            let config = Object.assign(configs['liveHalf'], snowdepth_single_specs)
+                            return parser.getByParams(config, params).then(values => {
+                                return Promise.all(values).then(resolved => {
+                                    return Promise.all(resolved.map(each => {
+                                        return each.x
+                                    })).then(ys => {
+                                        let expected = [1910, 1920, 1930, 1940, 1950, 1960, 1970, 1980]
+                                        console.log(expected, ys)
+                                        return assert.ok(ys+"" == expected+"")
+                                    })
+                                })
+                            })
+                        })
+                    })
+                })
                 describe('co2_weekly', function() {
                     it('value', () => {
                         let params = ['co2_weekly', 'all', 'shortValues', 0]
@@ -251,6 +302,44 @@ describe(
                         return parser.getByParams(config, params).then(values => {
                             //console.log(values)
                             return assert.equal(values.y, 410.25)
+                        })
+                    })
+                })
+                describe('warmest / coldest', function() {
+                    describe('weeks', function() {
+                        it('max', () => {
+                            let params = ['temperature', 'weekly', 'maxAvg', 'shortValues', 40]
+                            let config = Object.assign(configs['liveHalf'], specs)
+                            return parser.getByParams(config, params).then(values => {
+                                console.log(values)
+                                return assert.equal(values.y, 20.3)
+                            })
+                        })
+                        it('min', () => {
+                            let params = ['temperature', 'weekly', 'minAvg', 'shortValues', 40]
+                            let config = Object.assign(configs['liveHalf'], specs)
+                            return parser.getByParams(config, params).then(values => {
+                                console.log(values)
+                                return assert.equal(values.y, -28.6)
+                            })
+                        })
+                    })
+                    describe('daily' , function() {
+                        it('max', () => {
+                            let params = ['temperature', 'yrly', 'max', 'shortValues', 40]
+                            let config = Object.assign(configs['liveHalf'], specs)
+                            return parser.getByParams(config, params).then(values => {
+                                console.log(values)
+                                return assert.equal(values.y, 26.9)
+                            })
+                        })
+                        it('min', () => {
+                            let params = ['temperature', 'yrly', 'min', 'shortValues', 40]
+                            let config = Object.assign(configs['liveHalf'], specs)
+                            return parser.getByParams(config, params).then(values => {
+                                console.log(values)
+                                return assert.equal(values.y, -31.5)
+                            })
                         })
                     })
                 })
@@ -528,35 +617,6 @@ describe(
                         return parser.getByParams(config, params).then(values => {
                             //console.log(values)
                             return assert.ok(Math.abs(values.y - 9392.9) < 0.0001 )
-                        })
-                    })
-                })
-                it('splitDecades - alltimes - months', () => {
-                    let params = ['precipitation', 'splitDecades', 'allTime', 'values']
-                    let config = Object.assign(configs['liveHalf'], precipitation_specs)
-                    return parser.getByParams(config, params).then(values => {
-                        return Promise.all(values).then(resolved => {
-                            return Promise.all(resolved.map(each => {
-                                return each.x
-                            })).then(ys => {
-                                let expected = [7,8,9,10,11,12,13,14,15,16,17,18]
-                                return assert.ok(ys+"" == expected+"")
-                            })
-                        })
-                    })
-                })
-                it('splitDecades - splitDecade - decades', () => {
-                    let params = ['precipitation', 'splitDecades', 'splitDecade', 'values']
-                    let config = Object.assign(configs['liveHalf'], precipitation_specs)
-                    return parser.getByParams(config, params).then(values => {
-                        return Promise.all(values).then(resolved => {
-                            return Promise.all(resolved.map(each => {
-                                return each.x
-                            })).then(ys => {
-                                let expected = [1911, 1921, 1931, 1941, 1951]
-                                //console.log(expected, ys)
-                                return assert.ok(ys+"" == expected+"")
-                            })
                         })
                     })
                 })

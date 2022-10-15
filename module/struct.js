@@ -127,12 +127,18 @@ module.exports = class Struct {
                 m2 = 7
                 break;
             case 'splitMonth':
-             //   y1 = (x < 12) ? + -1 : 0;
-              //  y2 = 0;
-               // m1 = (x > 12) ? x -12 : x
-               // m2 = (x > 12) ? x -12 : x
-               // break;
+                y1 = (x < 12) ? + -1 : 0;
+                y2 = 0;
+                m1 = (x > 12) ? x -12 : x
+                m2 = (x > 12) ? x -12 : x
+                specs.dates.type = help.monthByIndex(x)
+                break;
             case 'monthly':
+                break;
+            case 'splitDecades':
+                m1 = 7
+                m2 = 7
+                y2 = 10;
                 break;
             case 'yrlySplit':
             case 'splitYear':
@@ -152,7 +158,7 @@ module.exports = class Struct {
             specs.dates.start = new Date(specs.dates.start + y1, m1, 1)
             specs.dates.end = new Date(specs.dates.end + y2, m2, d2)
         }
-        //console.log(specs.dates)
+        //console.log(specs.keys[0], specs.dates)
         return new Struct(parentEntry, specs, x, type, f, full, parentType)
     }
     constructor(values = undefined, specs, x = undefined, type = "avg", f, full = false, parentType ) {
@@ -287,8 +293,12 @@ module.exports = class Struct {
         }
         let result = Struct.build(specs, k, type, f, full);
         if(this.full){
+            //switch (type) {
+              //  case 'minAvg':
+              // case 'maxAvg':
+            //}
             result.entry = this.entry.then(entry => {
-               // if(entry.year === 1915) console.log(entry.dateSlice(result.specs.dates.start, result.specs.dates.end))
+        "values"       // if(entry.year === 1915) console.log(entry.dateSlice(result.specs.dates.start, result.specs.dates.end))
                 return entry.dateSlice(result.specs.dates.start, result.specs.dates.end)
             })
         }
@@ -468,7 +478,6 @@ module.exports = class Struct {
             value.y = value.y/length;
             return value
         }).then(value => value.y)
-
     }
     get "difference"() {
         return this.baseline.then(baseline => {
@@ -562,7 +571,7 @@ module.exports = class Struct {
 
     }
     get "yValues" () {
-        return this.shortValues.map(each => each.y)
+        return this.shortValues.map(each => each.then(vals => vals.y))
     }
     get "short" () {
         if (this.typeMeta !== undefined) return this.typeMeta
@@ -570,7 +579,7 @@ module.exports = class Struct {
         return this.entry.then(entry => {
             try {
 
-               // console.log(entry.x, entry.specs.dates)
+                // console.log(entry.x, entry.specs.dates)
                 return entry.short
             }catch(error) {
                 //console.log(entry)
@@ -907,7 +916,6 @@ module.exports = class Struct {
     "map"(F) {
         return new Struct(F(this.values), this.x, this.type)
     }
-
     get "xInterval"() {
         // TODO
         // let x1 = new Date(Math.min.apply(

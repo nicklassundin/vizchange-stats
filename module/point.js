@@ -65,6 +65,20 @@ class PointReq {
 						result[key] = req
 					}
 				})
+				break
+			case 'maxAvg':
+				// TODO sort out this so it takes averages of daily weekly etc
+				requests.forEach(req => {
+					let date = new Date(req.date)
+					let key = `${date.getFullYear()}${help.dayOfYear(date)}${req.position}`
+					if(typeof result[key] !== 'object'){
+						result[key] = req
+						result[key][`${specs.subType}_${specs.type}`] = [req[`${specs.parentType}_${specs.type}`]]
+					}else{
+						//req[`${specs.parentType}_${specs.type}`] > result[key][`${specs.parentType}_${specs.type}`]
+						result[key][`${specs.subType}_${specs.type}`].push(req[`${specs.parentType}_${specs.type}`])
+					}
+				})
 				break;
 			default:
 				requests.forEach(req => {
@@ -223,7 +237,22 @@ class Point {
 						return e.date.getWeekNumber()
 					})
 					break;
-				case 'month':
+				case 'splitMonth':
+					req = req.filter((e) => {
+						e.date = new Date(e.date)
+						let month = e.date.getMonth()
+						/*
+						if((month >= start.getMonth()) && (month < end.getMonth())){
+							console.log('-----', (month >= start.getMonth()) && (month < end.getMonth()))
+							console.log(month, start.getMonth(), month >= start.getMonth())
+							console.log(month, end.getMonth(), month < end.getMonth())
+						}
+						*/
+						//console.log(e.date, start, end)
+						//console.log(month, start.getMonth(), end.getMonth())
+						return (month >= start.getMonth()) && (month <= end.getMonth())
+					})
+					break
 				default:
 					req = req.filter((e) => {
 						e.date = new Date(e.date)
@@ -260,6 +289,9 @@ class Point {
 					default:
 						return this.year
 				}
+				return this.specs.dates
+			case 'splitMonth':
+				return this.monthName
 			case 'months':
 				return this.monthName
 			case 'month':
