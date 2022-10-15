@@ -71,21 +71,15 @@ module.exports = class ByDateStruct {
 				//this.insert(false, "decades", 'decade', 'year')(entry);
 				break;
 			case '30period':
+				/*
 				this.values[key] = {
 					'allTime': this.insert(false, 'allTime', 'splitMonth'),
 					'30Periodyear': this.insert(false, key, '30periodyear', 'splitMonth')
 				}
 				break;
+				 */
 			case 'splitDecades':
 				this.values[key] = this.insert(true, key, 'splitMonth', 'decade')
-				break;
-				this.values[key] = {
-					'allTime': this.insert(true, 'allTime', 'splitMonth', 'decade'),
-					get '2021' () {
-						return this.allTime
-					},
-					'splitDecade': this.insert(true, key, 'splitMonth', 'decade')
-				}
 				break;
 			case 'yrlySplit':
 				this.values[key] = this.insert(false, key, 'splitYear', 'DOY')

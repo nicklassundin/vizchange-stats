@@ -261,7 +261,7 @@ describe(
                             return assert.ok(Math.abs(values.y - 27.37) < 1)
                         })
                     })
-                    describe.only('decades', function() {
+                    describe('decades', function() {
                         it('allTime', () => {
                             let params = ['snowdepth_single', 'splitDecades', 'shortValues', 4]
                             let config = Object.assign(configs['live'], snowdepth_single_specs)
@@ -293,6 +293,9 @@ describe(
                                 })
                             })
                         })
+                    })
+                    describe('30period', () => {
+                        // TODO
                     })
                 })
                 describe('co2_weekly', function() {
@@ -599,38 +602,6 @@ describe(
                         return parser.getByParams(config, params).then(values => {
                             //console.log('values', values)
                             return assert.ok(Math.abs(values - 338.5) < 0.0001 )
-                        })
-                    })
-                })
-                describe('30period', function () {
-                    it('30period - allTime', () => {
-                        let params = ['precipitation', '30period', 'allTime', 'values', 1, 'y']
-                        let config = Object.assign(configs['liveHalf'], precipitation_specs)
-                        return parser.getByParams(config, params).then(values => {
-                            //console.log('values', values)
-                            return assert.ok(Math.abs(values - 16658.600000000362) < 0.0001 )
-                        })
-                    })
-                    it('30period - 30periodyear', () => {
-                        let params = ['precipitation', '30period', '30Periodyear', 'shortValues', 1]
-                        let config = Object.assign(configs['liveHalf'], precipitation_specs)
-                        return parser.getByParams(config, params).then(values => {
-                            //console.log(values)
-                            return assert.ok(Math.abs(values.y - 9392.9) < 0.0001 )
-                        })
-                    })
-                })
-                it('splitDecades - splitDecade - months', () => {
-                    let params = ['precipitation', 'splitDecades', 'splitDecade', 'values', 3, 'values']
-                    let config = Object.assign(configs['liveHalf'], precipitation_specs)
-                    return parser.getByParams(config, params).then(values => {
-                        return Promise.all(values).then(resolved => {
-                            return Promise.all(resolved.map(each => {
-                                return each.x
-                            })).then(ys => {
-                                let expected = [7,8,9,10,11,12,13,14,15,16,17,18]
-                                return assert.ok(ys+"" == expected+"")
-                            })
                         })
                     })
                 })
