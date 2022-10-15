@@ -13,7 +13,8 @@ const axios = require('axios');
 // TODO this should work on client side FIXME
 //const { setupCache } = require('axios-cache-adapter');
 //setupCache(axios)
-const fs = require("fs");
+
+//const fs = require("fs");
 
 let getSmhiStation = async function(id){
 	return await new Promise((result, reject) => {
@@ -169,9 +170,12 @@ module.exports = {
 	cached: {},
 	axios(url){
 		let path = `debug/${url.split('/').join('')}.json`;
+		/*
 		if(fs.existsSync(path)){
 			return require('./'+path)
 		}
+
+		 */
 		//console.log('url', url)
 		if(this.cached[url] === undefined){
 			// TODO nicer solution to individual requests
