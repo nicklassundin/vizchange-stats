@@ -13,9 +13,8 @@ const axios = require('axios');
 // TODO this should work on client side FIXME
 //const { setupCache } = require('axios-cache-adapter');
 //setupCache(axios)
-/* TODO
-const fs = require("fs");
- */
+
+
 let getSmhiStation = async function(id){
 	return await new Promise((result, reject) => {
 		let host = `https://opendata-download-metobs.smhi.se`
@@ -183,19 +182,20 @@ module.exports = {
 					this.number += 1;
 					//console.log('number', this.number)
 				}
-				/* TODO
 				let list = undefined;
-				if(fs.existsSync('./debug/list.json')){
-					list = require('./debug/list.json')
-					list[path] = result.data.length
-				}else{
-					list = {}
-					list[path] = result.data.length;
+				if(global.development) {
+					let fs = require("fs");
+					if(fs.existsSync('./debug/list.json')){
+						list = require('./debug/list.json')
+						list[path] = result.data.length
+					}else{
+						list = {}
+						list[path] = result.data.length;
+					}
+					fs.writeFile('./debug/list.json', JSON.stringify(list), () => {})
+					fs.writeFile('./'+path, JSON.stringify(result.data), () => {})
 				}
-				fs.writeFile('./debug/list.json', JSON.stringify(list), () => {})
-				fs.writeFile('./'+path, JSON.stringify(result.data), () => {})
 
-				 */
 
 				return result.data
 			}).catch(

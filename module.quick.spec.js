@@ -3,7 +3,7 @@ const fs = require('fs');
 global.climateplots = {
     dev: true
 }
-
+global.development = true;
 class Specs  {
     constructor(config, type) {
         this.config = config

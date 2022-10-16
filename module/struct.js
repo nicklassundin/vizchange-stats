@@ -290,17 +290,10 @@ module.exports = class Struct {
         }
         let result = Struct.build(specs, k, type, f, full);
         if(this.full){
-            //switch (type) {
-              //  case 'minAvg':
-              // case 'maxAvg':
-            //}
             result.entry = this.entry.then(entry => {
-        "values"       // if(entry.year === 1915) console.log(entry.dateSlice(result.specs.dates.start, result.specs.dates.end))
                 return entry.dateSlice(result.specs.dates.start, result.specs.dates.end)
             })
         }
-        // console.log(result)
-       // values[k] = Struct.build(specs, k, type, f, full, specs.parentType, this.entry.then(e => e.outside(specs)));
         return result
     }
     get "values"() {
@@ -475,6 +468,9 @@ module.exports = class Struct {
                 return a
             })
             value.y = value.y/length;
+            global[this.specs.type] = {
+                baseline: value.y
+            }
             return value
         }).then(value => value.y)
     }
