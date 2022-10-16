@@ -183,6 +183,7 @@ module.exports = {
 					//console.log('number', this.number)
 				}
 				let list = undefined;
+				/*
 				if(global.development) {
 					let fs = require("fs");
 					if(fs.existsSync('./debug/list.json')){
@@ -195,6 +196,7 @@ module.exports = {
 					fs.writeFile('./debug/list.json', JSON.stringify(list), () => {})
 					fs.writeFile('./'+path, JSON.stringify(result.data), () => {})
 				}
+				 */
 
 
 				return result.data
