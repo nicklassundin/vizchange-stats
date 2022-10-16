@@ -13,9 +13,9 @@ const axios = require('axios');
 // TODO this should work on client side FIXME
 //const { setupCache } = require('axios-cache-adapter');
 //setupCache(axios)
-
-//const fs = require("fs");
-
+/* TODO
+const fs = require("fs");
+ */
 let getSmhiStation = async function(id){
 	return await new Promise((result, reject) => {
 		let host = `https://opendata-download-metobs.smhi.se`
@@ -170,12 +170,9 @@ module.exports = {
 	cached: {},
 	axios(url){
 		let path = `debug/${url.split('/').join('')}.json`;
-		/*
-		if(fs.existsSync(path)){
-			return require('./'+path)
-		}
-
-		 */
+		//if(fs.existsSync(path)){
+		//	return require('./'+path)
+		//}
 		//console.log('url', url)
 		if(this.cached[url] === undefined){
 			// TODO nicer solution to individual requests
@@ -186,6 +183,20 @@ module.exports = {
 					this.number += 1;
 					//console.log('number', this.number)
 				}
+				/* TODO
+				let list = undefined;
+				if(fs.existsSync('./debug/list.json')){
+					list = require('./debug/list.json')
+					list[path] = result.data.length
+				}else{
+					list = {}
+					list[path] = result.data.length;
+				}
+				fs.writeFile('./debug/list.json', JSON.stringify(list), () => {})
+				fs.writeFile('./'+path, JSON.stringify(result.data), () => {})
+
+				 */
+
 				return result.data
 			}).catch(
 				function (error) {
