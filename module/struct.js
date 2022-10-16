@@ -136,7 +136,7 @@ module.exports = class Struct {
             case 'monthly':
                 break;
             case 'splitDecades':
-                m1 = 7
+                m1 = 5
                 m2 = 7
                 y2 = 10;
                 break;
@@ -172,6 +172,7 @@ module.exports = class Struct {
         this.parentType = parentType
         this.movAvg = undefined;
         this.VALUES = {};
+        this.BASELINE = {}
     }
     set "entry"(value) {
         this.POINT = value
@@ -183,8 +184,6 @@ module.exports = class Struct {
             this.POINT = Point.build(specs, this.full).then(point => {
                 if (this.full) {
                     switch (this.type) {
-                        case "difference":
-                            throw new Error("Not implemented")
                         case "avg":
                         case "max":
                         case "min":
@@ -212,8 +211,6 @@ module.exports = class Struct {
                     }
                 } else {
                     switch (this.type) {
-                        case "difference":
-                            return point.difference
                         default:
                             return point
                     }
@@ -464,7 +461,9 @@ module.exports = class Struct {
         let keys = (new Point(genSpecs))[`${genSpecs.keys[0]}s`]
         let values = {}
         for(let i = 0; i < keys.length; i++) {
-            values[keys[i]] = this.getValues(genSpecs, genSpecs.keys[0], keys[i], type, f, full, parentType).short
+            this.values
+            values[keys[i]] = this.VALUES[keys[i]].short
+            //this.BASELINE[keys[i]] = this.getValues(genSpecs, genSpecs.keys[0], keys[i], type, f, full, parentType).short
         }
         return Promise.all(Object.values(values).map(value => value)).then(values => {
             let length = values.length;

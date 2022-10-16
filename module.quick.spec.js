@@ -407,11 +407,11 @@ describe(
                 describe('precipitation', function() {
                     it('difference', () => {
                         let params = ['precipitation', 'yrly', 'difference'];
-                        let config = Object.assign(configs['latest'], precipitation_specs)
+                        let config = Object.assign(configs['live'], precipitation_specs)
                         return parser.getByParams(config, params).then(values => {
                             return Promise.all(values).then(array => {
                                 //console.log(values)
-                                return assert.equal(array.length, 6)
+                                return assert.equal(array.length, 115)
                             })
                         })
                     })
