@@ -29,7 +29,8 @@ module.exports = class ByDateStruct {
 			case 'all':
 				this.values[key] = this.insert(true, 'all')
 				break;
-			case 'yrly': 
+			case 'yrly':
+				// TODO check value 1914 for full: true vs false
 				this.values[key] = this.insert(true, "yrly", 'year', 'DOY')
 				break
 			case 'summer':

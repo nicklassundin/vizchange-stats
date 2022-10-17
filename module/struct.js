@@ -468,6 +468,7 @@ module.exports = class Struct {
                 return a
             })
             value.y = value.y/length;
+            //console.log(this.specs)
             global[this.specs.type] = {
                 baseline: value.y
             }
@@ -483,6 +484,7 @@ module.exports = class Struct {
                  //   console.log(`----- ${value.x} ------`)
                   //  console.log("values:", value.y)
                     value.y -= baseline;
+                    value.baseline = baseline;
                   //  console.log("diff:", value.y)
                     return value
                 })

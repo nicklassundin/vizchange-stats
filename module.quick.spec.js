@@ -85,8 +85,7 @@ describe(
                 let params = ['temperature', 'yrly', 'shortValues', 1];
                 let config = Object.assign(configs['liveHalf'], specs)
                 return parser.getByParams(config, params).then((values) => {
-                    ////console.log(values)
-                    ////console.log(values.y, -0.4282191780821911)
+                    //console.log(values)
                     return assert.ok(Math.abs(values.y - -0.4282191780821911) < 0.0001)
                 })
             })
@@ -351,7 +350,7 @@ describe(
                         let params = ['breakup', 'yrly', 'shortValues', 0];
                         let config = Object.assign(configs['latest'], breakup_specs)
                         return parser.getByParams(config, params).then(values => {
-                            ////console.log(values)
+                            //console.log(values)
                             return assert.equal(values.y, 156)
                         })
                     })
@@ -709,7 +708,7 @@ describe(
                     let params = ['temperature', 'yrly', 'values', 4, 'y']
                     let config = Object.assign(configs['latest'], specs)
                     return parser.getByParams(config, params).then(values => {
-                        return assert.equal(values, NaN)
+                        return assert.ok(isNaN(values) || values === undefined)
                     })
                 })
                 it('min', () => {
@@ -759,7 +758,7 @@ describe(
                         let params = ['temperature', 'yrly', 'baseline']
                         let config = Object.assign(configs['live'], specs)
                         return parser.getByParams(config, params).then(values => {
-                            ////console.log(values)
+                            //console.log(values)
                             return assert.ok( Math.abs(values - (-0.7873900649056548)) < 0.01)
                         })
                     })
@@ -769,10 +768,8 @@ describe(
                         let params = ['temperature', 'yrly', 'difference', 105]
                         let config = Object.assign(configs['live'], specs)
                         return parser.getByParams(config, params).then(values => {
-                            ////console.log(values)
+                            //console.log(values)
                             return assert.ok(Math.abs(values.y - 2.01) < 0.1)
-                            // TODO OLD?! test validity
-                            // return assert.equal(values, 1.4913425661630546)
                         })
                     })
                 })
