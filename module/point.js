@@ -178,6 +178,8 @@ class Point {
 		this.splitDecade = this.splitYear - this.splitYear % 10 +1;
 	}
 	get 'date' () {
+		// TODO sort out none valid points HOTFIX for empty this.req
+		if(this.req.length < 1) return this.x
 		switch (this.specs.subType){
 			case 'last':
 				return this.req[this.req.length - 1].date
