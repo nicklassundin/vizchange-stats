@@ -234,23 +234,26 @@ describe(
                     let params = ['precipitation', 'yrly', 'snow', 'values', 1, 'y']
                     let config = Object.assign(configs['latest'], precipitation_specs)
                     return parser.getByParams(config, params).then(values => {
+                        console.log(values)
                         return assert.ok(Math.abs(values - 132.8) < 0.0001 )
                       //  return assert.equal(values,132.8)
                     })
                 })
                 it('yrlyFull - values - rain', () => {
-                    let params = ['precipitation', 'yrly', 'rain', 'values', 1, 'y']
+                    let params = ['precipitation', 'yrly', 'rain', 'shortValues', 1]
                     let config = Object.assign(configs['latest'], precipitation_specs)
                     return parser.getByParams(config, params).then(values => {
-                        return assert.ok(Math.abs(values - 266.5) < 0.0001 )
+                        console.log(values)
+                        return assert.ok(Math.abs(values.y - 266.5) < 0.0001 )
                       //  return assert.equal(values,266.49999999999994)
                     })
                 })
                 it('yrlyFull - shortValues - snow', () => {
-                    let params = ['precipitation', 'yrly', 'snow', 'shortValues', 1, 'y']
+                    let params = ['precipitation', 'yrly', 'snow', 'shortValues', 1]
                     let config = Object.assign(configs['latest'], precipitation_specs)
                     return parser.getByParams(config, params).then(values => {
-                        return assert.ok(Math.abs(values - 132.8) < 0.0001 )
+                        console.log(values)
+                        return assert.ok(Math.abs(values.y - 132.8) < 0.0001 )
                        // return assert.equal(values, 132.8)
                     })
                 })
@@ -258,7 +261,7 @@ describe(
             describe('type', function() {
                 describe('snowdepth', function() {
                     it('snow depth', () => {
-                        let params = ['snowdepth_single', 'yrly', 'shortValues', 60]
+                        let params = ['snowdepth_single', 'yrlyFull', 'shortValues', 60]
                         let config = Object.assign(configs['live'], snowdepth_single_specs)
                         return parser.getByParams(config, params).then(values => {
                             //console.log(values)
@@ -898,7 +901,7 @@ describe(
                 })
             })
             describe('time to load', function() {
-                it.only('temperature', () => {
+                it('temperature', () => {
                     let params = ['temperature', 'yrly', 'shortValues']
                     let config = Object.assign(configs['live'], specs)
                     const startTime = (new Date()).getTime();
@@ -910,7 +913,7 @@ describe(
                         })
                     })
                 })
-                it.only('precipitation', () => {
+                it('precipitation', () => {
                     let params = ['precipitation', 'yrly', 'shortValues']
                     let config = Object.assign(configs['live'], precipitation_specs)
                     let startTime = (new Date()).getTime();

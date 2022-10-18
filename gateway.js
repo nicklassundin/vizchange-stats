@@ -201,9 +201,9 @@ module.exports = {
 			// TODO nicer solution to individual requests
 			this.cached[url] = axios.get(url).then(result => {
 
-
+/*
 				let list = undefined;
- /*
+
 				let fs = require("fs");
 				if(fs.existsSync('./debug/list.json')){
 					list = require('./debug/list.json')
