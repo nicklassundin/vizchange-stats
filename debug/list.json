@@ -1,0 +1,7 @@
+{
+  "https:vischange.k8s.glimworks.sedataqueryv1?position=18.8166,68.3538&radius=30&date=19100101-20250101&types=freezeup,breakup.json": 1,
+  "https:vischange.k8s.glimworks.sedataqueryv1?position=18.8166,68.3538&radius=30&date=19100101-20250101&types=icetime.json": 2,
+  "https:vischange.k8s.glimworks.sedataqueryv1?position=18.8166,68.3538&radius=30&date=19100101-20250101&types=precipitation,avg_temperature.json": 3,
+  "https:vischange.k8s.glimworks.sedataqueryv1?position=18.8166,68.3538&radius=30&date=19100101-20250101&types=snowdepth_single.json": 4,
+  "https:vischange.k8s.glimworks.sedataqueryv1?position=18.8166,68.3538&radius=30&date=19100101-20250101&types=temperature,avg_temperature,min_temperature,max_temperature.json": 5
+}

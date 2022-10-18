@@ -8,12 +8,17 @@
 // let local_debug = `localhost/debug/data/query/v1/test`;
 // const host = `vischange.k8s.glimworks.se/data/query/v1`;
 //
-
 const axios = require('axios');
 // TODO this should work on client side FIXME
 //const { setupCache } = require('axios-cache-adapter');
 //setupCache(axios)
 
+/*
+let cache = {}
+Object.keys(require('./debug/list.json')).forEach(key => {
+	cache[key] = require(`./debug/${key}`)
+})
+ */
 
 let getSmhiStation = async function(id){
 	return await new Promise((result, reject) => {
@@ -134,7 +139,7 @@ let parsePeriod = function(date){
 	}
 
 }
-const totalProductsCount = 500;
+
 module.exports = {
 	preset: preset,
 	proxRequest: function(specs, full = false){
@@ -173,17 +178,26 @@ module.exports = {
 		//	return require('./'+path)
 		//}
 		//console.log('url', url)
+		/*
+		if(cache[path] !== undefined){
+			return Promise.resolve(cache[path])
+		}
+		 */
 		if(this.cached[url] === undefined){
 			// TODO nicer solution to individual requests
 			//console.log('start', (new Date()).getTime(), this.number)
-			this.cached[url] = axios.get(url).then(result => {
+			this.cached[url] = axios({
+				method: 'GET',
+				url: url
+			}).then(result => {
 				//console.log((new Date()).getTime(), this.number)
+				//console.log((new Date()).getTime(), Object.keys(result))
 				if(!result.cached){
 					this.number += 1;
-					//console.log('number', this.number)
 				}
-				let list = undefined;
 				/*
+				let list = undefined;
+
 				if(global.development) {
 					let fs = require("fs");
 					if(fs.existsSync('./debug/list.json')){
@@ -196,9 +210,7 @@ module.exports = {
 					fs.writeFile('./debug/list.json', JSON.stringify(list), () => {})
 					fs.writeFile('./'+path, JSON.stringify(result.data), () => {})
 				}
-				 */
-
-
+				*/
 				return result.data
 			}).catch(
 				function (error) {
@@ -208,73 +220,6 @@ module.exports = {
 			)
 		}
 		return this.cached[url]
-	},
-	// requests: 300,
-	curl: function(url) {
-		const curl = new Curl();
-		curl.setOpt('URL', url)
-		curl.setOpt('FOLLOWLOCATION', true);
-		var req = new Promise((res, rej) => {
-			curl.on('end', function (statusCode, data) {
-				// console.info("curl req", statusCode);
-				// console.info('---');
-				// console.info(data.length);
-				// console.info('---');
-				// console.info("time",this.getInfo( 'TOTAL_TIME' ));
-
-				if(debug.slow){
-					debug.slow = debug.slow['TOTAL_TIME'] > this.getInfo('TOTAL_TIME') ?
-						debug.slow : 
-						{
-							'TOTAL_TIME' : this.getInfo('TOTAL_TIME'),
-							'data': data,
-							statusCode,
-							url
-						}
-				}else{
-					debug.slow = {
-						'TOTAL_TIME' : this.getInfo('TOTAL_TIME'),
-						'data': data,
-						statusCode,
-						url
-					}
-				}
-				// console.log({
-				// 	'url': url,
-				// 	'time': this.getInfo('TOTAL_TIME')
-				// })
-				this.close();
-				if(statusCode === 504){
-					rej(statusCode)
-				}else if(statusCode === 400){
-					res([]);
-				}else {
-					json = JSON.parse(data)
-					res(json)
-				}
-			});
-
-		})
-		curl.on('error', () => {
-			curl.close.bind(curl)
-		});
-		return new Promise((res, rej) => {
-
-		process.nextTick(() => {
-			curl.perform()
-			res(Promise.race([req, 
-				new Promise((res, rej) => {
-					let time = 50000;
-					let to = setTimeout(() => {
-						clearTimeout(to)
-						rej({'ERROR': `toLong time: ${time}`,
-							'url': url
-						})
-					},time)
-				})
-			]))
-		});
-		})
 	},
 }
 

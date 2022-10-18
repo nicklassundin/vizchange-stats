@@ -1,6 +1,5 @@
 // const help = require("./../helpers.js");
 const help = require('climate-plots-helper')
-
 /*
  * Const { JSDOM } = require( "jsdom" );
  * let { window } = new JSDOM( "" );
@@ -22,11 +21,6 @@ class Extreme {
                 return this.parent
         }
     }
-}
-
-function ColorToHex(color) {
-    let hexadecimal = color.toString();
-    return hexadecimal.length === 1 ? "0" + hexadecimal : hexadecimal;
 }
 
 function getDateOfWeek(w, y) {
@@ -174,10 +168,10 @@ module.exports = class Struct {
         this.VALUES = {};
         this.BASELINE = {}
     }
-    set "entry"(value) {
+    set 'entry' (value) {
         this.POINT = value
     }
-    get "entry"() {
+    get 'entry' () {
         if (this.POINT === undefined) {
             let specs = JSON.parse(JSON.stringify(this.specs));
             specs.subType = this.type
@@ -199,14 +193,12 @@ module.exports = class Struct {
                         case 'first':
                         case 'last':
                             return point[this.type](this.f);
-                            break;
                         case 'snow':
                         case 'rain':
                             break;
                         case 'low':
                         case 'high':
                             return point[this.type](this.f)
-                            break;
                         default:
                     }
                 } else {
@@ -224,10 +216,10 @@ module.exports = class Struct {
         }
         return this.POINT
     }
-    set "y"(val) {
+    set 'y' (val) {
         this.Y = val;
     }
-    get "y"() {
+    get 'y' () {
         try{
             return this.entry.then(point => {
                 if(undefined === point) return new Error('no point specified')
@@ -237,7 +229,7 @@ module.exports = class Struct {
             throw error
         }
     }
-    get "count"() {
+    get 'count' () {
         return this.values.length
     }
     /**
@@ -247,7 +239,7 @@ module.exports = class Struct {
      get "point" (){
 		return this.POINT[0]
 	}*/
-    getValues(genSpecs, key, k, type, f, full) {
+    'getValues' (genSpecs, key, k, type, f, full) {
         let specs = JSON.parse(JSON.stringify(genSpecs))
         specs.x = k;
         switch (key) {
@@ -288,24 +280,31 @@ module.exports = class Struct {
                 specs.dates.start = k;
                 specs.dates.end = k;
         }
-        let result = Struct.build(specs, k, type, f, full);
-        if(this.full){
+        let result = Struct.build(specs, k, type, f, this.full);
+        if(full){
             result.entry = this.entry.then(entry => {
                 return entry.dateSlice(result.specs.dates.start, result.specs.dates.end)
             })
         }
         return result
     }
-    get "values"() {
+    get 'values' () {
         let genSpecs = JSON.parse(JSON.stringify(this.specs));
         genSpecs.keys.shift();
         let type = this.type;
         let f = this.f;
         let full = this.full;
+        switch (this.specs.keys[0]) {
+            case 'yrly':
+                // TODO possible solution when queue is working
+                // full = false;
+                break;
+            default:
+        }
         let parentType = this.specs.parentType;
         if(genSpecs.keys[0] === undefined){
             this.VALUES = this.entry;
-        }else if(Object.keys(this.VALUES).length == 0) {
+        }else if(Object.keys(this.VALUES).length === 0) {
             let keys = (new Point(genSpecs))[`${genSpecs.keys[0]}s`]
             this.VALUES = {}
 
@@ -315,20 +314,12 @@ module.exports = class Struct {
                 this.VALUES[keys[i]] = this.getValues(genSpecs, genSpecs.keys[0], keys[i], type, f, full, parentType)
             }
         }
-        return Object.values(this.VALUES).map(each => {
-            if (each instanceof Error) {
-                return Promise.reject(each)
-            } else {
-                return Promise.resolve(each)
-            }
-        })
+        return Object.values(this.VALUES);
     }
-
-    get "valuesAll"() {
+    get 'valuesAll' () {
         return Struct.build(this.specs, this.x, this.type, this.f, true)
     }
-
-    "split"(f) {
+    'split' (f) {
         if (this.values[0].split) {
             return new Struct(
                 this.values.map((each) => each.split(f)),
@@ -342,8 +333,7 @@ module.exports = class Struct {
             this.type
         );
     }
-
-    "filter"(f, type = this.type, abs = true) {
+    'filter' (f, type = this.type, abs = true) {
         let res = new Struct([], this.x, this.type)
         if (typeof this.values[0].filter == 'function' && abs) {
             res.values = this.values.map((entry) => {
@@ -359,7 +349,7 @@ module.exports = class Struct {
         return res.build(type)
 
     }
-    "filterForm"(f, type, abs) {
+    'filterForm' (f, type, abs) {
         let g = (entry) => {
             const y = f(...entry.values.map((each) => each.y));
             return {
@@ -390,37 +380,37 @@ module.exports = class Struct {
         }
 
     }
-    get "snow" () {
+    get 'snow' () {
         return this.TYPE('snow', undefined, true)
     }
-    get "rain" () {
+    get 'rain' () {
         return this.TYPE('rain', undefined, true)
     }
-    get "min"() {
+    get 'min' () {
         return this.TYPE('min');
     }
-    get "minAvg"() {
+    get 'minAvg' () {
         return this.AVGTYPE('minAvg');
     }
-    get "max"() {
+    get 'max' () {
         return this.TYPE('max');
     }
-    get "maxAvg"() {
+    get 'maxAvg' () {
         return this.AVGTYPE('maxAvg');
     }
-    get "sum"() {
+    get 'sum' () {
         return this.TYPE('sum');
     }
-    get "first"() {
+    get 'first' () {
         return this.TYPE('first', (e) => e.y <= 0, true)
     }
-    get "last"() {
+    get 'last' () {
         return this.TYPE('last', (e) => e.y <= 0, true)
     }
-    "extreme" (type) {
+    'extreme' (type) {
         return new Extreme(this, type)
     }
-    get "high" () {
+    get 'high' () {
         let extreme = this.extreme('high')
         return (lim) => {
             return extreme.getValue(lim)
@@ -436,9 +426,6 @@ module.exports = class Struct {
         return this.TYPE("number", this.f)
     }
     get "baseline"() {
-        let {start} = this.specs.baseline
-        let {end} = this.specs.baseline
-
         // TODO remove embededed promises
         let genSpecs = JSON.parse(JSON.stringify(this.specs));
         genSpecs.dates.start = (new Date(genSpecs.dates.start))
@@ -446,15 +433,11 @@ module.exports = class Struct {
         genSpecs.dates.end = (new Date(genSpecs.dates.end))
         genSpecs.dates.end = new Date(genSpecs.baseline.end, genSpecs.dates.end.getMonth(), genSpecs.dates.end.getDate())
         genSpecs.keys.shift()
-        //let key = genSpecs.keys.shift();
-        let type = this.type;
-        let f = this.f;
-        let full = true;
-        let parentType = this.specs.parentType;
         let keys = (new Point(genSpecs))[`${genSpecs.keys[0]}s`]
         let values = {}
+        this.values // initiate values if not done so
         for(let i = 0; i < keys.length; i++) {
-            this.values
+            console.log(keys[i], this.VALUES[keys[i]])
             values[keys[i]] = this.VALUES[keys[i]].short
             //this.BASELINE[keys[i]] = this.getValues(genSpecs, genSpecs.keys[0], keys[i], type, f, full, parentType).short
         }
@@ -545,10 +528,10 @@ module.exports = class Struct {
         // }
         // return res.build(type)
     }
-    "numberReq"() {
+    'numberReq' () {
         return this;
     }
-    get "shortValues" () {
+    get 'shortValues' () {
         switch (this.specs.keys[0]){
             case 'all':
                 return this.entry.then((entry) => {
@@ -559,10 +542,8 @@ module.exports = class Struct {
                     }
                 })
             default:
-                return this.values.map(each => {
-                    return each.then(vals => {
-                        return vals.short
-                    })
+                return this.values.map(value => {
+                    return value.short
                 })
         }
 
@@ -583,6 +564,7 @@ module.exports = class Struct {
                 throw error
             }
         })
+        /*
         return this.y.then(y => {
             return {
                 compressed: true,
@@ -598,6 +580,7 @@ module.exports = class Struct {
                 date: (this.values.length === 1 ? this.values[0].short.date : null),
             }
         })
+        /*
     }
     get "occurrence" () {
 

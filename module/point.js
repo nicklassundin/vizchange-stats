@@ -14,32 +14,6 @@ let replace = (req, a, b) => {
 	return req;
 }
 
-class Baseline {
-	constructor(){
-		this.cache = {};
-	}
-	getBaseline(specs){
-		let start = specs.baseline.start;
-		let end = specs.baseline.end;
-		if(undefined === this.cache[`${start}${end}${specs.type}`]){
-			this.cache[`${start}${end}${specs.type}`] = curl.proxRequest({
-				dates: {
-					start: new Date(specs.baseline.start,1,1),
-					end: new Date(specs.baseline.end,1,1),
-				},
-				url: specs.url,
-				type: specs.type,
-				station: specs.station
-			}).then(baseline => {
-				return baseline.reduce((a,b) => Object.assign(a, b));
-			})
-		}
-		return this.cache[`${start}${end}${specs.type}`]
-	}
-}
-
-let baselineContain = new Baseline();
-
 class PointReq {
 	static build(requests, specs){
 		let result = {}
@@ -103,6 +77,7 @@ class PointReq {
 				if(this.y !== undefined && !isNaN(this.y)){
 					this.req[specs.type] = this.req[specs.type].replace(' ', '')
 				}
+				break;
 			default:
 		}
 		request = replace(request,'glob_temp', 'temperature')
@@ -156,6 +131,7 @@ class Point {
 			case 'nov':
 			case 'dec':
 				full = true;
+				break;
 			default:
 		}
 		return curl.proxRequest(specs, full).then(res => {
@@ -229,7 +205,7 @@ class Point {
 					req = req.filter((e) => {
 						e.date = new Date(e.date)
 						let season = help.getSeasonByIndex(e.date.getMonth())
-						return season == specs.keys[0]
+						return season === specs.keys[0]
 					})
 					break;
 				case 'weeks':
@@ -289,7 +265,6 @@ class Point {
 					default:
 						return this.year
 				}
-				return this.specs.dates
 			case 'splitMonth':
 				return this.monthName
 			case 'months':
@@ -384,7 +359,7 @@ class Point {
 	set 'y' (val){
 		this.req[`${this.subType}${this.type}`] = val
 	}
-	'getY'(req = this.req, number = false){
+	'getY'(req = this.req){
 		let y = req[`${this.type}`]
 		switch (this.SUBTYPE){
 			case 'breakfreeze':
@@ -512,8 +487,7 @@ class Point {
 		specs.type = type
 		let req = JSON.parse(JSON.stringify(this.req));
 		if(type === 'snow'){
-			let point = Point.build(specs, true);
-			return point
+			return Point.build(specs, true);
 		}
 		if(Array.isArray(req)){
 			return new Point(specs, req, this.full)
@@ -568,11 +542,6 @@ class Point {
 		let start = this['30periodyear']
 		let end = this.specs.dates.end.getFullYear();
 		return Array.from({length: (end - start)/30}, (v, k) => k*30 + start)
-		let decades = this.splitDecades
-		return decades.map((v) => {
-			console.log(v)
-			return v - v % 30 +1
-		})
 	}
 	get 'startDate'() {
 		return this.specs.dates.start;

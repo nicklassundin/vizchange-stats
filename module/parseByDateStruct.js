@@ -1,6 +1,4 @@
 const Struct = require('./struct.js');
-const help = require('climate-plots-helper');
-// const keys = Object.keys(values[0]),
 module.exports = class ByDateStruct {
 	constructor(type = 'avg', custom, specs) {
 		this.specs = specs;
@@ -19,7 +17,6 @@ module.exports = class ByDateStruct {
 	}
 	"request" (key) {
 		this.parse(key)
-		let type = this.type;
 		return this.values[key]
 	}
 "parse" (key) {
