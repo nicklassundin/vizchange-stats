@@ -26,7 +26,7 @@ const axios = require('axios').create({
 
 
 let cache = {}
-Object.keys(require('./debug/list.json')).forEach(key => {
+Object.keys(require(`${__dirname}/debug/list.json`)).forEach(key => {
 	cache[key] = require(`./debug/${key}`)
 })
 
