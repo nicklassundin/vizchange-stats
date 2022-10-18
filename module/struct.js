@@ -544,13 +544,25 @@ module.exports = class Struct {
                 })
             default:
                 //let startTime = (new Date()).getTime();
-                let val = Promise.resolve(true);
+                let val = [
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true)]
+                let qLength = Object.keys(val).length - 1;
                 return this.values.map((value, index) => {
-                    val = val.then(() => {
+                    let i = index % qLength;
+                    val[i] = val[i].then(() => {
                         //console.log((new Date()).getTime() - startTime)
                         return value.short
                     })
-                    return val.then()
+                    return val[i].then()
                 })
         }
 
