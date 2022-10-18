@@ -85,7 +85,7 @@ describe(
                 let params = ['temperature', 'yrly', 'shortValues', 1];
                 let config = Object.assign(configs['liveHalf'], specs)
                 return parser.getByParams(config, params).then((values) => {
-                    //console.log(values)
+                    console.log(values)
                     //return assert.ok(Math.abs(values.y - -0.4282191780821911) < 0.0001)
 
                     // TODO avg error
@@ -225,6 +225,7 @@ describe(
                     let params = ['precipitation', 'yrly', 'values', 1, 'y']
                     let config = Object.assign(configs['latest'], precipitation_specs)
                     return parser.getByParams(config, params).then(values => {
+                        console.log(values)
                         return assert.ok(Math.abs(values - 399.3) < 0.0001 )
                         //return assert.equal(values,399.2999999999999)
                     })
@@ -897,7 +898,7 @@ describe(
                 })
             })
             describe('time to load', function() {
-                it('temperature', () => {
+                it.only('temperature', () => {
                     let params = ['temperature', 'yrly', 'shortValues']
                     let config = Object.assign(configs['live'], specs)
                     const startTime = (new Date()).getTime();
@@ -909,7 +910,7 @@ describe(
                         })
                     })
                 })
-                it('precipitation', () => {
+                it.only('precipitation', () => {
                     let params = ['precipitation', 'yrly', 'shortValues']
                     let config = Object.assign(configs['live'], precipitation_specs)
                     let startTime = (new Date()).getTime();

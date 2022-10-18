@@ -24,12 +24,12 @@ const axios = require('axios').create({
 
 
 
-/*
+
 let cache = {}
 Object.keys(require('./debug/list.json')).forEach(key => {
 	cache[key] = require(`./debug/${key}`)
 })
- */
+
 
 
 let getSmhiStation = async function(id){
@@ -60,7 +60,6 @@ let getSmhiStation = async function(id){
 
 		}).on("error", (error) => {
 			console.error(error.message);
-
 		});
 	})
 }
@@ -192,17 +191,17 @@ module.exports = {
 		//}
 		//console.log('url', url)
 
-		/*
+
 		if(cache[path] !== undefined){
 			return Promise.resolve(cache[path])
 		}
-		 */
+
 
 		if(this.cached[url] === undefined){
 			// TODO nicer solution to individual requests
 			this.cached[url] = axios.get(url).then(result => {
 
-				/*
+
 				let list = undefined;
 
 				let fs = require("fs");
@@ -216,7 +215,7 @@ module.exports = {
 				fs.writeFile('./debug/list.json', JSON.stringify(list), () => {})
 				fs.writeFile('./debug/'+path, JSON.stringify(result.data), () => {})
 
-				 */
+
 
 				return result.data
 			}).catch(
