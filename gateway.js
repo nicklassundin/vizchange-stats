@@ -24,11 +24,12 @@ const axios = require('axios').create({
 
 
 
-
+/*
 let cache = {}
 Object.keys(require(`${__dirname}/debug/list.json`)).forEach(key => {
 	cache[key] = require(`./debug/${key}`)
 })
+*/
 
 
 
@@ -185,6 +186,7 @@ module.exports = {
 	queue: 0,
 	cached: {},
 	axios(url){
+	/*
 		let path = `${url.split('/').join('')}.json`;
 		//if(fs.existsSync(path)){
 		//	return require('./'+path)
@@ -195,6 +197,8 @@ module.exports = {
 		if(cache[path] !== undefined){
 			return Promise.resolve(cache[path])
 		}
+
+  */
 
 
 		if(this.cached[url] === undefined){

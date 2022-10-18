@@ -81,7 +81,7 @@ describe(
     'Requests',
     function () {
         describe('recursive', function () {
-            it('promises', function () {
+            it.only('promises', function () {
                 let params = ['temperature', 'yrly', 'shortValues', 1];
                 let config = Object.assign(configs['liveHalf'], specs)
                 return parser.getByParams(config, params).then((values) => {
