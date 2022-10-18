@@ -9,6 +9,7 @@
 // const host = `vischange.k8s.glimworks.se/data/query/v1`;
 //
 const http = require('http');
+const fs = require("fs");
 const axios = require('axios').create({
 	httpAgent: new http.Agent({
 //		keepAlive: true,
@@ -22,12 +23,12 @@ const axios = require('axios').create({
 //setupCache(axios)
 
 
-/*
+
 let cache = {}
-Object.keys(require('./debbug/list.json')).forEach(key => {
+Object.keys(require('./debug/list.json')).forEach(key => {
 	cache[key] = require(`./debug/${key}`)
 })
- */
+
 
 let getSmhiStation = async function(id){
 	return await new Promise((result, reject) => {
@@ -188,30 +189,30 @@ module.exports = {
 		//	return require('./'+path)
 		//}
 		//console.log('url', url)
-		/*
+
 		if(cache[path] !== undefined){
 			return Promise.resolve(cache[path])
 		}
-		 */
+
 		if(this.cached[url] === undefined){
 			// TODO nicer solution to individual requests
 			this.cached[url] = axios.get(url).then(result => {
+
 				/*
 				let list = undefined;
 
-				if(global.development) {
-					let fs = require("fs");
-					if(fs.existsSync('./debug/list.json')){
-						list = require('./debug/list.json')
-						list[path] = result.data.length
-					}else{
-						list = {}
-						list[path] = result.data.length;
-					}
-					fs.writeFile('./debug/list.json', JSON.stringify(list), () => {})
-					fs.writeFile('./'+path, JSON.stringify(result.data), () => {})
+				let fs = require("fs");
+				if(fs.existsSync('./debug/list.json')){
+					list = require('./debug/list.json')
+					list[path] = result.data.length
+				}else{
+					list = {}
+					list[path] = result.data.length;
 				}
-				*/
+				fs.writeFile('./debug/list.json', JSON.stringify(list), () => {})
+				fs.writeFile('./debug/'+path, JSON.stringify(result.data), () => {})
+				 */
+
 				return result.data
 			}).catch(
 				function (error) {

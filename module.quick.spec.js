@@ -909,7 +909,7 @@ describe(
                         })
                     })
                 })
-                it.skip('precipitation', () => {
+                it('precipitation', () => {
                     let params = ['precipitation', 'yrly', 'shortValues']
                     let config = Object.assign(configs['live'], precipitation_specs)
                     let startTime = (new Date()).getTime();
