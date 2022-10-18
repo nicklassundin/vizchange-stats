@@ -203,7 +203,7 @@ module.exports = {
 
 
 				let list = undefined;
-
+ /*
 				let fs = require("fs");
 				if(fs.existsSync('./debug/list.json')){
 					list = require('./debug/list.json')
@@ -214,7 +214,7 @@ module.exports = {
 				}
 				fs.writeFile('./debug/list.json', JSON.stringify(list), () => {})
 				fs.writeFile('./debug/'+path, JSON.stringify(result.data), () => {})
-
+*/
 
 
 				return result.data
