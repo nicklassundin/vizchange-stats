@@ -10,18 +10,24 @@
 //
 const http = require('http');
 const axios = require('axios').create({
-	httpAgent: new http.Agent({ keepAlive: true, maxSockets: 1 }),
+	httpAgent: new http.Agent({
+//		keepAlive: true,
+		scheduling: 'fifo',
+		maxSockets: 1,
+		maxTotalSockets: 1,
+	}),
 });
 // TODO this should work on client side FIXME
 //const { setupCache } = require('axios-cache-adapter');
 //setupCache(axios)
 
 
+/*
 let cache = {}
-Object.keys(require('./debug/list.json')).forEach(key => {
+Object.keys(require('./debbug/list.json')).forEach(key => {
 	cache[key] = require(`./debug/${key}`)
 })
-
+ */
 
 let getSmhiStation = async function(id){
 	return await new Promise((result, reject) => {
@@ -174,6 +180,7 @@ module.exports = {
 		}
 	},
 	number: 0,
+	queue: 0,
 	cached: {},
 	axios(url){
 		let path = `${url.split('/').join('')}.json`;
@@ -181,22 +188,14 @@ module.exports = {
 		//	return require('./'+path)
 		//}
 		//console.log('url', url)
-
+		/*
 		if(cache[path] !== undefined){
 			return Promise.resolve(cache[path])
 		}
+		 */
 		if(this.cached[url] === undefined){
 			// TODO nicer solution to individual requests
-			//console.log('start', (new Date()).getTime(), this.number)
-			this.cached[url] = axios({
-				method: 'GET',
-				url: url
-			}).then(result => {
-				//console.log((new Date()).getTime(), this.number)
-				//console.log((new Date()).getTime(), Object.keys(result))
-				if(!result.cached){
-					this.number += 1;
-				}
+			this.cached[url] = axios.get(url).then(result => {
 				/*
 				let list = undefined;
 

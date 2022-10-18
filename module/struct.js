@@ -458,7 +458,7 @@ module.exports = class Struct {
             return value
         }).then(value => value.y)
     }
-    get "difference"() {
+    get 'difference' () {
         return this.baseline.then(baseline => {
             return this.shortValues.map(value => {
                 return value.then(value => {
@@ -533,6 +533,7 @@ module.exports = class Struct {
     }
     get 'shortValues' () {
         switch (this.specs.keys[0]){
+
             case 'all':
                 return this.entry.then((entry) => {
                     if(entry instanceof Point){
@@ -542,8 +543,14 @@ module.exports = class Struct {
                     }
                 })
             default:
-                return this.values.map(value => {
-                    return value.short
+                //let startTime = (new Date()).getTime();
+                let val = Promise.resolve(true);
+                return this.values.map((value, index) => {
+                    val = val.then(() => {
+                        //console.log((new Date()).getTime() - startTime)
+                        return value.short
+                    })
+                    return val.then()
                 })
         }
 
