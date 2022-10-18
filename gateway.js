@@ -8,17 +8,20 @@
 // let local_debug = `localhost/debug/data/query/v1/test`;
 // const host = `vischange.k8s.glimworks.se/data/query/v1`;
 //
-const axios = require('axios');
+const http = require('http');
+const axios = require('axios').create({
+	httpAgent: new http.Agent({ keepAlive: true, maxSockets: 1 }),
+});
 // TODO this should work on client side FIXME
 //const { setupCache } = require('axios-cache-adapter');
 //setupCache(axios)
 
-/*
+
 let cache = {}
 Object.keys(require('./debug/list.json')).forEach(key => {
 	cache[key] = require(`./debug/${key}`)
 })
- */
+
 
 let getSmhiStation = async function(id){
 	return await new Promise((result, reject) => {
@@ -173,16 +176,15 @@ module.exports = {
 	number: 0,
 	cached: {},
 	axios(url){
-		let path = `debug/${url.split('/').join('')}.json`;
+		let path = `${url.split('/').join('')}.json`;
 		//if(fs.existsSync(path)){
 		//	return require('./'+path)
 		//}
 		//console.log('url', url)
-		/*
+
 		if(cache[path] !== undefined){
 			return Promise.resolve(cache[path])
 		}
-		 */
 		if(this.cached[url] === undefined){
 			// TODO nicer solution to individual requests
 			//console.log('start', (new Date()).getTime(), this.number)

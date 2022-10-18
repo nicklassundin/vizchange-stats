@@ -869,7 +869,7 @@ describe(
                 })
             })
         })
-        describe('undefined', function() {
+        describe('speed tests', function() {
             it.skip('difference', () => {
                 let params = ['temperature', 'yrly', 'difference', 11]
                 let config = Object.assign(configs['live'], specs)
@@ -877,15 +877,41 @@ describe(
                     return assert.ok(Math.abs(values.y - 0.8613948739984973) < 0.0001 )
                 })
             })
-            it('values', () => {
-                let params = ['temperature', 'yrly', 'shortValues', 35]
+            it('single', () => {
+                let params = ['temperature', 'yrly', 'shortValues']
                 let config = Object.assign(configs['live'], specs)
                 const startTime = (new Date()).getTime();
                 return parser.getByParams(config, params).then(values => {
-                    return Promise.all([values[35], values[40], values[70]]).then(values => {
+                    return Promise.any(values).then(values => {
                         let endTime = (new Date()).getTime();
                         console.log(endTime - startTime)
                         return assert.ok( endTime - startTime < 10000)
+                    })
+                })
+            })
+            describe('time to load', function() {
+                it('temperature', () => {
+                    let params = ['temperature', 'yrly', 'shortValues']
+                    let config = Object.assign(configs['live'], specs)
+                    const startTime = (new Date()).getTime();
+                    return parser.getByParams(config, params).then(values => {
+                        return Promise.all([values[35], values[40], values[70]]).then(values => {
+                            let endTime = (new Date()).getTime();
+                            console.log(endTime - startTime)
+                            return assert.ok( endTime - startTime < 10000)
+                        })
+                    })
+                })
+                it('precipitation', () => {
+                    let params = ['precipitation', 'yrly', 'shortValues']
+                    let config = Object.assign(configs['live'], precipitation_specs)
+                    let startTime = (new Date()).getTime();
+                    return parser.getByParams(config, params).then(values => {
+                        return Promise.all([values[35], values[40], values[70]]).then(values => {
+                            let endTime = (new Date()).getTime();
+                            console.log(endTime - startTime)
+                            return assert.ok( endTime - startTime < 10000)
+                        })
                     })
                 })
             })

@@ -297,7 +297,7 @@ module.exports = class Struct {
         switch (this.specs.keys[0]) {
             case 'yrly':
                 // TODO possible solution when queue is working
-                // full = false;
+                //full = false;
                 break;
             default:
         }
@@ -437,7 +437,7 @@ module.exports = class Struct {
         let values = {}
         this.values // initiate values if not done so
         for(let i = 0; i < keys.length; i++) {
-            console.log(keys[i], this.VALUES[keys[i]])
+            //console.log(keys[i], this.VALUES[keys[i]])
             values[keys[i]] = this.VALUES[keys[i]].short
             //this.BASELINE[keys[i]] = this.getValues(genSpecs, genSpecs.keys[0], keys[i], type, f, full, parentType).short
         }
