@@ -204,7 +204,8 @@ module.exports = {
 		if(this.cached[url] === undefined){
 			// TODO nicer solution to individual requests
 			this.cached[url] = axios.get(url).then(result => {
-
+				this.number += 1;
+				console.log(this.number)
 /*
 				let list = undefined;
 

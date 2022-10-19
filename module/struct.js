@@ -533,7 +533,6 @@ module.exports = class Struct {
     }
     get 'shortValues' () {
         switch (this.specs.keys[0]){
-
             case 'all':
                 return this.entry.then((entry) => {
                     if(entry instanceof Point){
