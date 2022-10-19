@@ -565,7 +565,7 @@ describe(
                             return assert.equal(values.y, 22)
                         })
                     })
-                    it('full test', () => {
+                    it.only('full test', () => {
                         let params = ['temperature', 'weekly', 'growingSeason', 'shortValues']
                         let config = Object.assign(configs['live'], specs)
                         return parser.getByParams(config, params).then(values => {
