@@ -920,7 +920,7 @@ describe(
                     })
                 })
             })
-            it.skip('order of resolve', () => {
+            it('order of resolve', () => {
                 let params = ['temperature', 'yrly', 'shortValues']
                 let config = Object.assign(configs['live'], specs)
                 const startTime = (new Date()).getTime();
