@@ -553,26 +553,21 @@ module.exports = class Struct {
                     Promise.resolve(true),
                     Promise.resolve(true),
                     Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
                     Promise.resolve(true)]
                 let qLength = Object.keys(val).length - 1;
-                /*
-                let values = []
-                for (let i = this.values.length-1; i >= 0; i){
-                    let index = i % qLength;
-                    val[index] = val[index].then(() => {
-                        //console.log((new Date()).getTime() - startTime)
-                        return values[i].short
-                    })
-                    values.unshift(val[index].then())
-                }
-                return values
-*/
                 return this.values.reverse().map((value, index) => {
                     let i = index % qLength;
                     val[i] = val[i].then(() => {
-
-                        //console.log((new Date()).getTime() - startTime)
-                        return value.short
+                        return new Promise((res) => setTimeout(() => res(value.short), Math.floor(Math.random() * 200)));
                     })
                     return val[i].then()
                 }).reverse()

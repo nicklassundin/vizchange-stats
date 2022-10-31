@@ -895,7 +895,7 @@ describe(
                 })
             })
             describe('time to load', function() {
-                it('temperature', () => {
+                it.only('temperature', () => {
                     let params = ['temperature', 'yrly', 'shortValues']
                     let config = Object.assign(configs['live'], specs)
                     const startTime = (new Date()).getTime();
