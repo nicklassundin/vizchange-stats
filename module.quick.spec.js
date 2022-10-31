@@ -515,8 +515,8 @@ describe(
                         let params = ['precipitation', 'autumn', 'shortValues', 1]
                         let config = Object.assign(configs['latest'], precipitation_specs)
                         return parser.getByParams(config, params).then(values => {
-                            //console.log(values)
-                            return assert.ok(Math.abs(values.y - 110.6) < 0.0001 )
+                            console.log(values)
+                            return assert.ok(Math.abs(values.y - 110.6) < 0.5 )
                         })
                     })
                     it('winter', () => {
