@@ -887,6 +887,7 @@ describe(
                 const startTime = (new Date()).getTime();
                 return parser.getByParams(config, params).then(values => {
                     return Promise.any(values).then(values => {
+                        //console.log('values', values)
                         let endTime = (new Date()).getTime();
                         //console.log(endTime - startTime)
                         return assert.ok( endTime - startTime < 10000)
@@ -902,7 +903,7 @@ describe(
                         return Promise.all([values[35], values[40], values[70]]).then(values => {
                             let endTime = (new Date()).getTime();
                             //console.log(endTime - startTime)
-                            return assert.ok( endTime - startTime < 10000)
+                            return assert.ok( endTime - startTime < 25000)
                         })
                     })
                 })
