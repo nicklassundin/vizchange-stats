@@ -536,9 +536,9 @@ module.exports = class Struct {
             case 'all':
                 return this.entry.then((entry) => {
                     if(entry instanceof Point){
-                        return entry.splinter.map(each => each.short)
+                        return entry.splinter.map(each => Promise.resolve(each.short))
                     }else{
-                        return NaN
+                        return new Error(`Invalid`)
                     }
                 })
             default:
@@ -575,6 +575,7 @@ module.exports = class Struct {
 
     }
     get "yValues" () {
+        // DEPRECATED TODO: Remove
         return this.shortValues.map(each => each.then(vals => vals.y))
     }
     get "short" () {

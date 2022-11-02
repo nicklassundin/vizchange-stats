@@ -231,6 +231,14 @@ describe(
                                 return assert.ok(Math.abs(values.y - 28) < 1)
                             })
                         })
+                        it('x', () => {
+                            let params = ['snowdepth_single', 'splitDecades', 'shortValues', 4]
+                            let config = Object.assign(configs['live'], snowdepth_single_specs)
+                            return parser.getByParams(config, params).then(values => {
+                                console.log(values)
+                                return assert.equal(values.x, 'dec')
+                            })
+                        })
                         it('decades', () => {
                             let params = ['snowdepth_single', 'splitDecades', 'shortValues', 3]
                             let config = Object.assign(configs['liveHalf'], snowdepth_single_specs)
@@ -895,7 +903,7 @@ describe(
                 })
             })
             describe('time to load', function() {
-                it.only('temperature', () => {
+                it('temperature', () => {
                     let params = ['temperature', 'yrly', 'shortValues']
                     let config = Object.assign(configs['live'], specs)
                     const startTime = (new Date()).getTime();
