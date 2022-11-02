@@ -532,44 +532,38 @@ module.exports = class Struct {
         return this;
     }
     get 'shortValues' () {
-        let val = [
-            Promise.resolve(true),
-            Promise.resolve(true),
-            Promise.resolve(true),
-            Promise.resolve(true),
-            Promise.resolve(true),
-            Promise.resolve(true),
-            Promise.resolve(true),
-            Promise.resolve(true),
-            Promise.resolve(true),
-            Promise.resolve(true),
-            Promise.resolve(true),
-            Promise.resolve(true),
-            Promise.resolve(true),
-            Promise.resolve(true),
-            Promise.resolve(true),
-            Promise.resolve(true),
-            Promise.resolve(true),
-            Promise.resolve(true),
-            Promise.resolve(true)]
-        let qLength = Object.keys(val).length - 1;
         switch (this.specs.keys[0]){
             case 'all':
                 return this.entry.then((entry) => {
                     if(entry instanceof Point){
-                        return entry.splinter.reverse().map((value, index) => {
-                            let i = index % qLength;
-                            val[i] = val[i].then(() => {
-                                return new Promise((res) => setTimeout(() => res(value.short), Math.floor(Math.random() * 200)));
-                            })
-                            return val[i].then()
-                        }).reverse()
+                        return entry.splinter.map(each => Promise.resolve(each.short))
                     }else{
                         return new Error(`Invalid`)
                     }
                 })
             default:
                 //let startTime = (new Date()).getTime();
+                let val = [
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true),
+                    Promise.resolve(true)]
+                let qLength = Object.keys(val).length - 1;
                 return this.values.reverse().map((value, index) => {
                     let i = index % qLength;
                     val[i] = val[i].then(() => {
