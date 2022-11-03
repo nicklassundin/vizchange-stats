@@ -317,6 +317,7 @@ module.exports = class Struct {
         return Object.values(this.VALUES);
     }
     get 'valuesAll' () {
+
         return Struct.build(this.specs, this.x, this.type, this.f, true)
     }
     'split' (f) {
