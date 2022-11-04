@@ -179,7 +179,8 @@ class Point {
 	}
 	get 'date' () {
 		// TODO sort out none valid points HOTFIX
-		if(this.req.length < 1) return this.x
+		//if(this.req.length < 1) return this.x
+		if(this.req.length < 1) return undefined
 		switch (this.specs.subType){
 			case 'last':
 				return this.req[this.req.length - 1].date
@@ -572,7 +573,10 @@ class Point {
 			case 'first':
 			case 'last':
 				value = y
-				y = help.dayOfYear(this.date)
+				let date = this.date
+				if(date !== undefined){
+					y = help.dayOfYear(date)
+				}
 				break;
 			default:
 		}

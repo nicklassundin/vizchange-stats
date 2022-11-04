@@ -505,7 +505,7 @@ module.exports = class Struct {
             return new Struct(nEntry, seed.specs, this.x, type, f, this.full, this.type)
         })
     }
-    "TYPE"(type, f = this.f, full = this.full) {
+    'TYPE' (type, f = this.f, full = this.full) {
         let specs = JSON.parse(JSON.stringify(this.specs));
         specs.subType = type;
         if (full === this.full) {
