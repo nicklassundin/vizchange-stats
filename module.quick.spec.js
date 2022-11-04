@@ -476,6 +476,14 @@ describe(
                     })
                 })
                 describe('frost', function() {
+                    it('last', () => {
+                        let params = ['temperature', 'yrlySplit', 'last', 'shortValues', 10];
+                        let config = Object.assign(configs['liveHalf'], specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values)
+                            return assert.equal(values.date.getDate(), 19)
+                        })
+                    })
                     it('first', () => {
                         let params = ['temperature', 'yrlySplit', 'min', 'first', 'shortValues', 10];
                         let config = Object.assign(configs['liveHalf'], specs)

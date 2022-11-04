@@ -336,38 +336,14 @@ class Point {
 		})
 		return new Point(this.specs, req, true)
 	}
-	/*
-	get 'difference' (){
-		return baselineContain.getBaseline(this.specs).then(baseline => {
-			let req = Object.assign(Object.create(Object.getPrototypeOf(this.req)), this.req)
-			Object.keys(baseline).forEach(key => {
-				try{
-					if(req[key] !== undefined){
-						req[key].baseline = baseline[key].avg
-						req[key].difference = this.req[key].avg - baseline[key].avg
-					}else{
-						req[key] = {
-							baseline: NaN,
-							difference: NaN
-						}
-					}
-				}catch(error){
-					throw error
-				}
-			})
-			return new Point(this.specs, req, this.full)
-		})
-	}
-
-	 */
 	set 'y' (val){
 		this.req[`${this.subType}${this.type}`] = val
 	}
 	'getY'(req = this.req){
 		let y = req[`${this.type}`]
+		let date = new Date(req[this.type]);
 		switch (this.SUBTYPE){
 			case 'breakfreeze':
-				let date = new Date(req[this.type]);
 				y = help.dayOfYear(date)
 				if(help.isFirstHalfYear(date.getMonth()) && this.specs.type === 'freezeup'){
 					y += (((date.getFullYear()-1) % 4 === 0 && (date.getFullYear()-1) % 100 > 0) || (date.getFullYear()) %400 === 0) ? 366 : 365;
@@ -432,6 +408,7 @@ class Point {
 				case 'rain':
 					return result.reduce((a,b) => a + b)
 				case 'last':
+
 					return this.getY(this.req[this.req.length - 1])
 				case 'first':
 					return this.getY(this.req[0]);
@@ -590,6 +567,15 @@ class Point {
 	}
 	get 'short' (){
 		let y = this.y
+		let value = undefined;
+		switch(this.SUBTYPE) {
+			case 'first':
+			case 'last':
+				value = y
+				y = help.dayOfYear(this.date)
+				break;
+			default:
+		}
 		return {
 			compressed: true,
 			y: y,
@@ -601,7 +587,8 @@ class Point {
 //			type: this.type,
 			xInterval: this.specs.dates,
 //			typeMeta: this.typeMeta,
-			date: this.date
+			date: this.date,
+			value
 		}
 	}
 	'getSeed' () {
