@@ -192,7 +192,11 @@ module.exports = class Struct {
                             break;
                         case 'first':
                         case 'last':
-                            return point[this.type](this.f);
+                            if(point instanceof Point){
+                                return point[this.type](this.f);
+                            }else{
+                                return NaN
+                            }
                         case 'snow':
                         case 'rain':
                             break;
@@ -276,11 +280,16 @@ module.exports = class Struct {
                         specs.dates.end = k+1;
                 }
                 break;
+            case 'splitYear':
+                specs.dates.start = k;
+                specs.dates.end = k;
+                // return for first iteration for getting a request for each year
+                return Struct.build(specs, k, type, f, this.full, this.parentType);
             default:
                 specs.dates.start = k;
                 specs.dates.end = k;
         }
-        let result = Struct.build(specs, k, type, f, this.full);
+        let result = Struct.build(specs, k, type, f, this.full, this.parentType);
         if(full){
             result.entry = this.entry.then(entry => {
                 return entry.dateSlice(result.specs.dates.start, result.specs.dates.end)
@@ -307,7 +316,6 @@ module.exports = class Struct {
         }else if(Object.keys(this.VALUES).length === 0) {
             let keys = (new Point(genSpecs))[`${genSpecs.keys[0]}s`]
             this.VALUES = {}
-
             //console.log("get values", keys.length, genSpecs.keys, genSpecs.dates)
             //console.log(`${genSpecs.keys[0]}s`, keys)
             for(let i = 0; i < keys.length; i++) {
@@ -566,7 +574,8 @@ module.exports = class Struct {
                 return this.values.reverse().map((value, index) => {
                     let i = index % qLength;
                     val[i] = val[i].then(() => {
-                        return new Promise((res) => setTimeout(() => res(value.short), Math.floor(Math.random() * 200)));
+                        //return new Promise((res) => setTimeout(() => res(value.short), Math.floor(Math.random() * 200)));
+                        return new Promise((res) => res(value.short));
                     })
                     return val[i].then()
                 }).reverse()

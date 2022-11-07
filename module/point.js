@@ -61,6 +61,7 @@ class PointReq {
 				})
 		}
 		return Object.values(result).filter(each => {
+			if(typeof each.date === 'string') each.date = new Date(each.date)
 			switch(specs.description) {
 				case 'splitMonth':
 				case 'splitDecades':

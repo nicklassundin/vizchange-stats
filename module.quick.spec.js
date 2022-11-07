@@ -480,7 +480,7 @@ describe(
                         let params = ['temperature', 'yrlySplit', 'min', 'first', 'shortValues', 24];
                         let config = Object.assign(configs['live'], specs)
                         return parser.getByParams(config, params).then(values => {
-                            //console.log(values)
+                            console.log(values)
                             return assert.equal(values.y, 233)
                         })
                     })
@@ -488,7 +488,7 @@ describe(
                         let params = ['temperature', 'yrlySplit', 'min', 'first', 'shortValues', 10];
                         let config = Object.assign(configs['liveHalf'], specs)
                         return parser.getByParams(config, params).then(values => {
-                            //console.log(values)
+                            console.log(values)
                             return assert.equal(values.date.getDate(), 30)
                         })
                     })
@@ -919,7 +919,7 @@ describe(
                     return parser.getByParams(config, params).then(values => {
                         return Promise.all([values[35], values[40], values[70]]).then(values => {
                             let endTime = (new Date()).getTime();
-                            //console.log(endTime - startTime)
+                            console.log(endTime - startTime)
                             return assert.ok( endTime - startTime < 25000)
                         })
                     })
