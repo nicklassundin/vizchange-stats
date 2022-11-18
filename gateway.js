@@ -8,6 +8,7 @@
 // let local_debug = `localhost/debug/data/query/v1/test`;
 // const host = `vischange.k8s.glimworks.se/data/query/v1`;
 //
+const cached_list = require('./debug/list.js')
 const http = require('http');
 const fs = require("fs");
 const axios = require('axios').create({
@@ -22,7 +23,13 @@ const axios = require('axios').create({
 //const { setupCache } = require('axios-cache-adapter');
 //setupCache(axios)
 
-
+hashCode = function(s) {
+	let h = 0, l = s.length, i = 0;
+	if ( l > 0 )
+		while (i < l)
+			h = (h << 5) - h + s.charCodeAt(i++) | 0;
+	return h;
+};
 
 /*
 let cache = {}
@@ -185,20 +192,22 @@ module.exports = {
 	number: 0,
 	queue: 0,
 	cached: {},
-	axios(url){
-	/*
-		let path = `${url.split('/').join('')}.json`;
-		//if(fs.existsSync(path)){
-		//	return require('./'+path)
-		//}
-		//console.log('url', url)
+	async axios(url){
+
+		//let path = `${url.split('/').join('').replace('https:', '').replace('.', '').replace(',', '').}.json`;
+		let path = `${hashCode(url)}.json`;
 
 
-		if(cache[path] !== undefined){
-			return Promise.resolve(cache[path])
+		if(cached_list[path.replace('.json', '')]){
+			return cached_list[path.replace('.json', '')]
 		}
 
-  */
+		/*
+            if(cache[path] !== undefined){
+                return Promise.resolve(cache[path])
+            }
+
+      */
 
 
 		if(this.cached[url] === undefined){
@@ -206,7 +215,8 @@ module.exports = {
 			this.cached[url] = axios.get(url).then(result => {
 				this.number += 1;
 				console.log(this.number)
-/*
+
+				/*
 				let list = undefined;
 
 				let fs = require("fs");
@@ -218,8 +228,11 @@ module.exports = {
 					list[path] = result.data.length;
 				}
 				fs.writeFile('./debug/list.json', JSON.stringify(list), () => {})
+				fs.writeFile('./debug/list.js', Object.keys(list).map(key => {
+					return `module.exports['${key.replace('.json', '')}'] = require('./${key}');`
+				}).join('\n'), () => {})
 				fs.writeFile('./debug/'+path, JSON.stringify(result.data), () => {})
-*/
+				 */
 
 
 				return result.data
