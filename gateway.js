@@ -8,7 +8,8 @@
 // let local_debug = `localhost/debug/data/query/v1/test`;
 // const host = `vischange.k8s.glimworks.se/data/query/v1`;
 //
-const cached_list = require('./debug/list.js')
+// TODO local cache should be available
+//const cached_list = require('./debug/list.js')
 const http = require('http');
 const fs = require("fs");
 const axios = require('axios').create({
@@ -197,9 +198,12 @@ module.exports = {
 		//let path = `${url.split('/').join('').replace('https:', '').replace('.', '').replace(',', '').}.json`;
 		let path = `${hashCode(url)}.json`;
 
+		/*
 		if(cached_list[path.replace('.json', '')]){
 			return cached_list[path.replace('.json', '')]
 		}
+
+		 */
 
 		/*
             if(cache[path] !== undefined){

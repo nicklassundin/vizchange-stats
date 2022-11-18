@@ -981,6 +981,17 @@ describe(
                         })
                     })
                 })
+                it('growingSeason', () => {
+                    let params = ['temperature', 'weekly', 'growingSeason', 'shortValues']
+                    let config = Object.assign(configs['live'], specs)
+                    return parser.getByParams(config, params).then(values => {
+                        const startTime = (new Date()).getTime();
+                        return Promise.all([values[35], values[40], values[70]]).then(values => {
+                            let endTime = (new Date()).getTime();
+                            return assert.ok( endTime - startTime < 25000)
+                        })
+                    })
+                })
             })
             it.skip('order of resolve', () => {
                 let params = ['temperature', 'yrly', 'shortValues']
