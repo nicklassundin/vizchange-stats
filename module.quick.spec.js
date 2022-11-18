@@ -325,7 +325,7 @@ describe(
                                 let config = Object.assign(configs['latest'], precipitation_specs)
                                 return parser.getByParams(config, params).then(values => {
                                     console.log(values)
-                                    return assert.ok(Math.abs(values-397.3) < 30)
+                                    return assert.ok(Math.abs(values-397.3) < 70)
                                 })
                             })
                             it('shortValues', () => {
@@ -932,8 +932,7 @@ describe(
                     return parser.getByParams(config, params).then(values => {
                         return Promise.all([values[35], values[40], values[70]]).then(values => {
                             let endTime = (new Date()).getTime();
-                            console.log(endTime - startTime)
-                            return assert.ok( endTime - startTime < 25000)
+                            return assert.ok( endTime - startTime < 30000)
                         })
                     })
                 })
@@ -945,6 +944,39 @@ describe(
                         return Promise.all([values[35], values[40], values[70]]).then(values => {
                             let endTime = (new Date()).getTime();
                             //console.log(endTime - startTime)
+                            return assert.ok( endTime - startTime < 25000)
+                        })
+                    })
+                })
+                it('freezeup', () => {
+                    let params = ['freezeup', 'yrly', 'shortValues', 60];
+                    let config = Object.assign(configs['live'], freezeup_specs)
+                    const startTime = (new Date()).getTime();
+                    return parser.getByParams(config, params).then(values => {
+                        return Promise.all([values[35], values[40], values[70]]).then(values => {
+                            let endTime = (new Date()).getTime();
+                            return assert.ok( endTime - startTime < 25000)
+                        })
+                    })
+                })
+                it('breakup', () => {
+                    let params = ['breakup', 'yrly', 'shortValues', 60];
+                    let config = Object.assign(configs['live'], breakup_specs)
+                    const startTime = (new Date()).getTime();
+                    return parser.getByParams(config, params).then(values => {
+                        return Promise.all([values[35], values[40], values[70]]).then(values => {
+                            let endTime = (new Date()).getTime();
+                            return assert.ok( endTime - startTime < 25000)
+                        })
+                    })
+                })
+                it('icetime', () => {
+                    let params = ['icetime', 'yrlyFull', 'shortValues'];
+                    let config = Object.assign(configs['live'], icetime_specs)
+                    const startTime = (new Date()).getTime();
+                    return parser.getByParams(config, params).then(values => {
+                        return Promise.all([values[35], values[40], values[70]]).then(values => {
+                            let endTime = (new Date()).getTime();
                             return assert.ok( endTime - startTime < 25000)
                         })
                     })

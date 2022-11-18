@@ -197,7 +197,6 @@ module.exports = {
 		//let path = `${url.split('/').join('').replace('https:', '').replace('.', '').replace(',', '').}.json`;
 		let path = `${hashCode(url)}.json`;
 
-
 		if(cached_list[path.replace('.json', '')]){
 			return cached_list[path.replace('.json', '')]
 		}
@@ -216,7 +215,7 @@ module.exports = {
 				this.number += 1;
 				console.log(this.number)
 
-				/*
+/*
 				let list = undefined;
 
 				let fs = require("fs");
@@ -232,7 +231,7 @@ module.exports = {
 					return `module.exports['${key.replace('.json', '')}'] = require('./${key}');`
 				}).join('\n'), () => {})
 				fs.writeFile('./debug/'+path, JSON.stringify(result.data), () => {})
-				 */
+*/
 
 
 				return result.data
