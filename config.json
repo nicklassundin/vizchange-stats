@@ -88,6 +88,17 @@
 		},
 		"url": "https://vischange.k8s.glimworks.se/data/query/v1"
 	},
+	"production_redirect": {
+		"baseline": {
+			"start": 1961,
+			"end": 1991
+		},
+		"dates": {
+			"start": 1910,
+			"end": 2025
+		},
+		"url": "http://vizchange.hopto.org/data/production/url"
+	},
 	"productionRedirect": {
 		"baseline": {
 			"start": 1961,

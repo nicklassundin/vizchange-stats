@@ -203,45 +203,49 @@ class Point {
 		specs.dates.end = end;
 		if(Array.isArray(req)){
 			// TODO test case for this individually
-			switch(specs.keys[0]){
-				case 'spring':
-				case 'summer':
-				case 'winter':
-				case 'autumn':
-					req = req.filter((e) => {
-						e.date = new Date(e.date)
-						let season = help.getSeasonByIndex(e.date.getMonth())
-						return season === specs.keys[0]
-					})
-					break;
-				case 'weeks':
-					req = req.filter((e) => {
-						return e.date.getWeekNumber()
-					})
-					break;
-				case 'splitMonth':
-					req = req.filter((e) => {
-						e.date = new Date(e.date)
-						let month = e.date.getMonth()
-						/*
-						if((month >= start.getMonth()) && (month < end.getMonth())){
-							console.log('-----', (month >= start.getMonth()) && (month < end.getMonth()))
-							console.log(month, start.getMonth(), month >= start.getMonth())
-							console.log(month, end.getMonth(), month < end.getMonth())
-						}
-						*/
-						//console.log(e.date, start, end)
-						//console.log(month, start.getMonth(), end.getMonth())
-						return (month >= start.getMonth()) && (month <= end.getMonth())
-					})
-					break
-				default:
-					req = req.filter((e) => {
-						e.date = new Date(e.date)
-						return (e.date > start) && (e.date < end)
-					})
+
+
+			let choice = (key) => {
+				switch(key){
+					case 'spring':
+					case 'summer':
+					case 'winter':
+					case 'autumn':
+						return req.filter((e) => {
+							e.date = new Date(e.date)
+							let season = help.getSeasonByIndex(e.date.getMonth())
+							return season === specs.keys[0]
+						})
+						break;
+					case 'weeks':
+						return req.filter((e) => {
+							return e.date.getWeekNumber()
+						})
+						break;
+					case 'splitMonth':
+						return req.filter((e) => {
+							e.date = new Date(e.date)
+							let month = e.date.getMonth()
+							/*
+                            if((month >= start.getMonth()) && (month < end.getMonth())){
+                                console.log('-----', (month >= start.getMonth()) && (month < end.getMonth()))
+                                console.log(month, start.getMonth(), month >= start.getMonth())
+                                console.log(month, end.getMonth(), month < end.getMonth())
+                            }
+                            */
+							//console.log(e.date, start, end)
+							//console.log(month, start.getMonth(), end.getMonth())
+							return (month >= start.getMonth()) && (month <= end.getMonth())
+						})
+						break
+					default:
+						return req.filter((e) => {
+							e.date = new Date(e.date)
+							return (e.date > start) && (e.date < end)
+						})
+				}
 			}
-			return new Point(specs, req, this.full)
+			return new Point(specs, choice(specs.keys[0]), this.full)
 		}else{
 			if((this.specs.dates.start > start) && (this.specs.dates.end < end)){
 				return this
