@@ -8,7 +8,7 @@
 			"start": 1910,
 			"end": 2025
 		},
-		"url": "vischange.k8s.glimworks.se/data/query/v1"
+		"url": "https://vischange.k8s.glimworks.se/data/query/v1"
 	},
 	"liveHalf": {
 		"baseline": {
@@ -19,7 +19,7 @@
 			"start": 1913,
 			"end": 1970
 		},
-		"url": "vischange.k8s.glimworks.se/data/query/v1"
+		"url": "https://vischange.k8s.glimworks.se/data/query/v1"
 	},
 	"xsLive": {
 		"baseline": {
@@ -30,7 +30,7 @@
 			"start": 2018,
 			"end": 2030
 		},
-		"url": "staging-devop-deploy-vischange.k8s.glimworks.se/data/query/v1"
+		"url": "staging-devop-deploy-https://vischange.k8s.glimworks.se/data/query/v1"
 	},
 	"empty": {
 		"baseline": {
@@ -41,7 +41,7 @@
 			"start": 1910,
 			"end": 1920
 		},
-		"url": "vischange.k8s.glimworks.se/data/query/v1"
+		"url": "https://vischange.k8s.glimworks.se/data/query/v1"
 	},
 	"debug": {
 		"baseline": {
@@ -75,7 +75,7 @@
 			"start": 2018,
 			"end": 2030
 		},
-		"url": "vischange.k8s.glimworks.se/data/query/v1"
+		"url": "https://vischange.k8s.glimworks.se/data/query/v1"
 	},
 	"production": {
 		"baseline": {
@@ -86,7 +86,7 @@
 			"start": 1910,
 			"end": 2025
 		},
-		"url": "vischange.k8s.glimworks.se/data/query/v1"
+		"url": "https://vischange.k8s.glimworks.se/data/query/v1"
 	},
 	"productionRedirect": {
 		"baseline": {
@@ -108,6 +108,6 @@
 			"start": 1961,
 			"end": 1991
 		},
-		"url": "vischange.k8s.glimworks.se/data/query/v1"
+		"url": "https://vischange.k8s.glimworks.se/data/query/v1"
 	}
 }

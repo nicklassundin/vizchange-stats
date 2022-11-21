@@ -185,9 +185,9 @@ module.exports = {
 			"URL": url
 		})
 		if(full){
-			return module.exports.axios('https://'+(host)+url)
+			return module.exports.axios((host)+url)
 		}else{
-			return module.exports.axios('https://'+(host)+url+"&calculate")
+			return module.exports.axios((host)+url+"&calculate")
 		}
 	},
 	number: 0,
