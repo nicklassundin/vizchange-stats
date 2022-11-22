@@ -386,7 +386,6 @@ module.exports = class Struct {
         } catch (error) {
             throw error
         }
-
     }
     get 'snow' () {
         return this.TYPE('snow', undefined, true)

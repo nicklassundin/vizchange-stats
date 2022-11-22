@@ -14,8 +14,59 @@ let replace = (req, a, b) => {
 	return req;
 }
 
+let nr_max = 0;
+Array.prototype.divideConquerFilter = function(f){
+	let nr = 0
+	let recursive = function(array){
+		nr += 1;
+		if(nr_max < nr){
+			nr_max = nr;
+		}
+		if(array.length === 0) return []
+		switch(f(array[array.length - 1])){
+			case -1:
+				return []
+			case 0:
+				switch(f(array[0])){
+					case -1:
+						return recursive(array.slice(0, Math.floor(array.length/2)))
+							.concat(recursive(array.slice(Math.floor(array.length/2))))
+					case 0:
+						return array;
+					default:
+						throw new Error('Should not happen')
+				}
+			case 1:
+				switch(f(array[0])){
+					case -1:
+						return recursive(array.slice(0, Math.floor(array.length/2)))
+							.concat(recursive(array.slice(Math.floor(array.length/2))))
+						break;
+					case 0:
+						return array;
+					default:
+						return []
+				}
+		}
+	}
+
+	console.log("max", nr_max)
+	return recursive(this)
+}
 class PointReq {
 	static build(requests, specs){
+		requests = requests.map(each => {
+			each.date = new Date(each.date)
+			return each
+		}).sort((a, b) => {
+			if(a.date.getTime() < b.date.getTime()){
+				return -1
+			}else if(a.date.getTime() > b.date.getTime()){
+				return 1
+			}else{
+				return 0
+			}
+		})
 		let result = {}
 		switch (specs.subType) {
 			case 'high':
@@ -202,9 +253,7 @@ class Point {
 		specs.dates.start = start;
 		specs.dates.end = end;
 		if(Array.isArray(req)){
-			// TODO test case for this individually
-
-
+			// TODO return to struct two piles of entries within and outside dates
 			let choice = (key) => {
 				switch(key){
 					case 'spring':
@@ -239,10 +288,22 @@ class Point {
 						})
 						break
 					default:
-						return req.filter((e) => {
+						return req.filter(function(a){return a.date>=start&&a.date<=end});
+						/*
+						return req.divideConquerFilter((e) => {
 							e.date = new Date(e.date)
-							return (e.date > start) && (e.date < end)
+							//(e.date > start) && (e.date < end)
+							if(e.date >= start){
+								if(e.date <= end){
+									return 0
+								}else{
+									return 1
+								}
+							}else {
+								return -1
+							}
 						})
+						 */
 				}
 			}
 			return new Point(specs, choice(specs.keys[0]), this.full)
@@ -414,7 +475,6 @@ class Point {
 				case 'rain':
 					return result.reduce((a,b) => a + b)
 				case 'last':
-
 					return this.getY(this.req[this.req.length - 1])
 				case 'first':
 					return this.getY(this.req[0]);

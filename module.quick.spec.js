@@ -590,7 +590,7 @@ describe(
                         let params = ['temperature', 'weekly', 'growingSeason', 'shortValues', 1]
                         let config = Object.assign(configs['latest'], specs)
                         return parser.getByParams(config, params).then(values => {
-                            //console.log('values', values)
+                            console.log('values', values)
                             return assert.equal(values.y, 22)
                         })
                     })
