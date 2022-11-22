@@ -187,7 +187,7 @@ class Point {
 			default:
 		}
 		return curl.proxRequest(specs, full).then(res => {
-			if (res.length < 1) return new Error('empty result', specs)
+			if (res.length < 1) return new Point(specs, res, full)
 
 			if (!full) res = res.reduce((a, b) => Object.assign(a, b))
 			return new Point(specs, res, full);
@@ -247,6 +247,7 @@ class Point {
 		}
 	}
 	'dateSlice' (start, end) {
+		//console.log('dateSlice', start, end, this.req.length)
 		//let req = this.req;
 		let specs = JSON.parse(JSON.stringify(this.specs));
 		specs.keys.shift()
@@ -428,6 +429,8 @@ class Point {
 					return req[`avg_${this.type}`].difference
 				}
 				return req[`${this.specs.parentType}_${this.type}`].difference
+			case 'growingSeason':
+				return Number(req[`${this.specs.parentType}_${this.type}`])
 			case 'snow':
 			case 'rain':
 				y = req[`${this.subType}${this.type}`]
@@ -482,6 +485,8 @@ class Point {
 					return this.difference
 				case 'breakfreeze':
 					return result[0]
+				case 'growingSeason':
+					return result.reduce((a,b) => a + b)/this.req.length
 				case 'high':
 				case 'low':
 					return result.length

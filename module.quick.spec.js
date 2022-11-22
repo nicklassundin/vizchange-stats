@@ -455,8 +455,8 @@ describe(
                         let params = ['icetime', 'yrlyFull', 'shortValues', 60];
                         let config = Object.assign(configs['live'], icetime_specs)
                         return parser.getByParams(config, params).then(values => {
-                            //console.log(values)
-                            return assert.ok(Math.abs(values.y - 170) < 0.1)
+                            console.log(values)
+                            return assert.ok(Math.abs(values.y - 167.5) < 0.5)
                         })
                     })
                 })
@@ -482,8 +482,8 @@ describe(
                         let params = ['temperature', 'yrly', 'min', 'low', -10, 'shortValues', 11]
                         let config = Object.assign(configs['liveHalf'], specs)
                         return parser.getByParams(config, params).then(values => {
-                            //console.log(values)
-                            return assert.equal(values.y, 100)
+                            console.log(values)
+                            return assert.equal(values.y, 101)
                         })
                     })
                 })
@@ -898,8 +898,8 @@ describe(
                 let params = ['precipitation', 'yrly', 'snow', 'shortValues', 0]
                 //let config = Object.assign(configs['latest'], precipitation_specs)
                 return parser.getByParams(config, params).then(values => {
-                    //console.log('values', values)
-                    return assert.ok(Math.abs(values.y - 92.2) < 0.1)
+                    console.log('values', values)
+                    return assert.ok(Math.abs(values.y - 93.8) < 0.1)
                 })
             })
         })

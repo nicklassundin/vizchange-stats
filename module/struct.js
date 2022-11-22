@@ -294,9 +294,16 @@ module.exports = class Struct {
         }
         let result = Struct.build(specs, k, type, f, this.full, this.parentType);
         if(this.full){
-            result.entry = this.entry.then(entry => {
-                return entry.dateSlice(result.specs.dates.start, result.specs.dates.end)
-            })
+            switch(key) {
+                case 'year':
+                    break;
+                default:
+                    result.entry = this.entry.then(entry => {
+                        //console.log('key', key, entry instanceof Point);
+                        if(!(entry instanceof Point)) console.log('entry', entry)
+                        return entry.dateSlice(result.specs.dates.start, result.specs.dates.end)
+                    })
+            }
         }
         return result
     }
@@ -310,7 +317,6 @@ module.exports = class Struct {
                 break;
             default:
         }
-        let parentType = this.specs.parentType;
         if(genSpecs.keys[0] === undefined){
             this.VALUES = this.entry;
         }else if(Object.keys(this.VALUES).length === 0) {
@@ -480,6 +486,7 @@ module.exports = class Struct {
         //return this.TYPE("difference", this.f)
     }
     get "growingSeason" () {
+        return this.TYPE('growingSeason', undefined, true)
         let specs = JSON.parse(JSON.stringify(this.specs));
         return Promise.all(this.values).then(values => {
             return {
@@ -571,7 +578,6 @@ module.exports = class Struct {
                 return this.values.reverse().map((value, index) => {
                     let i = index % qLength;
                     val[i] = val[i].then(() => {
-                        //return new Promise((res) => setTimeout(() => res(value.short), Math.floor(Math.random() * 200)));
                         return new Promise((res) => res(value.short));
                     })
                     return val[i].then()
@@ -583,54 +589,26 @@ module.exports = class Struct {
         // DEPRECATED TODO: Remove
         return this.shortValues.map(each => each.then(vals => vals.y))
     }
-    get "short" () {
+    get 'short' () {
         if (this.typeMeta !== undefined) return this.typeMeta
-
-        return this.entry.then(entry => {
-            try {
-
-                // console.log(entry.x, entry.specs.dates)
-                return entry.short
-            }catch(error) {
-                //console.log(entry)
-                throw error
-            }
-        })
-        /*
-        return this.y.then(y => {
-            return {
-                compressed: true,
-                y: y,
-                x: this.x,
-                colors: {
-                    red: ColorToHex(255, 55 + Math.floor(y * 200 / (this.y - y)), 0),
-                    blue: ColorToHex(55 + Math.floor(y * 200 / (this.y - y)), 255, 0)
-                },
-                type: this.type,
-                xInterval: this.xInterval,
-                typeMeta: this.typeMeta,
-                date: (this.values.length === 1 ? this.values[0].short.date : null),
-            }
-        })
-        /*
-    }
-    get "occurrence" () {
-
-        /*
-        let high = {
-            '20': this.sequence((e) => e.y > 20),
-            '25': this.sequence((e) => e.y > 25),
-            '30': this.sequence( (e) => e.y > 30),
-            '33': this.sequence((e) => e.y > 33)
+        switch(this.type){
+            case 'growingSeason':
+                if(this.specs.keys[0] === 'year'){
+                    return this.sequence()
+                }
+            default:
+                return this.entry.then(entry => {
+                    try {
+                        // console.log(entry.x, entry.specs.dates)
+                        return entry.short
+                    }catch(error) {
+                        //console.log(entry)
+                        throw error
+                    }
+                })
         }
-        let low = this.TYPE('low', (e) => e.y < val)
-        return {
-            high,
-            low
-        }
-         */
     }
-    "sequence" (f = (e) => e > 0) {
+    'sequence' (f = (e) => e > 0) {
        // console.log(this.x, this.shortValues)
         return Promise.all(this.shortValues).then((values => {
             //console.log("sequence", values.length, this.specs.keys, this.specs.dates)
