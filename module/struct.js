@@ -243,7 +243,10 @@ module.exports = class Struct {
      get "point" (){
 		return this.POINT[0]
 	}*/
-    'getValues' (genSpecs, key, k, type, f, full) {
+    'getValues' (genSpecs, k) {
+        let f = this.f;
+        let key = genSpecs.keys[0]
+        let type = this.type
         let specs = JSON.parse(JSON.stringify(genSpecs))
         specs.x = k;
         switch (key) {
@@ -290,7 +293,7 @@ module.exports = class Struct {
                 specs.dates.end = k;
         }
         let result = Struct.build(specs, k, type, f, this.full, this.parentType);
-        if(full){
+        if(this.full){
             result.entry = this.entry.then(entry => {
                 return entry.dateSlice(result.specs.dates.start, result.specs.dates.end)
             })
@@ -300,9 +303,6 @@ module.exports = class Struct {
     get 'values' () {
         let genSpecs = JSON.parse(JSON.stringify(this.specs));
         genSpecs.keys.shift();
-        let type = this.type;
-        let f = this.f;
-        let full = this.full;
         switch (this.specs.keys[0]) {
             case 'yrly':
                 // TODO possible solution when queue is working
@@ -316,10 +316,8 @@ module.exports = class Struct {
         }else if(Object.keys(this.VALUES).length === 0) {
             let keys = (new Point(genSpecs))[`${genSpecs.keys[0]}s`]
             this.VALUES = {}
-            //console.log("get values", keys.length, genSpecs.keys, genSpecs.dates)
-            //console.log(`${genSpecs.keys[0]}s`, keys)
             for(let i = 0; i < keys.length; i++) {
-                this.VALUES[keys[i]] = this.getValues(genSpecs, genSpecs.keys[0], keys[i], type, f, full, parentType)
+                this.VALUES[keys[i]] = this.getValues(genSpecs, keys[i])
             }
         }
         return Object.values(this.VALUES);

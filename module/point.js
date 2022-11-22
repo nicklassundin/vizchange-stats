@@ -247,12 +247,12 @@ class Point {
 		}
 	}
 	'dateSlice' (start, end) {
-		let req = this.req;
+		//let req = this.req;
 		let specs = JSON.parse(JSON.stringify(this.specs));
 		specs.keys.shift()
 		specs.dates.start = start;
 		specs.dates.end = end;
-		if(Array.isArray(req)){
+		if(Array.isArray(this.req)){
 			// TODO return to struct two piles of entries within and outside dates
 			let choice = (key) => {
 				switch(key){
@@ -260,19 +260,19 @@ class Point {
 					case 'summer':
 					case 'winter':
 					case 'autumn':
-						return req.filter((e) => {
+						return this.req.filter((e) => {
 							e.date = new Date(e.date)
 							let season = help.getSeasonByIndex(e.date.getMonth())
 							return season === specs.keys[0]
 						})
 						break;
 					case 'weeks':
-						return req.filter((e) => {
+						return this.req.filter((e) => {
 							return e.date.getWeekNumber()
 						})
 						break;
 					case 'splitMonth':
-						return req.filter((e) => {
+						return this.req.filter((e) => {
 							e.date = new Date(e.date)
 							let month = e.date.getMonth()
 							/*
@@ -288,7 +288,7 @@ class Point {
 						})
 						break
 					default:
-						return req.filter(function(a){return a.date>=start&&a.date<=end});
+						return this.req.filter(function(a){return a.date>=start&&a.date<=end});
 						/*
 						return req.divideConquerFilter((e) => {
 							e.date = new Date(e.date)
