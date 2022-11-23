@@ -34,6 +34,8 @@ function getDateOfWeek(w, y) {
 
 module.exports = class Struct {
     static build(seedSpecs, x, type, f = () => true, full = false, parentType, parentEntry) {
+        //console.log(seedSpecs.keys[0], seedSpecs.dates)
+
         switch (seedSpecs.type) {
             case 'freezeup':
             case 'breakup':
@@ -82,6 +84,7 @@ module.exports = class Struct {
             case 'oct':
             case 'nov':
             case 'dec':
+                specs.dates.type = 'month'
                 y2 = 1;
                 m1 = help.months().indexOf(specs.keys[0]);
                 m2 = m1+1;
@@ -152,7 +155,6 @@ module.exports = class Struct {
             specs.dates.start = new Date(specs.dates.start + y1, m1, 1)
             specs.dates.end = new Date(specs.dates.end + y2, m2, d2)
         }
-        //console.log(specs.keys[0], specs.dates)
         return new Struct(parentEntry, specs, x, type, f, full, parentType)
     }
     constructor(values = undefined, specs, x = undefined, type = "avg", f, full = false, parentType ) {
@@ -268,6 +270,7 @@ module.exports = class Struct {
                 let start = new Date(specs.dates.start);
                 let end = new Date(specs.dates.end)
                 switch (specs.dates.type) {
+                    case 'month':
                     case 'spring':
                     case 'autumn':
                     case 'summer':
@@ -456,13 +459,10 @@ module.exports = class Struct {
             let length = values.length;
             //console.log(values)
             let value = values.reduce((a, b) => {
-                //console.log(a.y)
                 a.y = (a.y + b.y)
-                //console.log(a.y)
                 return a
             })
             value.y = value.y/length;
-            //console.log(this.specs)
             global[this.specs.type] = {
                 baseline: value.y
             }
@@ -474,11 +474,8 @@ module.exports = class Struct {
             return this.shortValues.map(value => {
                 return value.then(value => {
                     if(value === undefined) return undefined
-                 //   console.log(`----- ${value.x} ------`)
-                  //  console.log("values:", value.y)
                     value.y -= baseline;
                     value.baseline = baseline;
-                  //  console.log("diff:", value.y)
                     return value
                 })
             })

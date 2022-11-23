@@ -160,6 +160,14 @@ describe(
                             return assert.equal(values.x, 2020)
                         })
                     })
+                    it('snow', () => {
+                        let params = ['precipitation', 'feb', 'rain', 'shortValues', 1]
+                        let config = Object.assign(configs['latest'], precipitation_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values)
+                            return assert.equal(values.y, 2.5)
+                        })
+                    })
                 })
             })
             it('y', () => {
