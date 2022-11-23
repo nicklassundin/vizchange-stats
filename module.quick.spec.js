@@ -313,7 +313,39 @@ describe(
                             return parser.getByParams(config2, params2).then(values => {
                                 return snow.then(value1 => {
                                     return rain.then(value2 => {
-                                        console.log(values, value1+value2)
+                                        console.log(values - (value1+value2))
+                                        console.log('snow:', value1)
+                                        console.log('rain:', value2)
+                                        assert.ok(Math.abs(values - (value1+value2)) < 100)
+                                    })
+                                })
+                            })
+                        })
+                        it('Check snow and rain', () => {
+                            let config = Object.assign(configs['latest'], precipitation_specs)
+                            let params = ['precipitation', 'yrly', 'rain', 'shortValues']
+
+                            let rain = parser.getByParams(config, params).then(values => {
+                                return values
+                            })
+
+                            let params1 = ['precipitation', 'yrly', 'snow', 'shortValues']
+                            let config1 = Object.assign(configs['latest'], precipitation_specs)
+                            let snow = parser.getByParams(config1, params1).then(values => {
+                                return values
+                            })
+                            let params2 = ['precipitation', 'yrly', 'y']
+                            let config2 = Object.assign(configs['latest'], precipitation_specs)
+                            return parser.getByParams(config2, params2).then(values => {
+                                return snow.then(val1 => Promise.all(val1)).then(value1 => {
+                                    value1 = value1.map(value => value.y).filter((e) => !isNaN(e)).reduce((a, b) => a + b)
+                                    return rain.then(val2 => Promise.all(val2)).then(value2 => {
+                                        value2 = value2.map(value => value.y).filter((e) => !isNaN(e)).reduce((a, b) => a + b)
+                                        /*
+                                        console.log(values - (value1+value2))
+                                        console.log('snow:', value1)
+                                        console.log('rain:', value2)
+                                         */
                                         assert.ok(Math.abs(values - (value1+value2)) < 100)
                                     })
                                 })
@@ -955,7 +987,7 @@ describe(
                         return Promise.all([values[35], values[40], values[70]]).then(values => {
                             let endTime = (new Date()).getTime();
                             //console.log(endTime - startTime)
-                            return assert.ok( endTime - startTime < 25000)
+                            return assert.ok( endTime - startTime < 30000)
                         })
                     })
                 })
@@ -966,7 +998,7 @@ describe(
                     return parser.getByParams(config, params).then(values => {
                         return Promise.all([values[35], values[40], values[70]]).then(values => {
                             let endTime = (new Date()).getTime();
-                            return assert.ok( endTime - startTime < 25000)
+                            return assert.ok( endTime - startTime < 30000)
                         })
                     })
                 })
@@ -977,7 +1009,7 @@ describe(
                     return parser.getByParams(config, params).then(values => {
                         return Promise.all([values[35], values[40], values[70]]).then(values => {
                             let endTime = (new Date()).getTime();
-                            return assert.ok( endTime - startTime < 25000)
+                            return assert.ok( endTime - startTime < 30000)
                         })
                     })
                 })
@@ -999,7 +1031,7 @@ describe(
                         const startTime = (new Date()).getTime();
                         return Promise.all([values[35], values[40], values[70]]).then(values => {
                             let endTime = (new Date()).getTime();
-                            return assert.ok( endTime - startTime < 25000)
+                            return assert.ok( endTime - startTime < 30000)
                         })
                     })
                 })
