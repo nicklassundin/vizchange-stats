@@ -91,19 +91,19 @@ class PointReq {
 					}
 				})
 				break
+			/*
 			case 'maxAvg':
 				// TODO sort out this so it takes averages of daily weekly etc
 				requests.forEach(req => {
 					let date = new Date(req.date)
 					let key = `${date.getFullYear()}${help.dayOfYear(date)}${req.position}`
-					if(typeof result[key] !== 'object'){
-						result[key] = req
+					if(result[key] === undefined){
+						result[key][`${specs.subType}_${specs.type}`] = []
 						result[key][`${specs.subType}_${specs.type}`] = [req[`${specs.parentType}_${specs.type}`]]
-					}else{
-						//req[`${specs.parentType}_${specs.type}`] > result[key][`${specs.parentType}_${specs.type}`]
-						result[key][`${specs.subType}_${specs.type}`].push(req[`${specs.parentType}_${specs.type}`])
 					}
+					result[key][`${specs.subType}_${specs.type}`].push(req[`${specs.parentType}_${specs.type}`])
 				})
+*/
 				break;
 			default:
 				requests.forEach(req => {
@@ -246,6 +246,58 @@ class Point {
 				return this.x;
 		}
 	}
+	choice(key, start, end) {
+		switch(key){
+			case 'spring':
+			case 'summer':
+			case 'winter':
+			case 'autumn':
+				return this.req.filter((e) => {
+					e.date = new Date(e.date)
+					let season = help.getSeasonByIndex(e.date.getMonth())
+					return season === specs.keys[0]
+				})
+				break;
+			case 'weeks':
+				return this.req.filter((e) => {
+					return e.date.getWeekNumber()
+				})
+				break;
+			case 'splitMonth':
+				return this.req.filter((e) => {
+					e.date = new Date(e.date)
+					let month = e.date.getMonth()
+					/*
+                    if((month >= start.getMonth()) && (month < end.getMonth())){
+                        console.log('-----', (month >= start.getMonth()) && (month < end.getMonth()))
+                        console.log(month, start.getMonth(), month >= start.getMonth())
+                        console.log(month, end.getMonth(), month < end.getMonth())
+                    }
+                    */
+					//console.log(e.date, start, end)
+					//console.log(month, start.getMonth(), end.getMonth())
+					return (month >= start.getMonth()) && (month <= end.getMonth())
+				})
+				break
+			default:
+				return this.req.filter(function(a){return a.date>=start&&a.date<=end});
+			/*
+            return req.divideConquerFilter((e) => {
+                e.date = new Date(e.date)
+                //(e.date > start) && (e.date < end)
+                if(e.date >= start){
+                    if(e.date <= end){
+                        return 0
+                    }else{
+                        return 1
+                    }
+                }else {
+                    return -1
+                }
+            })
+             */
+		}
+	}
 	'dateSlice' (start, end) {
 		//console.log('dateSlice', start, end, this.req.length)
 		//let req = this.req;
@@ -255,59 +307,7 @@ class Point {
 		specs.dates.end = end;
 		if(Array.isArray(this.req)){
 			// TODO return to struct two piles of entries within and outside dates
-			let choice = (key) => {
-				switch(key){
-					case 'spring':
-					case 'summer':
-					case 'winter':
-					case 'autumn':
-						return this.req.filter((e) => {
-							e.date = new Date(e.date)
-							let season = help.getSeasonByIndex(e.date.getMonth())
-							return season === specs.keys[0]
-						})
-						break;
-					case 'weeks':
-						return this.req.filter((e) => {
-							return e.date.getWeekNumber()
-						})
-						break;
-					case 'splitMonth':
-						return this.req.filter((e) => {
-							e.date = new Date(e.date)
-							let month = e.date.getMonth()
-							/*
-                            if((month >= start.getMonth()) && (month < end.getMonth())){
-                                console.log('-----', (month >= start.getMonth()) && (month < end.getMonth()))
-                                console.log(month, start.getMonth(), month >= start.getMonth())
-                                console.log(month, end.getMonth(), month < end.getMonth())
-                            }
-                            */
-							//console.log(e.date, start, end)
-							//console.log(month, start.getMonth(), end.getMonth())
-							return (month >= start.getMonth()) && (month <= end.getMonth())
-						})
-						break
-					default:
-						return this.req.filter(function(a){return a.date>=start&&a.date<=end});
-						/*
-						return req.divideConquerFilter((e) => {
-							e.date = new Date(e.date)
-							//(e.date > start) && (e.date < end)
-							if(e.date >= start){
-								if(e.date <= end){
-									return 0
-								}else{
-									return 1
-								}
-							}else {
-								return -1
-							}
-						})
-						 */
-				}
-			}
-			return new Point(specs, choice(specs.keys[0]), this.full)
+			return new Point(specs, this.choice(specs.keys[0], start, end), this.full)
 		}else{
 			if((this.specs.dates.start > start) && (this.specs.dates.end < end)){
 				return this

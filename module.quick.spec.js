@@ -221,12 +221,38 @@ describe(
                 })
             })
             describe('type', function() {
+                describe.skip('extreme events', function() {
+                    it('daily', () => {
+                        let params = ['temperature', 'yrly', 'maxAvg', 'shortValues', 1]
+                        let config = Object.assign(configs['latest'], specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values.y)
+                            return assert.ok(Math.abs(values.y - -4.2) < 0.01)
+                        })
+                    })
+                    it('weekly', () => {
+                        let params = ['temperature', 'weekly', 'maxAvg', 'shortValues', 1]
+                        let config = Object.assign(configs['latest'], specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values.y)
+                            return assert.ok(Math.abs(values.y - -4.2) < 0.01)
+                        })
+                    })
+                    it('monthly', () => {
+                        let params = ['temperature', 'months', 'maxAvg', 'shortValues', 1]
+                        let config = Object.assign(configs['latest'], specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values.y)
+                            return assert.ok(Math.abs(values.y - -4.2) < 0.01)
+                        })
+                    })
+                })
                 describe('temperature', function() {
                     it.skip('last entry', () => {
                         let params = ['temperature', 'yrly', 'max', 'values', 111, 'entry', 'req']
                         let config = Object.assign(configs['live'], specs)
                         return parser.getByParams(config, params).then(values => {
-                            console.log(values)
+                           // console.log(values)
                             return assert.ok(Math.abs(values.y - -4.2) < 0.01)
                         })
                     })

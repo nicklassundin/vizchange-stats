@@ -66,7 +66,6 @@ module.exports = class Struct {
                 y2 = 2;
                 break;
             case 'week':
-                //console.log(specs)
                 d2 = 0;
                 y2 = 2;
                 specs.dates.start = getDateOfWeek(specs.x, (new Date(specs.dates.start)).getFullYear())
@@ -505,7 +504,7 @@ module.exports = class Struct {
             }
         })
     }
-    "AVGTYPE"(type, f) {
+    'AVGTYPE'(type, f) {
         return this.entry.then((entry) => {
             let seed = entry.getSeed();
             seed.specs.subType = type;
