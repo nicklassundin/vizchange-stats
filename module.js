@@ -38,7 +38,6 @@ module.exports = {
 		return this.recursive(params, this[params[0]](specs).then(result => result.request(params[1])))
 	},
 	getByParamsPreCalculated: function (specs, params){
-		console.log('url', `${specs.url}/precalculated/${specs.station}/${specs.type}/${params.join('/')}`)
 		return axios.get(`${specs.url}/precalculated/${specs.station}/${specs.type}/${params.join('/')}`)
 	},
 	"recursive": function(params, data, index = 2){
