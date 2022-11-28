@@ -110,6 +110,17 @@
 		},
 		"url": "http://vizchange.hopto.org"
 	},
+	"production_precalc_short": {
+		"baseline": {
+			"start": 1970,
+			"end": 1980
+		},
+		"dates": {
+			"start": 1960,
+			"end": 1990
+		},
+		"url": "http://vizchange.hopto.org"
+	},
 	"productionRedirect": {
 		"baseline": {
 			"start": 1961,

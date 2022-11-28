@@ -976,7 +976,7 @@ describe(
             describe.skip('precalculated' , function() {
                 it.skip('precalculatede', () => {
                     let params = ['temperature', 'yrly', 'shortValues']
-                    let config = Object.assign(configs['production_precalc'], specs)
+                    let config = Object.assign(configs['production_precalc_short'], specs)
                     const startTime = (new Date()).getTime();
                     return parser.getByParamsPreCalculated(config, params).then(values => {
                         values = values.data
