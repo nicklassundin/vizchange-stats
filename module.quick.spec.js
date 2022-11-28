@@ -1,5 +1,7 @@
 const parser = require('./module.js')
 const fs = require('fs');
+
+
 global.climateplots = {
     dev: true
 }
@@ -76,7 +78,8 @@ let configs = require('./config.json')
 let cache = {}
 
 const assert = require('assert');
-const help = require("climate-plots-helper");
+
+
 describe(
     'Requests',
     function () {
@@ -970,6 +973,19 @@ describe(
             })
         })
         describe('speed tests', function() {
+            describe('precalculated' , function() {
+                it('precalculatede', () => {
+                    let params = ['temperature', 'yrly', 'shortValues']
+                    let config = Object.assign(configs['production_precalc'], specs)
+                    const startTime = (new Date()).getTime();
+                    return parser.getByParamsPreCalculated(config, params).then(values => {
+                        return Promise.all([values[35], values[40], values[70]]).then(values => {
+                            let endTime = (new Date()).getTime();
+                            return assert.ok( endTime - startTime < 30000)
+                        })
+                    })
+                })
+            })
             it.skip('difference', () => {
                 let params = ['temperature', 'yrly', 'difference', 11]
                 let config = Object.assign(configs['live'], specs)
