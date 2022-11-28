@@ -1,7 +1,7 @@
 require('./point.js')
 
 describe('Point', function () {
-    it.only('should', function () {
+    it('should', function () {
         // TODO
     })
 })
