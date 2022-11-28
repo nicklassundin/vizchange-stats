@@ -834,7 +834,7 @@ describe(
                         return assert.equal(values, 18.1)
                     })
                 })
-                it.only('sum', () => {
+                it('sum', () => {
                     let params = ['temperature', 'yrly', 'values', 1, 'sum', 'y']
                     let config = Object.assign(configs['latest'], specs)
                     return parser.getByParams(config, params).then(values => {
@@ -891,7 +891,7 @@ describe(
                      */
                 })
             })
-            it.only('difference', () => {
+            it('difference', () => {
                 let params = ['temperature', 'yrly', 'difference', 3]
                 let config = Object.assign(configs['live'], specs)
                 return parser.getByParams(config, params).then(values => {
