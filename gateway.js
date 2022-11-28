@@ -51,7 +51,6 @@ let getSmhiStation = async function(id){
 
 			res.on("data", (chunk) => {
 				body += chunk;
-
 			});
 
 			res.on("end", () => {

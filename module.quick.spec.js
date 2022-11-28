@@ -974,14 +974,15 @@ describe(
         })
         describe('speed tests', function() {
             describe('precalculated' , function() {
-                it.skip('precalculatede', () => {
+                it.only('precalculatede', () => {
                     let params = ['temperature', 'yrly', 'shortValues']
                     let config = Object.assign(configs['production_precalc'], specs)
                     const startTime = (new Date()).getTime();
                     return parser.getByParamsPreCalculated(config, params).then(values => {
+                        values = values.data
                         return Promise.all([values[35], values[40], values[70]]).then(values => {
                             let endTime = (new Date()).getTime();
-                            return assert.ok( endTime - startTime < 30000)
+                            return assert.ok( endTime - startTime < 150)
                         })
                     })
                 })
