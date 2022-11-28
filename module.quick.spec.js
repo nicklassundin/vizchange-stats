@@ -973,8 +973,8 @@ describe(
             })
         })
         describe('speed tests', function() {
-            describe('precalculated' , function() {
-                it.only('precalculatede', () => {
+            describe.skip('precalculated' , function() {
+                it.skip('precalculatede', () => {
                     let params = ['temperature', 'yrly', 'shortValues']
                     let config = Object.assign(configs['production_precalc'], specs)
                     const startTime = (new Date()).getTime();
