@@ -871,11 +871,11 @@ describe(
                     })
                 })
                 describe('baseline', function () {
-                    it('value', () => {
-                        let params = ['temperature', 'yrly', 'baseline']
+                    it.only('value', () => {
+                        let params = ['temperature', 'yrly', 'baseline', 'y']
                         let config = Object.assign(configs['live'], specs)
                         return parser.getByParams(config, params).then(values => {
-                            //console.log(values)
+                            console.log(values)
                             //return assert.ok( Math.abs(values - (-0.7873900649056548)) < 0.01)
                             // TODO difference between estimated from server and client side
                             //return assert.ok( Math.abs(values - (-0.8067076562515705)) < 0.01)
