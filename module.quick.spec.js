@@ -250,7 +250,30 @@ describe(
                         })
                     })
                 })
+                describe.only('baseline', () => {
+                    it('temperature', () => {
+                        let params = ['temperature', 'yrly', 'baseline']
+                        let config = Object.assign(configs['live'], specs)
+                        return parser.getByParams(config, params).then(values => {
+                            return values.y.then(y => {
+                                console.log('values', y)
+                                return assert.ok(Math.abs(y - -0.7103919643531532) < 0.001)
+                            })
+                        })
+                    })
+                    it('precipitation', () => {
+                        let params = ['precipitation', 'yrly', 'baseline']
+                        let config = Object.assign(configs['live'], precipitation_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            return values.y.then(y => {
+                                console.log('values', y)
+                                return assert.ok(Math.abs(y - 301.22666667) < 0.001)
+                            })
+                        })
+                    })
+                })
                 describe('temperature', function() {
+
                     it.skip('last entry', () => {
                         let params = ['temperature', 'yrly', 'max', 'values', 111, 'entry', 'req']
                         let config = Object.assign(configs['live'], specs)
@@ -909,8 +932,7 @@ describe(
                 let params = ['temperature', 'yrly', 'difference', 3]
                 let config = Object.assign(configs['live'], specs)
                 return parser.getByParams(config, params).then(values => {
-                    //console.log(values)
-                    return assert.ok(Math.abs(values.y - (-0.2276794878302656)) < 0.0001)
+                    return assert.ok(Math.abs(values.y - (-0.2276794878302656)) < 0.001)
                 })
             })
             /*

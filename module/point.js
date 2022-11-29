@@ -476,7 +476,13 @@ class Point {
 			if(result.length === 0) return NaN
 			switch(this.SUBTYPE){
 				case 'sum':
-					return result.reduce((a,b) => a + b)
+					switch (this.specs.keys[0]) {
+						case 'yrly':
+							return result.reduce((a,b) => a + b)/this.years.length
+						default:
+							return result.reduce((a,b) => a + b)
+					}
+
 				case 'avg':
 					return result.reduce((a,b) => a + b)/this.req.length
 				case 'min':
