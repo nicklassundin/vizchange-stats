@@ -477,50 +477,12 @@ module.exports = class Struct {
             default:
         }
         return baseline
-        // TODO remove embededed promises
-        /*
-        let genSpecs = JSON.parse(JSON.stringify(this.specs));let genSpecs = JSON.parse(JSON.stringify(this.specs));
-        genSpecs.dates.start = (new Date(genSpecs.dates.start))
-        genSpecs.dates.start = new Date(genSpecs.baseline.start, genSpecs.dates.start.getMonth(), genSpecs.dates.start.getDate())
-        genSpecs.dates.end = (new Date(genSpecs.dates.end))
-        genSpecs.dates.end = new Date(genSpecs.baseline.end, genSpecs.dates.end.getMonth(), genSpecs.dates.end.getDate())
-
-        genSpecs.dates.start = (new Date(genSpecs.dates.start))
-        genSpecs.dates.start = new Date(genSpecs.baseline.start, genSpecs.dates.start.getMonth(), genSpecs.dates.start.getDate())
-        genSpecs.dates.end = (new Date(genSpecs.dates.end))
-        genSpecs.dates.end = new Date(genSpecs.baseline.end, genSpecs.dates.end.getMonth(), genSpecs.dates.end.getDate())
-        genSpecs.keys.shift()
-        let keys = (new Point(genSpecs))[`${genSpecs.keys[0]}s`]
-        let values = {}
-        this.values // initiate values if not done so
-
-        for(let i = 0; i < keys.length; i++) {
-            //console.log(keys[i], this.VALUES[keys[i]])
-            values[keys[i]] = this.VALUES[keys[i]].short
-            //this.BASELINE[keys[i]] = this.getValues(genSpecs, genSpecs.keys[0], keys[i], type, f, full, parentType).short
-        }
-        return Promise.all(Object.values(values).map(value => value)).then(values => {
-            let length = values.length;
-            //console.log(values)
-            let value = values.reduce((a, b) => {
-                a.y = (a.y + b.y)
-                return a
-            })
-            value.y = value.y/length;
-            global[this.specs.type] = {
-                baseline: value.y
-            }
-            return value
-        }).then(value => value.y)
-
-         */
     }
     get 'difference' () {
         switch (this.type) {
             case 'first':
             case 'last':
                 return this.shortValues.map(each => {
-                    console.log(each)
                     return each
                 })
                 break;
