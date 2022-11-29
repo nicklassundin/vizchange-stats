@@ -500,7 +500,7 @@ class Point {
 							return result.reduce((a,b) => a + b)
 					}
 				case 'avg':
-					return result.reduce((a,b) => a + b)/this.req.length
+					return result.reduce((a,b) => a + b)/result.length
 				case 'min':
 				case 'max':
 					return Math[this.SUBTYPE](...result)
