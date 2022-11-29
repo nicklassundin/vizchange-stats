@@ -418,6 +418,11 @@ class Point {
 	'getY'(req = this.req){
 		let y = req[`${this.type}`]
 		let date = new Date(req[this.type]);
+		switch (this.specs.dates.type) {
+			case 'month':
+				if(help.monthByIndex(req.date.getMonth()) !== this.specs.keys[0]) return undefined
+			default:
+		}
 		switch (this.SUBTYPE){
 			case 'breakfreeze':
 				y = help.dayOfYear(date)
@@ -477,12 +482,23 @@ class Point {
 			switch(this.SUBTYPE){
 				case 'sum':
 					switch (this.specs.keys[0]) {
+						case 'jan':
+						case 'feb':
+						case 'mar':
+						case 'apr':
+						case 'may':
+						case 'jun':
+						case 'jul':
+						case 'aug':
+						case 'sep':
+						case 'oct':
+						case 'nov':
+						case 'dec':
 						case 'yrly':
 							return result.reduce((a,b) => a + b)/this.years.length
 						default:
 							return result.reduce((a,b) => a + b)
 					}
-
 				case 'avg':
 					return result.reduce((a,b) => a + b)/this.req.length
 				case 'min':

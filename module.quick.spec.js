@@ -251,6 +251,17 @@ describe(
                     })
                 })
                 describe('baseline', () => {
+                    it.only('monthly', () => {
+                        let params = ['precipitation', 'jan', 'baseline']
+                        let config = Object.assign(configs['liveHalf'], precipitation_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            //console.log(values)
+                            return values.y.then(y => {
+                                console.log('values', y)
+                                return assert.ok(Math.abs(y - 25.17000000000003) < 0.01)
+                            })
+                        })
+                    })
                     it('temperature', () => {
                         let params = ['temperature', 'yrly', 'baseline']
                         let config = Object.assign(configs['live'], specs)
@@ -788,7 +799,7 @@ describe(
                             return assert.ok( Math.abs(values.y - 3) < 0.01)
                         })
                     })
-                    it.only('values - december', () => {
+                    it('values - december', () => {
                         let params = ['precipitation', 'dec', 'shortValues', 30 ]
                         let config = Object.assign(configs['liveHalf'], precipitation_specs)
                         return parser.getByParams(config, params).then(values => {
