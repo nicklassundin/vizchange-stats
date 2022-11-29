@@ -525,7 +525,6 @@ class Point {
 							value: (all[year][doy] ? all[year][doy].value : []).concat([entry.value]),
 							nr: (all[year][doy] ? all[year][doy].nr : 0) + 1,
 							y: (all[year][doy] ? all[year][doy].y : 0) + entry.y,
-							x: entry.x,
 							start: (all[year][doy] ? all[year][doy].start : entry.start),
 							end: entry.end
 						}
@@ -538,7 +537,6 @@ class Point {
 					Object.keys(result).forEach(key => {
 						result[key] = Object.values(result[key]).map(each => {
 							each.value = each.value.reduce((a, b) => a + b)/each.nr
-
 							let f = (e) => e > 0
 							each.y = f(each.value) ? 1 : 0;
 							return each
@@ -551,10 +549,19 @@ class Point {
 							all.push(current)
 							return all
 						}, [])
+						/*
+						if(Math.max(...result[key].map(e => e.y)) === 155){
+							result[key].forEach(each => {
+								console.log(each)
+							})
+						}
+
+						 */
 						result[key] = Math.max(...result[key].map(e => e.y));
 					})
 					////console.log(this.x)
-					return Object.values(result).reduce((a, b) => a + b)/Object.keys(result).length
+					result = Object.values(result).filter(each => each !== 0)
+					return result.reduce((a, b) => a + b)/result.length
 				//	return result.reduce((a,b) => a + b)/this.req.length
 				case 'high':
 				case 'low':
