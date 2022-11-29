@@ -83,8 +83,14 @@ module.exports = class Struct {
             case 'sep':
             case 'oct':
             case 'nov':
+                specs.dates.type = 'month'
+                y2 = 1;
+                m1 = help.months().indexOf(specs.keys[0]);
+                m2 = m1+1;
+                break;
             case 'dec':
                 specs.dates.type = 'month'
+                specs.dates.month = 'dec'
                 y2 = 1;
                 m1 = help.months().indexOf(specs.keys[0]);
                 m2 = m1+1;
@@ -157,7 +163,6 @@ module.exports = class Struct {
             specs.dates.start = new Date(specs.dates.start + y1, m1, 1)
             specs.dates.end = new Date(specs.dates.end + y2, m2, d2)
         }
-        //console.log('build.end', specs.dates)
         return new Struct(parentEntry, specs, x, type, f, full, parentType)
     }
     constructor(values = undefined, specs, x = undefined, type = "avg", f, full = false, parentType ) {
@@ -272,13 +277,19 @@ module.exports = class Struct {
             case "year":
                 let start = new Date(specs.dates.start);
                 let end = new Date(specs.dates.end)
+                let kn = k;
                 switch (specs.dates.type) {
                     case 'month':
+                        switch (specs.dates.month) {
+                            case 'dec':
+                                kn += 1;
+                            default:
+                        }
                     case 'spring':
                     case 'autumn':
                     case 'summer':
                         specs.dates.start = new Date(k, start.getMonth(),start.getDate());
-                        specs.dates.end = new Date(k, end.getMonth(), end.getDate());
+                        specs.dates.end = new Date(kn, end.getMonth(), end.getDate());
                         break;
                     case 'winter':
                         specs.dates.start = new Date(k, start.getMonth(),start.getDate());

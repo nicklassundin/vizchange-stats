@@ -250,7 +250,7 @@ describe(
                         })
                     })
                 })
-                describe.only('baseline', () => {
+                describe('baseline', () => {
                     it('temperature', () => {
                         let params = ['temperature', 'yrly', 'baseline']
                         let config = Object.assign(configs['live'], specs)
@@ -281,7 +281,7 @@ describe(
                             })
                         })
                     })
-                    it.only('growingSeason Days', () => {
+                    it('growingSeason Days', () => {
                         let params = ['temperature', 'yrly', 'growingSeason', 'baseline']
                         let config = Object.assign(configs['live'], specs)
                         return parser.getByParams(config, params).then(values => {
@@ -291,7 +291,7 @@ describe(
                             })
                         })
                     })
-                    it.only('growingSeason Weeks', () => {
+                    it('growingSeason Weeks', () => {
                         let params = ['temperature', 'weekly', 'growingSeason', 'baseline']
                         let config = Object.assign(configs['live'], specs)
                         return parser.getByParams(config, params).then(values => {
@@ -709,7 +709,7 @@ describe(
                             return assert.equal(values.y, 22)
                         })
                     })
-                    it.only('days', () => {
+                    it('days', () => {
                         let params = ['temperature', 'yrly', 'growingSeason', 'shortValues', 110]
                         let config = Object.assign(configs['live'], specs)
                         return parser.getByParams(config, params).then(values => {
@@ -776,8 +776,25 @@ describe(
                         let params = ['precipitation', 'jan', 'shortValues', 30 ]
                         let config = Object.assign(configs['liveHalf'], precipitation_specs)
                         return parser.getByParams(config, params).then(values => {
-                            //console.log(values)
+                            console.log(values)
                             return assert.ok( Math.abs(values.y - 5.9) < 0.01)
+                        })
+                    })
+                    it('values - november', () => {
+                        let params = ['precipitation', 'nov', 'shortValues', 30 ]
+                        let config = Object.assign(configs['liveHalf'], precipitation_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values)
+                            return assert.ok( Math.abs(values.y - 3) < 0.01)
+                        })
+                    })
+                    it.only('values - december', () => {
+                        let params = ['precipitation', 'dec', 'shortValues', 30 ]
+                        let config = Object.assign(configs['liveHalf'], precipitation_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values)
+                            // 1943 , 1943/1944
+                            return assert.ok( Math.abs(values.y - 26.9) < 0.01)
                         })
                     })
                 })
