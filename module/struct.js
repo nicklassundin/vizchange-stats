@@ -36,6 +36,7 @@ module.exports = class Struct {
     static build(seedSpecs, x, type, f = () => true, full = false, parentType, parentEntry) {
         //console.log(seedSpecs.keys[0], seedSpecs.dates)
 
+        //console.log('build.start', seedSpecs.dates)
         switch (seedSpecs.type) {
             case 'freezeup':
             case 'breakup':
@@ -150,10 +151,13 @@ module.exports = class Struct {
                     return new Struct(parentEntry, specs, x, type, f, full, parentType)
                 }
         }
+        // TODO sort out dates correctly with testing
+       // console.log(specs.dates)
         if (typeof specs.dates.start === 'number') {
             specs.dates.start = new Date(specs.dates.start + y1, m1, 1)
             specs.dates.end = new Date(specs.dates.end + y2, m2, d2)
         }
+        //console.log('build.end', specs.dates)
         return new Struct(parentEntry, specs, x, type, f, full, parentType)
     }
     constructor(values = undefined, specs, x = undefined, type = "avg", f, full = false, parentType ) {
@@ -441,12 +445,12 @@ module.exports = class Struct {
     get 'baseline'() {
         //static build(seedSpecs, x, type, f = () => true, full = false, parentType, parentEntry) {
         let genSpecs = JSON.parse(JSON.stringify(this.specs));
-        genSpecs.dates.start = (new Date(genSpecs.dates.start))
-        genSpecs.dates.start = new Date(genSpecs.baseline.start, genSpecs.dates.start.getMonth(), genSpecs.dates.start.getDate())
-        genSpecs.dates.end = (new Date(genSpecs.dates.end))
-        genSpecs.dates.end = new Date(genSpecs.baseline.end, genSpecs.dates.end.getMonth(), genSpecs.dates.end.getDate())
+        let start = (new Date(genSpecs.dates.start))
+        genSpecs.dates.start = new Date(genSpecs.baseline.start, start.getMonth(), start.getDate())
+        let end = (new Date(genSpecs.dates.end))
+        genSpecs.dates.end = new Date(genSpecs.baseline.end, end.getMonth(), end.getDate())
         let baseline = Struct.build(genSpecs, this.x, this.type, this.f, this.full, this.parentType);
-        return baseline.y
+        return baseline
         // TODO remove embededed promises
         /*
         let genSpecs = JSON.parse(JSON.stringify(this.specs));let genSpecs = JSON.parse(JSON.stringify(this.specs));
@@ -486,7 +490,7 @@ module.exports = class Struct {
          */
     }
     get 'difference' () {
-        return this.baseline.then(baseline => {
+        return this.baseline.y.then(baseline => {
             return this.shortValues.map(value => {
                 return value.then(value => {
                     if(value === undefined) return undefined
@@ -500,26 +504,6 @@ module.exports = class Struct {
     }
     get "growingSeason" () {
         return this.TYPE('growingSeason', undefined, true)
-        let specs = JSON.parse(JSON.stringify(this.specs));
-        return Promise.all(this.values).then(values => {
-            return {
-                shortValues: values.map((value) => {
-                    return value.sequence()
-                }),
-                specs,
-                get "difference" () {
-                    let start = this.specs.baseline.start;
-                    let end = this.specs.baseline.end;
-                    return Promise.all(this.shortValues).then(values => {
-                        let baseline = values.filter(value => (value.x >= start && value.x <= end)).map(each => each.y).reduce((a,b) => a + b)/(end - start)
-                        return values.map(each => {
-                            each.y -= baseline;
-                            return each
-                        })
-                    })
-                }
-            }
-        })
     }
     'AVGTYPE'(type, f) {
         return this.entry.then((entry) => {
@@ -605,10 +589,13 @@ module.exports = class Struct {
     get 'short' () {
         if (this.typeMeta !== undefined) return this.typeMeta
         switch(this.type){
+            /*
             case 'growingSeason':
                 if(this.specs.keys[0] === 'year'){
                     return this.sequence()
                 }
+
+             */
             default:
                 return this.entry.then(entry => {
                     try {

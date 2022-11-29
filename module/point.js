@@ -161,6 +161,9 @@ class PointReq {
 	get 'month' (){
 		return this.date.getMonth();
 	}
+	get 'week' (){
+		return this.date.getWeekNumber()
+	}
 	get 'season' () {
 		return help.getSeasonByIndex(this.month)
 	}
@@ -435,7 +438,11 @@ class Point {
 				}
 				return req[`${this.specs.parentType}_${this.type}`].difference
 			case 'growingSeason':
-				return Number(req[`${this.specs.parentType}_${this.type}`])
+				let res = {}
+				res.value = Number(req[`${this.specs.parentType}_${this.type}`])
+				res.start = req.date;
+				res.end = req.date;
+				return res
 			case 'snow':
 			case 'rain':
 				y = req[`${this.subType}${this.type}`]
@@ -465,7 +472,7 @@ class Point {
 		let result = NaN;
 		if(this.req.length === 0) return NaN
 		if(this.full){
-			result = this.req.map(each => this.getY(each)).filter(y => y !== undefined && !isNaN(y))
+			result = this.req.map(each => this.getY(each)).filter(y => (y !== undefined && !isNaN(y)) || (typeof y === 'object'))
 			if(result.length === 0) return NaN
 			switch(this.SUBTYPE){
 				case 'sum':
@@ -491,7 +498,58 @@ class Point {
 				case 'breakfreeze':
 					return result[0]
 				case 'growingSeason':
-					return result.reduce((a,b) => a + b)/this.req.length
+					result = result.filter(each => each.start !== undefined).sort((a, b) => (new Date(a)) < (new Date(b)))
+				//	console.log('first', result[0])
+				//	console.log('last', result[result.length - 1])Math.abs(current.start - current.end)/(1000*60*60*24);
+
+					let getKey = (entry) => {
+						switch (this.specs.keys[this.specs.keys.length - 1]) {
+							case 'DOY':
+								return `${help.dayOfYear(entry.start)}`
+							case 'week':
+								return `${entry.start.getWeekNumber()}`
+							default:
+						}
+					}
+					result = result.reduce((all, entry) => {
+						let doy = getKey(entry)
+						let year = entry.start.getFullYear();
+						if(all[year] === undefined) all[year] = {}
+						let curr = {
+							value: (all[year][doy] ? all[year][doy].value : []).concat([entry.value]),
+							nr: (all[year][doy] ? all[year][doy].nr : 0) + 1,
+							y: (all[year][doy] ? all[year][doy].y : 0) + entry.y,
+							x: entry.x,
+							start: (all[year][doy] ? all[year][doy].start : entry.start),
+							end: entry.end
+						}
+						all[year][doy] = curr;
+						return {
+							...all,
+							//[doy]: curr,
+						};
+					}, {});
+					Object.keys(result).forEach(key => {
+						result[key] = Object.values(result[key]).map(each => {
+							each.value = each.value.reduce((a, b) => a + b)/each.nr
+
+							let f = (e) => e > 0
+							each.y = f(each.value) ? 1 : 0;
+							return each
+						}).reduce((all, current) => {
+							// NEXT TODO
+							if(all.length > 0) {
+								current.y = current.y > 0 ? current.y + all[all.length - 1].y : 0
+								current.start = current.y > 0 ? all[all.length - 1].start : current.start
+							}
+							all.push(current)
+							return all
+						}, [])
+						result[key] = Math.max(...result[key].map(e => e.y));
+					})
+					//console.log(this.x)
+					return Object.values(result).reduce((a, b) => a + b)/Object.keys(result).length
+				//	return result.reduce((a,b) => a + b)/this.req.length
 				case 'high':
 				case 'low':
 					return result.length
