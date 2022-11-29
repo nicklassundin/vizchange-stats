@@ -265,7 +265,7 @@ class Point {
 				if(this.years.length > 0){
 					return Object.values(this.req.reduce((all, current) => {
 						let year = current.splitYear
-						all[year] = all[year] ?? current.date
+						if(all[year] === undefined) all[year] = current.date
 						return {
 							...all
 						}
