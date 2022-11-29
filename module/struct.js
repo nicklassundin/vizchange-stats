@@ -438,9 +438,23 @@ module.exports = class Struct {
     get "number"() {
         return this.TYPE("number", this.f)
     }
-    get "baseline"() {
-        // TODO remove embededed promises
+    get 'baseline'() {
+        //static build(seedSpecs, x, type, f = () => true, full = false, parentType, parentEntry) {
         let genSpecs = JSON.parse(JSON.stringify(this.specs));
+        genSpecs.dates.start = (new Date(genSpecs.dates.start))
+        genSpecs.dates.start = new Date(genSpecs.baseline.start, genSpecs.dates.start.getMonth(), genSpecs.dates.start.getDate())
+        genSpecs.dates.end = (new Date(genSpecs.dates.end))
+        genSpecs.dates.end = new Date(genSpecs.baseline.end, genSpecs.dates.end.getMonth(), genSpecs.dates.end.getDate())
+        let baseline = Struct.build(genSpecs, this.x, this.type, this.f, this.full, this.parentType);
+        return baseline.y
+        // TODO remove embededed promises
+        /*
+        let genSpecs = JSON.parse(JSON.stringify(this.specs));let genSpecs = JSON.parse(JSON.stringify(this.specs));
+        genSpecs.dates.start = (new Date(genSpecs.dates.start))
+        genSpecs.dates.start = new Date(genSpecs.baseline.start, genSpecs.dates.start.getMonth(), genSpecs.dates.start.getDate())
+        genSpecs.dates.end = (new Date(genSpecs.dates.end))
+        genSpecs.dates.end = new Date(genSpecs.baseline.end, genSpecs.dates.end.getMonth(), genSpecs.dates.end.getDate())
+
         genSpecs.dates.start = (new Date(genSpecs.dates.start))
         genSpecs.dates.start = new Date(genSpecs.baseline.start, genSpecs.dates.start.getMonth(), genSpecs.dates.start.getDate())
         genSpecs.dates.end = (new Date(genSpecs.dates.end))
@@ -449,6 +463,7 @@ module.exports = class Struct {
         let keys = (new Point(genSpecs))[`${genSpecs.keys[0]}s`]
         let values = {}
         this.values // initiate values if not done so
+
         for(let i = 0; i < keys.length; i++) {
             //console.log(keys[i], this.VALUES[keys[i]])
             values[keys[i]] = this.VALUES[keys[i]].short
@@ -467,6 +482,8 @@ module.exports = class Struct {
             }
             return value
         }).then(value => value.y)
+
+         */
     }
     get 'difference' () {
         return this.baseline.then(baseline => {

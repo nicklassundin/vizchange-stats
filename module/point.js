@@ -55,18 +55,23 @@ Array.prototype.divideConquerFilter = function(f){
 }
 class PointReq {
 	static build(requests, specs){
-		requests = requests.map(each => {
-			each.date = new Date(each.date)
-			return each
-		}).sort((a, b) => {
-			if(a.date.getTime() < b.date.getTime()){
-				return -1
-			}else if(a.date.getTime() > b.date.getTime()){
-				return 1
-			}else{
-				return 0
-			}
-		})
+		try{
+			requests = requests.map(each => {
+				each.date = new Date(each.date)
+				return each
+			}).sort((a, b) => {
+				if(a.date.getTime() < b.date.getTime()){
+					return -1
+				}else if(a.date.getTime() > b.date.getTime()){
+					return 1
+				}else{
+					return 0
+				}
+			})
+		}catch (error) {
+			console.log(error)
+			throw error
+		}
 		let result = {}
 		switch (specs.subType) {
 			case 'high':

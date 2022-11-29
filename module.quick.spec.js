@@ -84,7 +84,7 @@ describe(
     'Requests',
     function () {
         describe('recursive', function () {
-            it.only('promises', function () {
+            it('promises', function () {
                 let params = ['temperature', 'yrly', 'shortValues', 1];
                 let config = Object.assign(configs['liveHalf'], specs)
                 return parser.getByParams(config, params).then((values) => {
@@ -854,11 +854,11 @@ describe(
                         let params = ['temperature', 'yrly', 'baseline']
                         let config = Object.assign(configs['live'], specs)
                         return parser.getByParams(config, params).then(values => {
-                            //console.log(values)
+                            console.log(values)
                             //return assert.ok( Math.abs(values - (-0.7873900649056548)) < 0.01)
                             // TODO difference between estimated from server and client side
                             //return assert.ok( Math.abs(values - (-0.8067076562515705)) < 0.01)
-                            return assert.ok( Math.abs(values - (-0.7873900649056548)) < 0.05)
+                            return assert.ok( Math.abs(values - (-0.6449561116205947)) < 0.05)
                         })
                     })
                 })
@@ -867,8 +867,8 @@ describe(
                         let params = ['temperature', 'yrly', 'difference', 105]
                         let config = Object.assign(configs['live'], specs)
                         return parser.getByParams(config, params).then(values => {
-                            //console.log(values)
-                            return assert.ok(Math.abs(values.y - 2.01) < 0.1)
+                            console.log(values)
+                            return assert.ok(Math.abs(values.y - 1.8856042597) < 0.001)
                         })
                     })
                 })
