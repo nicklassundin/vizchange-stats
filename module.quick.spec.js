@@ -257,7 +257,7 @@ describe(
                         return parser.getByParams(config, params).then(values => {
                             return values.y.then(y => {
                                 console.log('values', y)
-                                return assert.ok(Math.abs(y - -0.7103919643531532) < 0.001)
+                                return assert.ok(Math.abs(y - -0.7103919643531532) < 0.01)
                             })
                         })
                     })
@@ -268,6 +268,16 @@ describe(
                             return values.y.then(y => {
                                 console.log('values', y)
                                 return assert.ok(Math.abs(y - 301.22666667) < 0.001)
+                            })
+                        })
+                    })
+                    it('icetime', () => {
+                        let params = ['icetime', 'yrlyFull', 'baseline'];
+                        let config = Object.assign(configs['live'], icetime_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            return values.y.then(y => {
+                                console.log('values', y)
+                                return assert.ok(Math.abs(y - 176.29032258064515) < 0.001)
                             })
                         })
                     })
