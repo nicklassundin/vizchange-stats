@@ -250,7 +250,7 @@ describe(
                         })
                     })
                 })
-                describe.only('baseline', () => {
+                describe('baseline', () => {
                     it('temperature', () => {
                         let params = ['temperature', 'yrly', 'baseline']
                         let config = Object.assign(configs['live'], specs)
