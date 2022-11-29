@@ -216,7 +216,7 @@ module.exports = {
 			// TODO nicer solution to individual requests
 			this.cached[url] = axios.get(url).then(result => {
 				this.number += 1;
-			//	console.log('rqst Nr:', this.number)
+				console.log('rqst Nr:', this.number)
 /*
 				let list = undefined;
 

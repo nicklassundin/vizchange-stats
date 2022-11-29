@@ -115,7 +115,7 @@ describe(
                 let params = ['temperature', 'yrly', 'y'];
                 let config = Object.assign(configs['latest'], specs)
                 parser.getByParams(config, params)
-                return parser.cache['abisko'][`temperature${config.dates.start}${config.dates.end}`].then(values => {
+                return parser.cache['abisko'][`temperature${config.dates.start}${config.dates.end}${config.baseline.start}${config.baseline.end}`].then(values => {
                     return values
                 })
             })
@@ -871,7 +871,7 @@ describe(
                     })
                 })
                 describe('baseline', function () {
-                    it.only('value', () => {
+                    it('value', () => {
                         let params = ['temperature', 'yrly', 'baseline', 'y']
                         let config = Object.assign(configs['live'], specs)
                         return parser.getByParams(config, params).then(values => {
@@ -964,7 +964,7 @@ describe(
                 })
             })
         })
-        describe('speed tests', function() {
+        describe.skip('speed tests', function() {
             describe.skip('precalculated' , function() {
                 it.skip('precalculatede', () => {
                     let params = ['temperature', 'yrly', 'shortValues']
@@ -979,13 +979,34 @@ describe(
                     })
                 })
             })
+            // TODO futher testings should be possible
             it.skip('difference', () => {
-                let params = ['temperature', 'yrly', 'difference', 11]
+                let params = ['temperature', 'yrly', 'baseline', 'y']
                 let config = Object.assign(configs['live'], specs)
-                return parser.getByParams(config, params).then(values => {
-                    return assert.ok(Math.abs(values.y - 0.8613948739984973) < 0.0001 )
+                const startTime = (new Date()).getTime();
+                let value1 =  parser.getByParams(config, params).then(values => {
+                    let endTime = (new Date()).getTime();
+                    return {
+                        time: endTime - startTime,
+                        value: values
+                    }
+                })
+                let config2 = JSON.parse(JSON.stringify(config))
+                config2.baseline.start = 1950;
+                let value2 =  parser.getByParams(config2, params).then(values => {
+                    let endTime = (new Date()).getTime();
+                    return {
+                        time: endTime - startTime,
+                        value: values
+                    }
+                })
+                return value1.then(val1 => {
+                    return value2.then(val2 => {
+                        return assert.ok(val1.time < val2.time)
+                    })
                 })
             })
+
             it('single', () => {
                 let params = ['temperature', 'yrly', 'shortValues']
                 let config = Object.assign(configs['live'], specs)
@@ -1000,17 +1021,42 @@ describe(
                 })
             })
             describe('time to load', function() {
-                it.skip('redirect', () => {
-                    let params = ['temperature', 'yrly', 'shortValues']
-                    let config = Object.assign(configs['production_redirect'], specs)
-                    const startTime = (new Date()).getTime();
-                    return parser.getByParams(config, params).then(values => {
-                        return Promise.all([values[35], values[40], values[70]]).then(values => {
-                            let endTime = (new Date()).getTime();
-                            return assert.ok( endTime - startTime < 30000)
+                describe('redirect', function() {
+                    it('temperature', () => {
+                        let params = ['temperature', 'yrly', 'shortValues']
+                        let config = Object.assign(configs['production_redirect'], specs)
+                        const startTime = (new Date()).getTime();
+                        return parser.getByParams(config, params).then(values => {
+                            return Promise.all([values[35], values[40], values[70]]).then(values => {
+                                let endTime = (new Date()).getTime();
+                                return assert.ok( endTime - startTime < 30000)
+                            })
+                        })
+                    })
+                    it('precipitation', () => {
+                        let params = ['precipitation', 'yrly', 'snow', 'shortValues']
+                        let config = Object.assign(configs['production_redirect'], precipitation_specs)
+                        const startTime = (new Date()).getTime();
+                        return parser.getByParams(config, params).then(values => {
+                            return Promise.all([values[35], values[40], values[70]]).then(values => {
+                                let endTime = (new Date()).getTime();
+                                return assert.ok( endTime - startTime < 30000)
+                            })
+                        })
+                    })
+                    it('precipitation', () => {
+                        let params = ['precipitation', 'yrly', 'rain', 'shortValues']
+                        let config = Object.assign(configs['production_redirect'], precipitation_specs)
+                        const startTime = (new Date()).getTime();
+                        return parser.getByParams(config, params).then(values => {
+                            return Promise.all([values[35], values[40], values[70]]).then(values => {
+                                let endTime = (new Date()).getTime();
+                                return assert.ok( endTime - startTime < 30000)
+                            })
                         })
                     })
                 })
+
                 it('temperature', () => {
                     let params = ['temperature', 'yrly', 'shortValues']
                     let config = Object.assign(configs['live'], specs)

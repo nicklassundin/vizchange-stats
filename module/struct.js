@@ -298,11 +298,13 @@ module.exports = class Struct {
                 specs.dates.start = k;
                 specs.dates.end = k;
         }
-        let result = Struct.build(specs, k, type, f, this.full, this.parentType);
+        let result = Struct.build(specs, k, type, f, this.full, this.parentType, this.entry);
         if(this.full){
             switch(key) {
+
                 case 'year':
                     break;
+
                 default:
                     result.entry = this.entry.then(entry => {
                         //console.log('key', key, entry instanceof Point);
@@ -318,6 +320,7 @@ module.exports = class Struct {
         genSpecs.keys.shift();
         switch (this.specs.keys[0]) {
             case 'yrly':
+                // Possible disable
                 // TODO possible solution when queue is working
                 //full = false;
                 break;
@@ -551,27 +554,12 @@ module.exports = class Struct {
                 })
             default:
                 //let startTime = (new Date()).getTime();
-                let val = [
-                    Promise.resolve(true),
-                    Promise.resolve(true),
-                    Promise.resolve(true),
-                    Promise.resolve(true),
-                    Promise.resolve(true),
-                    Promise.resolve(true),
-                    Promise.resolve(true),
-                    Promise.resolve(true),
-                    Promise.resolve(true),
-                    Promise.resolve(true),
-                    Promise.resolve(true),
-                    Promise.resolve(true),
-                    Promise.resolve(true),
-                    Promise.resolve(true),
-                    Promise.resolve(true),
-                    Promise.resolve(true),
-                    Promise.resolve(true),
-                    Promise.resolve(true),
-                    Promise.resolve(true)]
-                let qLength = Object.keys(val).length - 1;
+                let length = 50
+                let val = []
+                for (let i = 0; i < length; i++) {
+                    val.push(Promise.resolve(true))
+                }
+                let qLength = length - 1
                 return this.values.reverse().map((value, index) => {
                     let i = index % qLength;
                     val[i] = val[i].then(() => {
