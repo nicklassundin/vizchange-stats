@@ -50,7 +50,6 @@ Array.prototype.divideConquerFilter = function(f){
 		}
 	}
 
-	//console.log("max", nr_max)
 	return recursive(this)
 }
 class PointReq {
@@ -69,7 +68,6 @@ class PointReq {
 				}
 			})
 		}catch (error) {
-			//console.log(error)
 			throw error
 		}
 		let result = {}
@@ -145,6 +143,16 @@ class PointReq {
 			this[key] = request[key];
 		})
 	}
+	get 'year' (){
+		return this.date.getFullYear();
+	}
+	get 'splitYear' () {
+		if(help.isFirstHalfYear(this.month)){
+			return this.year - 1
+		}else{
+			return this.year
+		}
+	}
 	get 'snow_precipitation'() {
 		return ((Number(this.request['avg_temperature']) > 0) ? 0 : Number(this.request['precipitation']))
 	}
@@ -204,7 +212,6 @@ class Point {
 	constructor(specs, req = {}, full=false){
 		this.full = full;
 		this.specs = specs;
-		////console.log(this.specs)
 		if(typeof this.specs.dates.start === 'string'){
 			this.specs.dates.start = new Date(this.specs.dates.start)
 			this.specs.dates.end = new Date(this.specs.dates.end)
@@ -243,9 +250,29 @@ class Point {
 		if(this.req.length < 1) return undefined
 		switch (this.specs.subType){
 			case 'last':
-				return this.req[this.req.length - 1].date
+				if(this.years.length > 0){
+					return Object.values(this.req.reduce((all, current) => {
+						let year = current.splitYear
+						all[year] = current.date
+						return {
+							...all
+						}
+					}, {}))
+				}else{
+					return this.req[this.req.length - 1].date
+				}
 			case 'first':
-				return this.req[0].date
+				if(this.years.length > 0){
+					return Object.values(this.req.reduce((all, current) => {
+						let year = current.splitYear
+						all[year] = all[year] ?? current.date
+						return {
+							...all
+						}
+					}, {}))
+				}else{
+					return this.req[0].date
+				}
 			case 'breakfreeze':
 				return new Date(this.req[0][this.type])
 			case 'avg':
@@ -275,40 +302,14 @@ class Point {
 				return this.req.filter((e) => {
 					e.date = new Date(e.date)
 					let month = e.date.getMonth()
-					/*
-                    if((month >= start.getMonth()) && (month < end.getMonth())){
-                        //console.log('-----', (month >= start.getMonth()) && (month < end.getMonth()))
-                        //console.log(month, start.getMonth(), month >= start.getMonth())
-                        //console.log(month, end.getMonth(), month < end.getMonth())
-                    }
-                    */
-					////console.log(e.date, start, end)
-					////console.log(month, start.getMonth(), end.getMonth())
 					return (month >= start.getMonth()) && (month <= end.getMonth())
 				})
 				break
 			default:
 				return this.req.filter(function(a){return a.date>=start&&a.date<=end});
-			/*
-            return req.divideConquerFilter((e) => {
-                e.date = new Date(e.date)
-                //(e.date > start) && (e.date < end)
-                if(e.date >= start){
-                    if(e.date <= end){
-                        return 0
-                    }else{
-                        return 1
-                    }
-                }else {
-                    return -1
-                }
-            })
-             */
 		}
 	}
 	'dateSlice' (start, end) {
-		////console.log('dateSlice', start, end, this.req.length)
-		//let req = this.req;
 		let specs = JSON.parse(JSON.stringify(this.specs));
 		specs.keys.shift()
 		specs.dates.start = start;
@@ -379,12 +380,13 @@ class Point {
 		return new Point(specs, req, this.full)
 	}
 	'first'(f){
+		//let n = 0;
 		let req = this.req.sort((a, b) => {
 			return (new Date(a.date).getTime()) - (new Date(b.date).getTime())
 		}).filter((e) => {
-			return f({
-				'y': this.getY(e)
-			})
+			//n += 1;
+			//console.log(n+'/'+this.req.length)
+			return f(this.getY(e))
 		})
 		return new Point(this.specs, req, true)
 	}
@@ -392,9 +394,7 @@ class Point {
 		let req = this.req.sort((a, b) => {
 			return (new Date(a.date).getTime()) - (new Date(b.date).getTime())
 		}).filter((e) => {
-			return f({
-				'y': this.getY(e)
-			})
+			return f(this.getY(e))
 		})
 		return new Point(this.specs, req, true)
 	}
@@ -432,6 +432,15 @@ class Point {
 				return y
 			case 'last':
 			case 'first':
+				date = this.date
+				if(!Array.isArray(date)){
+					date = [date];
+				}
+				date = date.map(each => help.dayOfYear(each)).reduce((a, b) => a + b)/date.length
+				return {
+					value: date,
+					y: req[`${this.specs.parentType}_${this.type}`]
+				}
 			case 'high':
 			case 'low':
 				return req[`${this.specs.parentType}_${this.type}`]
@@ -521,9 +530,6 @@ class Point {
 					return result[0]
 				case 'growingSeason':
 					result = result.filter(each => each.start !== undefined).sort((a, b) => (new Date(a)) < (new Date(b)))
-				//	//console.log('first', result[0])
-				//	//console.log('last', result[result.length - 1])Math.abs(current.start - current.end)/(1000*60*60*24);
-
 					let getKey = (entry) => {
 						switch (this.specs.keys[this.specs.keys.length - 1]) {
 							case 'DOY':
@@ -565,20 +571,11 @@ class Point {
 							all.push(current)
 							return all
 						}, [])
-						/*
-						if(Math.max(...result[key].map(e => e.y)) === 155){
-							result[key].forEach(each => {
-								console.log(each)
-							})
-						}
-
-						 */
 						result[key] = Math.max(...result[key].map(e => e.y));
 					})
-					////console.log(this.x)
 					result = Object.values(result).filter(each => each !== 0)
+					if(result.length === 0) return undefined
 					return result.reduce((a, b) => a + b)/result.length
-				//	return result.reduce((a,b) => a + b)/this.req.length
 				case 'high':
 				case 'low':
 					return result.length
@@ -734,11 +731,9 @@ class Point {
 		switch(this.SUBTYPE) {
 			case 'first':
 			case 'last':
-				value = y
-				let date = this.date
-				if(date !== undefined){
-					y = help.dayOfYear(date)
-				}
+				value = Number(y.y)
+				y = y.value
+
 				break;
 			default:
 		}

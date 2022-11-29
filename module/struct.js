@@ -331,6 +331,7 @@ module.exports = class Struct {
         genSpecs.keys.shift();
         switch (this.specs.keys[0]) {
             case 'yrly':
+                console.log('key', this.specs.keys)
                 // Possible disable
                 // TODO possible solution when queue is working
                 //full = false;
@@ -464,6 +465,17 @@ module.exports = class Struct {
         let end = (new Date(genSpecs.dates.end))
         genSpecs.dates.end = new Date(genSpecs.baseline.end, end.getMonth(), end.getDate())
         let baseline = Struct.build(genSpecs, this.x, this.type, this.f, this.full, this.parentType);
+        switch (this.type) {
+            case 'first':
+            case 'last':
+                return {
+                    // TODO hot fix need speedier way
+                    y: Promise.all(baseline.shortValues).then(values => {
+                        return values.map(each => each.y).reduce((a, b) => a + b)/values.length
+                    })
+                }
+            default:
+        }
         return baseline
         // TODO remove embededed promises
         /*
@@ -504,17 +516,26 @@ module.exports = class Struct {
          */
     }
     get 'difference' () {
-        return this.baseline.y.then(baseline => {
-            return this.shortValues.map(value => {
-                return value.then(value => {
-                    if(value === undefined) return undefined
-                    value.y -= baseline;
-                    value.baseline = baseline;
-                    return value
+        switch (this.type) {
+            case 'first':
+            case 'last':
+                return this.shortValues.map(each => {
+                    console.log(each)
+                    return each
                 })
-            })
-        })
-        //return this.TYPE("difference", this.f)
+                break;
+            default:
+                return this.baseline.y.then(baseline => {
+                    return this.shortValues.map(value => {
+                        return value.then(value => {
+                            if(value === undefined) return undefined
+                            value.y -= baseline;
+                            value.baseline = baseline;
+                            return value
+                        })
+                    })
+                })
+        }
     }
     get "growingSeason" () {
         return this.TYPE('growingSeason', undefined, true)
