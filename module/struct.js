@@ -331,7 +331,6 @@ module.exports = class Struct {
         genSpecs.keys.shift();
         switch (this.specs.keys[0]) {
             case 'yrly':
-                console.log('key', this.specs.keys)
                 // Possible disable
                 // TODO possible solution when queue is working
                 //full = false;
@@ -486,10 +485,8 @@ module.exports = class Struct {
             return this.shortValues.map(value => {
                 return value.then(value => {
                     if(value === undefined) return undefined
-                    console.log('pre:', value)
                     value.y -= baseline;
                     value.baseline = baseline;
-                    console.log('post:', value)
                     return value
                 })
             })
@@ -514,7 +511,6 @@ module.exports = class Struct {
             let res = new Struct(this.VALUES, specs, this.x, type, f, full, this.type)
             res.colored = this.colored;
             res.color = this.color;
-            //console.log(res)
             return res
         } else {
             let res = Struct.build(specs, this.x, type, f, full, this.type)
