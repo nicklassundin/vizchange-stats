@@ -83,15 +83,17 @@ module.exports = {
 		return this;
 	},
 	getStruct: function(specs, type = undefined) {
-		//let key = `${specs.type}${specs.dates.start}${specs.dates.end}${specs.baseline.start}${specs.baseline.end}`
-		let key = `${specs.type}${specs.dates.start}${specs.dates.end}`
+		let key = `${specs.type}${specs.dates.start}${specs.dates.end}${specs.baseline.start}${specs.baseline.end}`
+		//let key = `${specs.type}${specs.dates.start}${specs.dates.end}`
 		if(this.cache[specs.station] === undefined){
 			this.cache[specs.station] = {}
 		}
 		if(this.cache[specs.station][key] === undefined) {
 			this.cache[specs.station][key] = parseByDate(specs, type, undefined, this.precalcCached)
 		}
-		return this.cache[specs.station][key].then((value) => { return value })
+		return this.cache[specs.station][key].then((value) => {
+			return value
+		})
 	},
 	cache: {},
 	"temperature" (specs) {
