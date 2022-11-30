@@ -276,7 +276,7 @@ describe(
                         return parser.getByParams(config, params).then(values => {
                             return values.y.then(y => {
                                 console.log(y)
-                                return assert.ok(Math.abs(y - 25.4) < 0.01)
+                                return assert.ok(Math.abs(y - 25.17000000000003) < 0.001)
                             })
                         })
                     })
