@@ -230,7 +230,7 @@ describe(
                         let config = Object.assign(configs['latest'], specs)
                         return parser.getByParams(config, params).then(values => {
                             console.log(values)
-                            return assert.ok(Math.abs(values.y - -16.7) < 0.01)
+                            return assert.ok(Math.abs(values.y - 18.1) < 0.01)
                         })
                     })
                     it('weekly', () => {
@@ -238,7 +238,7 @@ describe(
                         let config = Object.assign(configs['latest'], specs)
                         return parser.getByParams(config, params).then(values => {
                             console.log(values)
-                            return assert.ok(Math.abs(values.y - -11.2) < 0.01)
+                            return assert.ok(Math.abs(values.y - 15.085714285714285) < 0.01)
                         })
                     })
                     it('monthly', () => {
@@ -246,7 +246,7 @@ describe(
                         let config = Object.assign(configs['latest'], specs)
                         return parser.getByParams(config, params).then(values => {
                             console.log(values)
-                            return assert.ok(Math.abs(values.y - -6.4206896551724135) < 0.01)
+                            return assert.ok(Math.abs(values.y - 11.009677419354839) < 0.01)
                         })
                     })
                 })
