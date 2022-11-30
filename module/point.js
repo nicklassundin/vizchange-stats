@@ -553,12 +553,11 @@ class Point {
 						if(all[year] === undefined){
 							all[year] = {}
 							all[year][key] = {
-								key: key,
+								value: key,
 								y: []
 							}
 						}else if(all[year][key] === undefined){
 							all[year][key] = {
-								key: key,
 								y: []
 							};
 						}
@@ -583,9 +582,9 @@ class Point {
 					if(result.length === 0) return undefined
 					switch (this.SUBTYPE) {
 						case 'minAvg':
-							return Math.min(...result.map(each => each.y));
+							return result.sort((a, b) => (b.y - a.y)/Math.abs(a.y - b.y))[0]
 						case 'maxAvg':
-							return Math.max(...result.map(each => each.y));
+							return result.sort((a, b) => (b.y - a.y)/Math.abs(a.y - b.y))[0]
 					}
 				case 'snow':
 				case 'rain':
@@ -801,6 +800,10 @@ class Point {
 				y = y.value
 
 				break;
+			case 'minAvg':
+			case 'maxAvg':
+				value = Number(y.value)
+				y = y.y;
 			default:
 		}
 		return {
