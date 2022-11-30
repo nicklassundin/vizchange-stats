@@ -1,6 +1,7 @@
 const Struct = require('./struct.js');
 module.exports = class ByDateStruct {
-	constructor(type = 'avg', custom, specs) {
+	// TODO precalcCached pass along wih structure
+	constructor(type = 'avg', custom, specs, preCalculated) {
 		this.specs = specs;
 		this.type = type;
 		this.values = {};

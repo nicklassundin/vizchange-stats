@@ -37,8 +37,23 @@ module.exports = {
 	getByParams: function (specs, params){
 		return this.recursive(params, this[params[0]](specs).then(result => result.request(params[1])))
 	},
+	precalcCached: {},
 	getByParamsPreCalculated: function (specs, params){
-		return axios.get(`${specs.url}/precalculated/${specs.station}/${params.join('/')}?start=${specs.dates.start}&end=${specs.dates.end}&baselineStart=${specs.baseline.start}&baselineEnd=${specs.baseline.end}`)
+		let struct = axios.get(`${specs.url}/precalculated/${specs.station}/${params.join('/')}?start=${specs.dates.start}&end=${specs.dates.end}&baselineStart=${specs.baseline.start}&baselineEnd=${specs.baseline.end}`)
+
+		let key = `${specs.type}${specs.dates.start}${specs.dates.end}${specs.baseline.start}${specs.baseline.end}`
+		if(typeof this.precalcCached[specs.station] !== 'object'){
+			this.precalcCached[specs.station] = {};
+			this.precalcCached[specs.station][key] = {}
+		}else if(typeof this.precalcCached[specs.station][key] !== 'object'){
+			this.precalcCached[specs.station][key] = {}
+		}
+		this.precalcCached[specs.station][key] = Object.assign(this.precalcCached[specs.station][key], this.precalcCached[specs.station][key]  = params.reverse().reduce((all, current) => {
+			let res = {};
+			res[current] = all;
+			return res;
+		}, struct), true)
+		return struct
 	},
 	"recursive": function(params, data, index = 2){
 		if(params.length - index === 1){
@@ -73,7 +88,7 @@ module.exports = {
 			this.cache[specs.station] = {}
 		}
 		if(this.cache[specs.station][key] === undefined) {
-			this.cache[specs.station][key] = parseByDate(specs, type)
+			this.cache[specs.station][key] = parseByDate(specs, type, undefined, this.precalcCached)
 		}
 		return this.cache[specs.station][key].then((value) => { return value })
 	},

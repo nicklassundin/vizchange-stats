@@ -434,9 +434,11 @@ module.exports = class Struct {
         return this.TYPE('sum');
     }
     get 'first' () {
+        if (this.type === 'first') this.type = 'min'
         return this.TYPE('first', (e) => e.y <= 0, true)
     }
     get 'last' () {
+        if (this.type === 'last') this.type = 'min'
         return this.TYPE('last', (e) => e.y <= 0, true)
     }
     'extreme' (type) {
@@ -468,6 +470,7 @@ module.exports = class Struct {
         switch (this.type) {
             case 'first':
             case 'last':
+                baseline = baseline[this.type]
                 return {
                     // TODO hot fix need speedier way
                     y: Promise.all(baseline.shortValues).then(values => {
@@ -479,25 +482,18 @@ module.exports = class Struct {
         return baseline
     }
     get 'difference' () {
-        switch (this.type) {
-            case 'first':
-            case 'last':
-                return this.shortValues.map(each => {
-                    return each
+        return this.baseline.y.then(baseline => {
+            return this.shortValues.map(value => {
+                return value.then(value => {
+                    if(value === undefined) return undefined
+                    console.log('pre:', value)
+                    value.y -= baseline;
+                    value.baseline = baseline;
+                    console.log('post:', value)
+                    return value
                 })
-                break;
-            default:
-                return this.baseline.y.then(baseline => {
-                    return this.shortValues.map(value => {
-                        return value.then(value => {
-                            if(value === undefined) return undefined
-                            value.y -= baseline;
-                            value.baseline = baseline;
-                            return value
-                        })
-                    })
-                })
-        }
+            })
+        })
     }
     get "growingSeason" () {
         return this.TYPE('growingSeason', undefined, true)
