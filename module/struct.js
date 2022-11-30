@@ -476,6 +476,12 @@ module.exports = class Struct {
                         return values.map(each => each.y).reduce((a, b) => a + b)/values.length
                     })
                 }
+            case 'minAvg':
+            case 'maxAvg':
+                return {
+                    y: baseline.y.then(y => y.y)
+                }
+                break;
             default:
         }
         return baseline

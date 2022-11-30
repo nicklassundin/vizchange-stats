@@ -558,6 +558,7 @@ class Point {
 							}
 						}else if(all[year][key] === undefined){
 							all[year][key] = {
+								value: key,
 								y: []
 							};
 						}
@@ -566,26 +567,39 @@ class Point {
 
 						return all;
 					}, {})
-					result = result[this.year]
-					result = Object.values(result).map(each => {
-						switch (this.specs.parentType) {
-							case 'avg':
-								each.y = each.y.reduce((a, b) => a + b)/each.y.length
-								return each
-							case 'sum':
-								each.y = each.y.reduce((a, b) => a + b)
-								return each
-							default:
-								return each
+					result = Object.values(result).map(year => Object.values(year)).filter(year => {
+						return year.length > 10
+					})
+					result = result.map(year => {
+						year = year.map(each => {
+							switch (this.specs.parentType) {
+								case 'avg':
+									each.y = each.y.reduce((a, b) => a + b)/each.y.length
+									return each
+								case 'sum':
+									each.y = each.y.reduce((a, b) => a + b)
+									return each
+								default:
+									return each
+							}
+						})
+						switch (this.SUBTYPE) {
+							case 'minAvg':
+								return year.sort((a, b) => (b.y - a.y)/Math.abs(a.y - b.y))[0]
+							case 'maxAvg':
+								return year.sort((a, b) => (b.y - a.y)/Math.abs(a.y - b.y))[0]
 						}
 					})
-					if(result.length === 0) return undefined
-					switch (this.SUBTYPE) {
-						case 'minAvg':
-							return result.sort((a, b) => (b.y - a.y)/Math.abs(a.y - b.y))[0]
-						case 'maxAvg':
-							return result.sort((a, b) => (b.y - a.y)/Math.abs(a.y - b.y))[0]
-					}
+					return result.reduce((all, current) => {
+						all.y = (all.y*all.value.length) + current.y
+						all.value.push(current.value)
+						all.y = all.y/all.value.length
+						return all
+					}, {
+						value: [],
+						y: 0,
+					})
+					break;
 				case 'snow':
 				case 'rain':
 					return result.reduce((a,b) => a + b)

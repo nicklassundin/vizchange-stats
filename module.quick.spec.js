@@ -224,8 +224,8 @@ describe(
                 })
             })
             describe('type', function() {
-                describe.only('extreme events', function() {
-                    it('daily', () => {
+                describe('extreme events', function() {
+                    it.only('daily', () => {
                         let params = ['temperature', 'yrly', 'maxAvg', 'shortValues', 1]
                         let config = Object.assign(configs['latest'], specs)
                         return parser.getByParams(config, params).then(values => {
@@ -251,6 +251,16 @@ describe(
                     })
                 })
                 describe('baseline', () => {
+                    it.only('daily', () => {
+                        let params = ['temperature', 'yrly', 'maxAvg', 'baseline']
+                        let config = Object.assign(configs['latest'], specs)
+                        return parser.getByParams(config, params).then(values => {
+                            return values.y.then(y => {
+                                console.log('y', y)
+                                return assert.ok(Math.abs(y - 18.26) < 1)
+                            })
+                        })
+                    })
                     it('breakup', () => {
                         let params = ['breakup', 'yrlySplit', 'baseline'];
                         let config = Object.assign(configs['live'], breakup_specs)
