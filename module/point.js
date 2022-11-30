@@ -198,6 +198,10 @@ class Point {
 			case 'oct':
 			case 'nov':
 			case 'dec':
+			case 'spring':
+			case 'summer':
+			case 'winter':
+			case 'autumn':
 				full = true;
 				break;
 			default:
@@ -418,9 +422,16 @@ class Point {
 	'getY'(req = this.req){
 		let y = req[`${this.type}`]
 		let date = new Date(req[this.type]);
+
 		switch (this.specs.dates.type) {
 			case 'month':
 				if(help.monthByIndex(req.date.getMonth()) !== this.specs.keys[0]) return undefined
+				break;
+			case 'spring':
+			case 'autumn':
+			case 'winter':
+			case 'summer':
+				if(help.getSeasonByIndex(req.date.getMonth()) !== this.specs.keys[0]) return undefined
 			default:
 		}
 		switch (this.SUBTYPE){
@@ -459,6 +470,9 @@ class Point {
 				return res
 			case 'snow':
 			case 'rain':
+				switch (this.specs.keys[0]) {
+
+				}
 				y = req[`${this.subType}${this.type}`]
 				break;
 			case 'minAvg':
@@ -485,6 +499,7 @@ class Point {
 	get 'y' (){
 		let result = NaN;
 		if(this.req.length === 0) return NaN
+
 		if(this.full){
 			result = this.req.map(each => this.getY(each)).filter(y => (y !== undefined && !isNaN(y)) || (typeof y === 'object'))
 			if(result.length === 0) return NaN
@@ -504,6 +519,10 @@ class Point {
 						case 'nov':
 						case 'dec':
 						case 'yrly':
+						case 'spring':
+						case 'summer':
+						case 'winter':
+						case 'autumn':
 							return result.reduce((a,b) => a + b)/this.years.length
 						default:
 							return result.reduce((a,b) => a + b)
@@ -527,7 +546,12 @@ class Point {
 				case 'difference':
 					return this.difference
 				case 'breakfreeze':
-					return result[0]
+					switch (this.specs.keys[0]) {
+						case 'yrlySplit':
+							return result.reduce((a,b) => a + b)/result.length
+						default:
+							return result[0]
+					}
 				case 'growingSeason':
 					result = result.filter(each => each.start !== undefined).sort((a, b) => (new Date(a)) < (new Date(b)))
 					let getKey = (entry) => {

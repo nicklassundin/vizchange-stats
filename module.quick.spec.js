@@ -84,7 +84,7 @@ describe(
     'Requests',
     function () {
         describe('recursive', function () {
-            it.only('promises', function () {
+            it('promises', function () {
                 let params = ['temperature', 'yrly', 'shortValues', 1];
                 let config = Object.assign(configs['liveHalf'], specs)
                 return parser.getByParams(config, params).then((values) => {
@@ -251,6 +251,17 @@ describe(
                     })
                 })
                 describe('baseline', () => {
+                    it('breakup', () => {
+                        let params = ['breakup', 'yrlySplit', 'baseline'];
+                        let config = Object.assign(configs['live'], breakup_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            //////console.log(values)
+                            return values.y.then(y => {
+                                console.log('values', y)
+                                return assert.ok(Math.abs(y - 163.63333333333333) < 1)
+                            })
+                        })
+                    })
                     it('first', () => {
                         let params = ['temperature', 'yrlySplit', 'min', 'first', 'baseline'];
                         let config = Object.assign(configs['live'], specs)
@@ -288,6 +299,16 @@ describe(
                             return values.y.then(y => {
                                 console.log('values', y)
                                 return assert.ok(Math.abs(y - -11.761478933791913) < 0.1)
+                            })
+                        })
+                    })
+                    it.only('season', () => {
+                        let params = ['precipitation', 'spring', 'baseline']
+                        let config = Object.assign(configs['liveHalf'], precipitation_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            return values.y.then(y => {
+                                console.log(y)
+                                return assert.ok(Math.abs(y - 41.0366666666667) < 0.001)
                             })
                         })
                     })
