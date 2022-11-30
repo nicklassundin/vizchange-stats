@@ -251,7 +251,7 @@ describe(
                     })
                 })
                 describe('baseline', () => {
-                    it.only('first', () => {
+                    it('first', () => {
                         let params = ['temperature', 'yrlySplit', 'min', 'first', 'baseline'];
                         let config = Object.assign(configs['live'], specs)
                         return parser.getByParams(config, params).then(values => {
@@ -262,12 +262,12 @@ describe(
                             })
                         })
                     })
-                    it.only('first - difference', () => {
+                    it('first - difference', () => {
                         let params = ['temperature', 'yrlySplit', 'min', 'first', 'difference', 1];
                         let config = Object.assign(configs['latest'], specs)
                         return parser.getByParams(config, params).then(values => {
                             console.log(values)
-                            return assert.ok(Math.abs(values.y - 243.9) < 0.01)
+                            return assert.ok(Math.abs(values.y - -5.066666666666663) < 0.01)
                         })
                     })
                     it('monthly', () => {
@@ -275,7 +275,8 @@ describe(
                         let config = Object.assign(configs['liveHalf'], precipitation_specs)
                         return parser.getByParams(config, params).then(values => {
                             return values.y.then(y => {
-                                return assert.ok(Math.abs(y - -5.066666666666663) < 0.4)
+                                console.log(y)
+                                return assert.ok(Math.abs(y - 25.4) < 0.01)
                             })
                         })
                     })
