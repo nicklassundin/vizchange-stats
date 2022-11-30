@@ -533,6 +533,7 @@ module.exports = class Struct {
             case 'all':
                 return this.entry.then((entry) => {
                     if(entry instanceof Point){
+                        console.log('point')
                         return entry.splinter.map(each => Promise.resolve(each.short))
                     }else{
                         return new Error(`Invalid`)

@@ -546,7 +546,6 @@ class Point {
 					return Math[this.SUBTYPE](...result)
 				case 'maxAvg':
 				case 'minAvg':
-					// TODO
 					let time = this.specs.keys[this.specs.keys.length - 1]
 					result = result.reduce((all, entry) => {
 						let key = this.key(entry.date)
@@ -586,7 +585,7 @@ class Point {
 						case 'minAvg':
 							return Math.min(...result.map(each => each.y));
 						case 'maxAvg':
-							return Math.min(...result.map(each => each.y));
+							return Math.max(...result.map(each => each.y));
 					}
 				case 'snow':
 				case 'rain':
