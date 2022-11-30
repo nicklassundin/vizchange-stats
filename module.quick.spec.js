@@ -84,7 +84,7 @@ describe(
     'Requests',
     function () {
         describe('recursive', function () {
-            it.only('promises', function () {
+            it('promises', function () {
                 let params = ['temperature', 'yrly', 'shortValues', 1];
                 let config = Object.assign(configs['liveHalf'], specs)
                 return parser.getByParams(config, params).then((values) => {
@@ -267,7 +267,7 @@ describe(
                         let config = Object.assign(configs['latest'], specs)
                         return parser.getByParams(config, params).then(values => {
                             console.log(values)
-                            return assert.ok(Math.abs(values.y - -5.066666666666663) < 0.01)
+                            return assert.ok(Math.abs(values.y - -5.066666666666663) < 0.1)
                         })
                     })
                     it('monthly', () => {
@@ -287,7 +287,7 @@ describe(
                             //console.log(values)
                             return values.y.then(y => {
                                 console.log('values', y)
-                                return assert.ok(Math.abs(y - -11.761478933791913) < 0.01)
+                                return assert.ok(Math.abs(y - -11.761478933791913) < 0.1)
                             })
                         })
                     })
