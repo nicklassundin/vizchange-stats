@@ -235,8 +235,8 @@ module.exports = {
 				fs.writeFile('./debug/'+path, JSON.stringify(result.data), () => {})
 */
 
-
-				return result.data
+				if(result.data) result = data
+				return result
 			}).catch(
 				function (error) {
 					console.log('Show error notification!')

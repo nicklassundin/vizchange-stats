@@ -83,7 +83,8 @@ module.exports = {
 		return this;
 	},
 	getStruct: function(specs, type = undefined) {
-		let key = `${specs.type}${specs.dates.start}${specs.dates.end}${specs.baseline.start}${specs.baseline.end}`
+		//let key = `${specs.type}${specs.dates.start}${specs.dates.end}${specs.baseline.start}${specs.baseline.end}`
+		let key = `${specs.type}${specs.dates.start}${specs.dates.end}`
 		if(this.cache[specs.station] === undefined){
 			this.cache[specs.station] = {}
 		}
