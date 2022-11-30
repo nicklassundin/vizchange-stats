@@ -224,29 +224,29 @@ describe(
                 })
             })
             describe('type', function() {
-                describe.skip('extreme events', function() {
+                describe.only('extreme events', function() {
                     it('daily', () => {
                         let params = ['temperature', 'yrly', 'maxAvg', 'shortValues', 1]
                         let config = Object.assign(configs['latest'], specs)
                         return parser.getByParams(config, params).then(values => {
-                            //////console.log(values.y)
-                            return assert.ok(Math.abs(values.y - -4.2) < 0.01)
+                            console.log(values.y)
+                            return assert.ok(Math.abs(values.y - -16.7) < 0.01)
                         })
                     })
                     it('weekly', () => {
                         let params = ['temperature', 'weekly', 'maxAvg', 'shortValues', 1]
                         let config = Object.assign(configs['latest'], specs)
                         return parser.getByParams(config, params).then(values => {
-                            //////console.log(values.y)
-                            return assert.ok(Math.abs(values.y - -4.2) < 0.01)
+                            console.log(values.y)
+                            return assert.ok(Math.abs(values.y - -11.2) < 0.01)
                         })
                     })
                     it('monthly', () => {
                         let params = ['temperature', 'months', 'maxAvg', 'shortValues', 1]
                         let config = Object.assign(configs['latest'], specs)
                         return parser.getByParams(config, params).then(values => {
-                            //////console.log(values.y)
-                            return assert.ok(Math.abs(values.y - -4.2) < 0.01)
+                            console.log(values.y)
+                            return assert.ok(Math.abs(values.y - -6.4206896551724135) < 0.01)
                         })
                     })
                 })
@@ -302,7 +302,7 @@ describe(
                             })
                         })
                     })
-                    it.only('season', () => {
+                    it('season', () => {
                         let params = ['precipitation', 'spring', 'baseline']
                         let config = Object.assign(configs['liveHalf'], precipitation_specs)
                         return parser.getByParams(config, params).then(values => {

@@ -202,6 +202,7 @@ class Point {
 			case 'summer':
 			case 'winter':
 			case 'autumn':
+			case 'year':
 				full = true;
 				break;
 			default:
@@ -476,17 +477,17 @@ class Point {
 				y = req[`${this.subType}${this.type}`]
 				break;
 			case 'minAvg':
-				y = req[`${'avg'}_${this.type}`]
-				if(typeof y == 'object'){
-					return Number(y.min)
-				}
-				return Number(req[`avg_${this.type}`])
 			case 'maxAvg':
 				y = req[`${'avg'}_${this.type}`]
 				if(typeof y == 'object'){
-					return Number(y.max)
+					y = Number(y[this.specs.parentType])
+				}else{
+					y = Number(y)
 				}
-				return Number(req[`avg_${this.type}`])
+				return {
+					date: req.date,
+					y: y
+				}
 			default:
 				// TODO generalize
 		}
@@ -495,6 +496,17 @@ class Point {
 		if(y === undefined) y = req[this.type];
 		if(typeof y == 'object') y = y[this.SUBTYPE]
 		return Number(y)
+	}
+	key(date) {
+		switch (this.specs.keys[this.specs.keys.length - 1]) {
+			case 'DOY':
+				return `${help.dayOfYear(date)}`
+			case 'week':
+				return `${date.getWeekNumber()}`
+			case 'month':
+				return `${date.getMonth()}`
+			default:
+		}
 	}
 	get 'y' (){
 		let result = NaN;
@@ -533,9 +545,49 @@ class Point {
 				case 'max':
 					return Math[this.SUBTYPE](...result)
 				case 'maxAvg':
-					return Math.max(...result)
 				case 'minAvg':
-					return Math.min(...result);
+					// TODO
+					let time = this.specs.keys[this.specs.keys.length - 1]
+					result = result.reduce((all, entry) => {
+						let key = this.key(entry.date)
+						let year = entry.date.getFullYear();
+						if(all[year] === undefined){
+							all[year] = {}
+							all[year][key] = {
+								key: key,
+								y: []
+							}
+						}else if(all[year][key] === undefined){
+							all[year][key] = {
+								key: key,
+								y: []
+							};
+						}
+						//console.log('(', (all[year][key] ? all[year][key].y : 0),'*', (all[year][key] ? all[year][key].nr : 1), '+', entry.y, ')/', ((all[year][key] ? all[year][key].nr : 0) + 1))
+						if(!isNaN(entry.y)) all[year][key].y.push(entry.y)
+
+						return all;
+					}, {})
+					result = result[this.year]
+					result = Object.values(result).map(each => {
+						switch (this.specs.parentType) {
+							case 'avg':
+								each.y = each.y.reduce((a, b) => a + b)/each.y.length
+								return each
+							case 'sum':
+								each.y = each.y.reduce((a, b) => a + b)
+								return each
+							default:
+								return each
+						}
+					})
+					if(result.length === 0) return undefined
+					switch (this.SUBTYPE) {
+						case 'minAvg':
+							return Math.min(...result.map(each => each.y));
+						case 'maxAvg':
+							return Math.min(...result.map(each => each.y));
+					}
 				case 'snow':
 				case 'rain':
 					return result.reduce((a,b) => a + b)
@@ -554,17 +606,8 @@ class Point {
 					}
 				case 'growingSeason':
 					result = result.filter(each => each.start !== undefined).sort((a, b) => (new Date(a)) < (new Date(b)))
-					let getKey = (entry) => {
-						switch (this.specs.keys[this.specs.keys.length - 1]) {
-							case 'DOY':
-								return `${help.dayOfYear(entry.start)}`
-							case 'week':
-								return `${entry.start.getWeekNumber()}`
-							default:
-						}
-					}
 					result = result.reduce((all, entry) => {
-						let doy = getKey(entry)
+						let doy = this.key(entry.start)
 						let year = entry.start.getFullYear();
 						if(all[year] === undefined) all[year] = {}
 						let curr = {
