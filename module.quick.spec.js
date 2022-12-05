@@ -1008,19 +1008,6 @@ describe(
                         return assert.equal(values, 365)
                     })
                 })
-                describe('baseline', function () {
-                    it('value', () => {
-                        let params = ['temperature', 'yrly', 'baseline', 'y']
-                        let config = Object.assign(configs['live'], specs)
-                        return parser.getByParams(config, params).then(values => {
-                            //console.log(values)
-                            //return assert.ok( Math.abs(values - (-0.7873900649056548)) < 0.01)
-                            // TODO difference between estimated from server and client side
-                            //return assert.ok( Math.abs(values - (-0.8067076562515705)) < 0.01)
-                            return assert.ok( Math.abs(values - (-0.7117740351937244)) < 0.05)
-                        })
-                    })
-                })
                 describe('difference', () => {
                     it('y', () => {
                         let params = ['temperature', 'yrly', 'difference', 105]
@@ -1114,34 +1101,6 @@ describe(
                     })
                 })
             })
-            // TODO futher testings should be possible
-            it.skip('difference', () => {
-                let params = ['temperature', 'yrly', 'baseline', 'y']
-                let config = Object.assign(configs['live'], specs)
-                const startTime = (new Date()).getTime();
-                let value1 =  parser.getByParams(config, params).then(values => {
-                    let endTime = (new Date()).getTime();
-                    return {
-                        time: endTime - startTime,
-                        value: values
-                    }
-                })
-                let config2 = JSON.parse(JSON.stringify(config))
-                config2.baseline.start = 1950;
-                let value2 =  parser.getByParams(config2, params).then(values => {
-                    let endTime = (new Date()).getTime();
-                    return {
-                        time: endTime - startTime,
-                        value: values
-                    }
-                })
-                return value1.then(val1 => {
-                    return value2.then(val2 => {
-                        return assert.ok(val1.time < val2.time)
-                    })
-                })
-            })
-
             it('single', () => {
                 let params = ['temperature', 'yrly', 'shortValues']
                 let config = Object.assign(configs['live'], specs)
