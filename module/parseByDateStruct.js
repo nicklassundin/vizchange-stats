@@ -52,7 +52,7 @@ module.exports = class ByDateStruct {
 				this.values[key] = this.insert(false, key, 'year')
 				break;
 			case 'weekly':
-				this.values[key] = this.insert(false, key, 'year', 'week')
+				this.values[key] = this.insert(true, key, 'year', 'week')
 				break;
 			//case 'weeks':
 			//	this.values[key] = this.insert(true, key, 'year', 'week')
