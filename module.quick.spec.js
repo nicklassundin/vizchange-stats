@@ -121,6 +121,18 @@ describe(
             })
         })
         describe('functionality', function () {
+            describe('movingAverages', () => {
+                it('values', function () {
+                    it('year', () => {
+                        let params = ['temperature', 'yrly', 'movingAverage', 1]
+                        let config = Object.assign(configs['latest'], specs)
+                        return parser.getByParams(config, params).then(values => {
+                            //console.log(values)
+                            return assert.equal(values.x, 2020)
+                        })
+                    })
+                })
+            })
             describe('shortValues', function () {
                 describe('x', function () {
                     it('year', () => {
@@ -262,7 +274,7 @@ describe(
                 })
                 describe('baseline', () => {
                     describe('extreme', () => {
-                        it('daily', () => {
+                        it.only('daily', () => {
                             let params = ['temperature', 'yrly', 'maxAvg', 'baseline']
                             let config = Object.assign(configs['latest'], specs)
                             return parser.getByParams(config, params).then(values => {

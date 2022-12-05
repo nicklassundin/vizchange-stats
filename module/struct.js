@@ -739,9 +739,7 @@ module.exports = class Struct {
         return result;
 
     }
-
-    "plotMovAvg"() {
-
+    get "movingAverages"() {
         if (this.movAvg !== undefined) {
 
             return this.movAvg;
