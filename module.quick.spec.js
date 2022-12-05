@@ -225,12 +225,22 @@ describe(
             })
             describe('type', function() {
                 describe('extreme events', function() {
-                    it.only('daily', () => {
-                        let params = ['temperature', 'yrly', 'maxAvg', 'shortValues', 1]
-                        let config = Object.assign(configs['latest'], specs)
-                        return parser.getByParams(config, params).then(values => {
-                            console.log(values)
-                            return assert.ok(Math.abs(values.y - 18.1) < 0.01)
+                    describe('daily', () => {
+                        it('max', () => {
+                            let params = ['temperature', 'yrly', 'maxAvg', 'shortValues', 1]
+                            let config = Object.assign(configs['latest'], specs)
+                            return parser.getByParams(config, params).then(values => {
+                                console.log(values)
+                                return assert.ok(Math.abs(values.y - 18.1) < 0.01)
+                            })
+                        })
+                        it('min', () => {
+                            let params = ['temperature', 'yrly', 'minAvg', 'shortValues', 1]
+                            let config = Object.assign(configs['latest'], specs)
+                            return parser.getByParams(config, params).then(values => {
+                                console.log(values)
+                                return assert.ok(Math.abs(values.y - -16.7) < 0.01)
+                            })
                         })
                     })
                     it('weekly', () => {
@@ -251,13 +261,33 @@ describe(
                     })
                 })
                 describe('baseline', () => {
-                    it.only('daily', () => {
-                        let params = ['temperature', 'yrly', 'maxAvg', 'baseline']
-                        let config = Object.assign(configs['latest'], specs)
-                        return parser.getByParams(config, params).then(values => {
-                            return values.y.then(y => {
-                                console.log('y', y)
-                                return assert.ok(Math.abs(y - 18.26) < 1)
+                    describe('extreme', () => {
+                        it('daily', () => {
+                            let params = ['temperature', 'yrly', 'maxAvg', 'baseline']
+                            let config = Object.assign(configs['latest'], specs)
+                            return parser.getByParams(config, params).then(values => {
+                                return values.y.then(baseline => {
+                                    return parser.getByParams(config, ['temperature', 'yrly', 'maxAvg', 'difference', 1]).then(difference => {
+                                        return parser.getByParams(config, ['temperature', 'yrly', 'maxAvg', 'shortValues', 1]).then(value => {
+                                            console.log(baseline, '+', difference.y, '=', value.y)
+                                            return assert.ok(baseline+difference.y - value.y < 0.00001)
+                                        })
+                                    })
+                                })
+                            })
+                        })
+                        it('weekly', () => {
+                            let params = ['temperature', 'weekly', 'maxAvg', 'baseline']
+                            let config = Object.assign(configs['latest'], specs)
+                            return parser.getByParams(config, params).then(values => {
+                                return values.y.then(baseline => {
+                                    return parser.getByParams(config, ['temperature', 'weekly', 'maxAvg', 'difference', 1]).then(difference => {
+                                        return parser.getByParams(config, ['temperature', 'weekly', 'maxAvg', 'shortValues', 1]).then(value => {
+                                            console.log(baseline, '+', difference.y, '=', value.y)
+                                            return assert.ok(baseline+difference.y - value.y < 0.00001)
+                                        })
+                                    })
+                                })
                             })
                         })
                     })
@@ -635,7 +665,6 @@ describe(
                         })
                     })
                 })
-
                 describe('extreme', function() {
                     it('high', () => {
                         let params = ['temperature', 'yrly', 'max', 'high', 20, 'shortValues', 11]

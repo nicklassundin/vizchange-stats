@@ -585,7 +585,7 @@ class Point {
 						})
 						switch (this.SUBTYPE) {
 							case 'minAvg':
-								return year.sort((a, b) => (b.y - a.y)/Math.abs(a.y - b.y))[0]
+								return year.sort((a, b) => (a.y - b.y)/Math.abs(a.y - b.y))[0]
 							case 'maxAvg':
 								return year.sort((a, b) => (b.y - a.y)/Math.abs(a.y - b.y))[0]
 						}
