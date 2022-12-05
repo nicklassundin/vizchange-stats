@@ -635,54 +635,6 @@ module.exports = class Struct {
         }))
 
     }
-
-    "variance"() {
-
-        switch (this.type) {
-
-            case "sum":
-                return this.count * variance(this.values.map((each) => each.y));
-            default:
-                return variance(this.values.map((each) => each.y));
-
-        }
-
-    }
-
-    "ci"() {
-
-        return help.confidenceInterval(
-            this.y,
-            this.variance(),
-            this.count
-        );
-
-    }
-
-    "plotCI"() {
-
-        let result = [],
-            e = this.ci(),
-            {y} = this;
-        this.values.forEach((each) => {
-
-            if (each.ci) {
-
-                e = each.ci();
-                y = each.y;
-
-            }
-            result.push({
-                "x": each.x,
-                "high": e.high + (each.y - y),
-                "low": e.low + (each.y - y)
-            });
-
-        });
-        return result;
-
-    }
-
     "closest"(date) {
         if (typeof date == 'string') date = new Date(date)
         const oneDay = 24 * 60 * 60 * 1000,
@@ -739,7 +691,86 @@ module.exports = class Struct {
         return result;
 
     }
+    "variance"() {
+        switch (this.type) {
+            case "sum":
+                return this.count * variance(this.values.map((each) => each.y));
+            default:
+                return variance(this.values.map((each) => each.y));
+        }
+    }
+    "ci"() {
+        return help.confidenceInterval(
+            this.y,
+            this.variance(),
+            this.count
+        );
+    }
+    "plotCI"() {
+        let result = [],
+            e = this.ci(),
+            {y} = this;
+        this.values.forEach((each) => {
+            if (each.ci) {
+
+                e = each.ci();
+                y = each.y;
+
+            }
+            result.push({
+                "x": each.x,
+                "high": e.high + (each.y - y),
+                "low": e.low + (each.y - y)
+            });
+
+        });
+        return result;
+
+    }
     get "movingAverages"() {
+        let mov = 5;
+        return this.shortValues.reduce((all, current) => {
+            current = current.then((value) => {
+                //console.log(value)
+                value.yReal = value.y;
+                delete value.y
+                value.all = [];
+                return value
+            })
+            all.push(current.then())
+            let middle = all.length - (mov % 2 + 1)
+            if(middle < 0){
+                //console.log('middle Zero??', middle)
+                return all
+            }
+            if(middle+mov%2 > mov%2 && middle >= 0){
+                let worker = all[middle].then()
+                //console.log('interval', middle-mov%2, middle+mov%2)
+                for (let i = middle-mov%2; i <= middle+mov%2; i++){
+                    //console.log(i, middle, all.length)
+                    let worker = all[i].then()
+                    all[middle] = all[middle].then(value => {
+                        return worker.then(cur => {
+                          //  console.log('current ID:', cur.id)
+                          //  console.log('pre', 'id:', value.id, 'legth:', value.all.length)
+                            value.all.push(cur.yReal)
+                          //  console.log('post', 'id:', value.id, 'legth:', value.all.length)
+                            return value
+                        })
+                    })
+                }
+            }
+            return all
+        }, []).map((promise) => {
+            return promise.then(value => {
+                if(value.all.length >= mov){
+                    value.y = value.all.reduce((a, b) => a + b)/value.all.length
+                }
+                return value
+            })
+            return promise
+        })
+
         if (this.movAvg !== undefined) {
 
             return this.movAvg;
