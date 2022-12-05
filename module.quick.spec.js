@@ -122,7 +122,7 @@ describe(
         })
         describe('functionality', function () {
             describe('movingAverages', () => {
-                it.only('values', function () {
+                it('values', function () {
                     let params = ['temperature', 'yrly', 'movingAverages']
                     let config = Object.assign(configs['liveHalf'], specs)
                     return parser.getByParams(config, params).then(values => {
@@ -273,43 +273,89 @@ describe(
                 })
                 describe('baseline', () => {
                     describe('extreme', () => {
-                        it('daily', () => {
-                            let params = ['temperature', 'yrly', 'maxAvg', 'baseline']
-                            let config = Object.assign(configs['latest'], specs)
-                            return parser.getByParams(config, params).then(values => {
-                                return values.y.then(baseline => {
-                                    return parser.getByParams(config, ['temperature', 'yrly', 'maxAvg', 'difference', 1]).then(difference => {
-                                        return parser.getByParams(config, ['temperature', 'yrly', 'maxAvg', 'shortValues', 1]).then(value => {
-                                            //console.log(baseline, '+', difference.y, '=', value.y)
-                                            return assert.ok(baseline+difference.y - value.y < 0.00001)
+                        describe.only('precipitation', () => {
+                            it('daily', () => {
+                                let params = ['precipitation', 'yrly', 'maxAvg', 'baseline']
+                                let config = Object.assign(configs['latest'], precipitation_specs)
+                                return parser.getByParams(config, params).then(values => {
+                                    return values.y.then(baseline => {
+                                        return parser.getByParams(config, ['precipitation', 'yrly', 'maxAvg', 'difference', 1]).then(difference => {
+                                            return parser.getByParams(config, ['precipitation', 'yrly', 'maxAvg', 'shortValues', 1]).then(value => {
+                                                console.log(baseline, '+', difference.y, '=', value.y)
+                                                return assert.ok(baseline+difference.y - value.y < 0.00001)
+                                            })
+                                        })
+                                    })
+                                })
+                            })
+                            it('weekly', () => {
+                                let params = ['precipitation', 'weekly', 'maxAvg', 'baseline']
+                                let config = Object.assign(configs['latest'], precipitation_specs)
+                                return parser.getByParams(config, params).then(values => {
+                                    return values.y.then(baseline => {
+                                        return parser.getByParams(config, ['precipitation', 'weekly', 'maxAvg', 'difference', 1]).then(difference => {
+                                            return parser.getByParams(config, ['precipitation', 'weekly', 'maxAvg', 'shortValues', 1]).then(value => {
+                                                console.log(baseline, '+', difference.y, '=', value.y)
+                                                return assert.ok(baseline+difference.y - value.y < 0.00001)
+                                            })
+                                        })
+                                    })
+                                })
+                            })
+                            it('monthly', () => {
+                                let params = ['precipitation', 'months', 'maxAvg', 'baseline']
+                                let config = Object.assign(configs['latest'], precipitation_specs)
+                                return parser.getByParams(config, params).then(values => {
+                                    return values.y.then(baseline => {
+                                        return parser.getByParams(config, ['precipitation', 'months', 'maxAvg', 'difference', 1]).then(difference => {
+                                            return parser.getByParams(config, ['precipitation', 'months', 'maxAvg', 'shortValues', 1]).then(value => {
+                                                console.log(baseline, '+', difference.y, '=', value.y)
+                                                return assert.ok(baseline+difference.y - value.y < 0.00001)
+                                            })
                                         })
                                     })
                                 })
                             })
                         })
-                        it('weekly', () => {
-                            let params = ['temperature', 'weekly', 'maxAvg', 'baseline']
-                            let config = Object.assign(configs['latest'], specs)
-                            return parser.getByParams(config, params).then(values => {
-                                return values.y.then(baseline => {
-                                    return parser.getByParams(config, ['temperature', 'weekly', 'maxAvg', 'difference', 1]).then(difference => {
-                                        return parser.getByParams(config, ['temperature', 'weekly', 'maxAvg', 'shortValues', 1]).then(value => {
-                                            //console.log(baseline, '+', difference.y, '=', value.y)
-                                            return assert.ok(baseline+difference.y - value.y < 0.00001)
+                        describe('temperature', () => {
+                            it('daily', () => {
+                                let params = ['temperature', 'yrly', 'maxAvg', 'baseline']
+                                let config = Object.assign(configs['latest'], specs)
+                                return parser.getByParams(config, params).then(values => {
+                                    return values.y.then(baseline => {
+                                        return parser.getByParams(config, ['temperature', 'yrly', 'maxAvg', 'difference', 1]).then(difference => {
+                                            return parser.getByParams(config, ['temperature', 'yrly', 'maxAvg', 'shortValues', 1]).then(value => {
+                                                //console.log(baseline, '+', difference.y, '=', value.y)
+                                                return assert.ok(baseline+difference.y - value.y < 0.00001)
+                                            })
                                         })
                                     })
                                 })
                             })
-                        })
-                        it('monthly', () => {
-                            let params = ['temperature', 'months', 'maxAvg', 'baseline']
-                            let config = Object.assign(configs['latest'], specs)
-                            return parser.getByParams(config, params).then(values => {
-                                return values.y.then(baseline => {
-                                    return parser.getByParams(config, ['temperature', 'months', 'maxAvg', 'difference', 1]).then(difference => {
-                                        return parser.getByParams(config, ['temperature', 'months', 'maxAvg', 'shortValues', 1]).then(value => {
-                                            console.log(baseline, '+', difference.y, '=', value.y)
-                                            return assert.ok(baseline+difference.y - value.y < 0.00001)
+                            it('weekly', () => {
+                                let params = ['temperature', 'weekly', 'maxAvg', 'baseline']
+                                let config = Object.assign(configs['latest'], specs)
+                                return parser.getByParams(config, params).then(values => {
+                                    return values.y.then(baseline => {
+                                        return parser.getByParams(config, ['temperature', 'weekly', 'maxAvg', 'difference', 1]).then(difference => {
+                                            return parser.getByParams(config, ['temperature', 'weekly', 'maxAvg', 'shortValues', 1]).then(value => {
+                                                //console.log(baseline, '+', difference.y, '=', value.y)
+                                                return assert.ok(baseline+difference.y - value.y < 0.00001)
+                                            })
+                                        })
+                                    })
+                                })
+                            })
+                            it('monthly', () => {
+                                let params = ['temperature', 'months', 'maxAvg', 'baseline']
+                                let config = Object.assign(configs['latest'], specs)
+                                return parser.getByParams(config, params).then(values => {
+                                    return values.y.then(baseline => {
+                                        return parser.getByParams(config, ['temperature', 'months', 'maxAvg', 'difference', 1]).then(difference => {
+                                            return parser.getByParams(config, ['temperature', 'months', 'maxAvg', 'shortValues', 1]).then(value => {
+                                                console.log(baseline, '+', difference.y, '=', value.y)
+                                                return assert.ok(baseline+difference.y - value.y < 0.00001)
+                                            })
                                         })
                                     })
                                 })

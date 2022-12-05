@@ -479,6 +479,9 @@ class Point {
 			case 'minAvg':
 			case 'maxAvg':
 				y = req[`${'avg'}_${this.type}`]
+				if(y === undefined && req[this.type] !== undefined){
+					y = req[this.type]
+				}
 				if(typeof y == 'object'){
 					y = Number(y[this.specs.parentType])
 				}else{
@@ -511,7 +514,6 @@ class Point {
 	get 'y' (){
 		let result = NaN;
 		if(this.req.length === 0) return NaN
-
 		if(this.full){
 			result = this.req.map(each => this.getY(each)).filter(y => (y !== undefined && !isNaN(y)) || (typeof y === 'object'))
 			if(result.length === 0) return NaN
@@ -577,7 +579,12 @@ class Point {
 									each.y = each.y.reduce((a, b) => a + b)/each.y.length
 									return each
 								case 'sum':
-									each.y = each.y.reduce((a, b) => a + b)
+									if(each.y.length === 0){
+										each.y == NaN
+									}else{
+										each.y = each.y.reduce((a, b) => a + b)
+									}
+
 									return each
 								default:
 									return each
