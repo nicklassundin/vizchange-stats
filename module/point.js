@@ -795,6 +795,7 @@ class Point {
 		switch (this.SUBTYPE){
 			case 'minAvg':
 			case 'maxAvg':
+				// TODO test case for this and maybe not necessarily even run this
 				if(this.date === undefined) return undefined
 				return this.date.getMonth();
 			default:
@@ -863,6 +864,7 @@ class Point {
 			week: this.week,
 			month: this.month,
 			monthName: this.monthName,
+			date: this.date,
 //			type: this.type,
 			xInterval: this.specs.dates,
 //			typeMeta: this.typeMeta,
