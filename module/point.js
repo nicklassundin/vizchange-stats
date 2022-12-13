@@ -795,6 +795,7 @@ class Point {
 		switch (this.SUBTYPE){
 			case 'minAvg':
 			case 'maxAvg':
+				if(this.date === undefined) return undefined
 				return this.date.getMonth();
 			default:
 				return this.startDate.getMonth();
