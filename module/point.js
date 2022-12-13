@@ -234,20 +234,29 @@ class Point {
 		}else{
 			this.req = new PointReq(req, specs);
 		}
-		//this.monthName = help.monthByIndex(this.month);
-		//this.season = help.getSeasonByIndex(this.month)
-		this.decade = this.year - this.year % 10;
-		this.decade = this.year - this.year % 10;
-		// this.DOY = help.dayOfYear(this.x)
-		this.century = this.year - this.year % 100
+	}
+	get 'decade' () {
+		return this.year - this.year % 10;
+	}
+	get 'century' () {
+		return this.year - this.year % 100
+	}
+	get 'splitMonth' () {
 		if(help.isFirstHalfYear(this.month)){
-			this.splitMonth = this.month+12
-			this.splitYear = this.year - 1
+			return this.month+12
 		}else{
-			this.splitMonth = this.month
-			this.splitYear = this.year
+			return this.month
 		}
-		this.splitDecade = this.splitYear - this.splitYear % 10 +1;
+	}
+	get 'splitYear' () {
+		if(help.isFirstHalfYear(this.month)){
+			return this.year - 1
+		}else{
+			return this.year
+		}
+	}
+	get 'splitDecade' () {
+		return this.splitYear - this.splitYear % 10 +1;
 	}
 	get 'date' () {
 		// TODO sort out none valid points HOTFIX
@@ -282,6 +291,10 @@ class Point {
 				return new Date(this.req[0][this.type])
 			case 'avg':
 				if(typeof this.x === 'number') return new Date(this.x)
+			case 'maxAvg':
+			case 'minAvg':
+				return this.y.date[0]
+				break;
 			default:
 				return this.x;
 		}
@@ -556,17 +569,19 @@ class Point {
 							all[year] = {}
 							all[year][key] = {
 								value: key,
-								y: []
+								y: [],
+								date: []
 							}
 						}else if(all[year][key] === undefined){
 							all[year][key] = {
 								value: key,
-								y: []
+								y: [],
+								date: []
 							};
 						}
 						//console.log('(', (all[year][key] ? all[year][key].y : 0),'*', (all[year][key] ? all[year][key].nr : 1), '+', entry.y, ')/', ((all[year][key] ? all[year][key].nr : 0) + 1))
 						if(!isNaN(entry.y)) all[year][key].y.push(entry.y)
-
+						if(!isNaN(entry.date)) all[year][key].date.push(entry.date)
 						return all;
 					}, {})
 					result = Object.values(result).map(year => Object.values(year)).filter(year => {
@@ -592,21 +607,24 @@ class Point {
 						})
 						switch (this.SUBTYPE) {
 							case 'minAvg':
-								return year.sort((a, b) => (a.y - b.y)/Math.abs(a.y - b.y))[0]
+								year = year.sort((a, b) => (a.y - b.y)/Math.abs(a.y - b.y))[0];
+								return year
 							case 'maxAvg':
-								return year.sort((a, b) => (b.y - a.y)/Math.abs(a.y - b.y))[0]
+								year = year.sort((a, b) => (b.y - a.y)/Math.abs(a.y - b.y))[0]
+								return year
 						}
 					})
 					return result.reduce((all, current) => {
 						all.y = (all.y*all.value.length) + current.y
 						all.value.push(current.value)
 						all.y = all.y/all.value.length
+						all.date = all.date.concat(current.date)
 						return all
 					}, {
 						value: [],
 						y: 0,
+						date: []
 					})
-					break;
 				case 'snow':
 				case 'rain':
 					return result.reduce((a,b) => a + b)
@@ -774,7 +792,13 @@ class Point {
 		return this.specs.dates.start;
 	}
 	get 'month' (){
-		return this.startDate.getMonth();
+		switch (this.SUBTYPE){
+			case 'minAvg':
+			case 'maxAvg':
+				return this.date.getMonth();
+			default:
+				return this.startDate.getMonth();
+		}
 	}
 	get 'monthName'() {
 		return help.monthByIndex(this.month);
@@ -835,10 +859,12 @@ class Point {
 				red: ColorToHex(255, 55 + Math.floor(y * 200 / (this.y - y)), 0),
 				blue: ColorToHex(55 + Math.floor(y * 200 / (this.y - y)), 255, 0)
 			},
+			week: this.week,
+			month: this.month,
+			monthName: this.monthName,
 //			type: this.type,
 			xInterval: this.specs.dates,
 //			typeMeta: this.typeMeta,
-			date: this.date,
 			value
 		}
 	}

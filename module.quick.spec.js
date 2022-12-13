@@ -235,13 +235,13 @@ describe(
                 })
             })
             describe('type', function() {
-                describe('extreme events', function() {
+                describe.only('extreme events', function() {
                     describe('daily', () => {
                         it('max', () => {
                             let params = ['temperature', 'yrly', 'maxAvg', 'shortValues', 1]
                             let config = Object.assign(configs['latest'], specs)
                             return parser.getByParams(config, params).then(values => {
-                                //console.log(values)
+                                console.log('values', values)
                                 return assert.ok(Math.abs(values.y - 18.1) < 0.01)
                             })
                         })
@@ -249,31 +249,51 @@ describe(
                             let params = ['temperature', 'yrly', 'minAvg', 'shortValues', 1]
                             let config = Object.assign(configs['latest'], specs)
                             return parser.getByParams(config, params).then(values => {
-                                //console.log(values)
+                                console.log('values', values)
                                 return assert.ok(Math.abs(values.y - -16.7) < 0.01)
                             })
                         })
                     })
-                    it('weekly', () => {
-                        let params = ['temperature', 'weekly', 'maxAvg', 'shortValues', 1]
-                        let config = Object.assign(configs['latest'], specs)
-                        return parser.getByParams(config, params).then(values => {
-                            //console.log(values)
-                            return assert.ok(Math.abs(values.y - 15.085714285714285) < 0.01)
+                    describe('weekly', function () {
+                        it('max', () => {
+                            let params = ['temperature', 'weekly', 'maxAvg', 'shortValues', 1]
+                            let config = Object.assign(configs['latest'], specs)
+                            return parser.getByParams(config, params).then(values => {
+                                console.log('values', values)
+                                return assert.ok(Math.abs(values.y - 15.085714285714285) < 0.01)
+                            })
+                        })
+                        it('min', () => {
+                            let params = ['temperature', 'weekly', 'minAvg', 'shortValues', 1]
+                            let config = Object.assign(configs['latest'], specs)
+                            return parser.getByParams(config, params).then(values => {
+                                console.log('values', values)
+                                return assert.ok(Math.abs(values.y - -11.2) < 0.01)
+                            })
                         })
                     })
-                    it('monthly', () => {
-                        let params = ['temperature', 'months', 'maxAvg', 'shortValues', 1]
-                        let config = Object.assign(configs['latest'], specs)
-                        return parser.getByParams(config, params).then(values => {
-                            //console.log(values)
-                            return assert.ok(Math.abs(values.y - 11.009677419354839) < 0.01)
+                    describe('monthly', function () {
+                        it('max', () => {
+                            let params = ['temperature', 'months', 'maxAvg', 'shortValues', 1]
+                            let config = Object.assign(configs['latest'], specs)
+                            return parser.getByParams(config, params).then(values => {
+                                console.log('values', values)
+                                return assert.ok(Math.abs(values.y - 11.009677419354839) < 0.01)
+                            })
+                        })
+                        it('min', () => {
+                            let params = ['temperature', 'months', 'minAvg', 'shortValues', 1]
+                            let config = Object.assign(configs['latest'], specs)
+                            return parser.getByParams(config, params).then(values => {
+                                console.log('values', values)
+                                return assert.ok(Math.abs(values.y - -6.4206896551724135) < 0.01)
+                            })
                         })
                     })
                 })
                 describe('baseline', () => {
                     describe('extreme', () => {
-                        describe.only('precipitation', () => {
+                        describe('precipitation', () => {
                             it('daily', () => {
                                 let params = ['precipitation', 'yrly', 'maxAvg', 'baseline']
                                 let config = Object.assign(configs['latest'], precipitation_specs)
