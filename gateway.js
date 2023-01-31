@@ -193,7 +193,6 @@ module.exports = {
 	queue: 0,
 	cached: {},
 	async axios(url){
-
 		//let path = `${url.split('/').join('').replace('https:', '').replace('.', '').replace(',', '').}.json`;
 		let path = `${hashCode(url)}.json`;
 

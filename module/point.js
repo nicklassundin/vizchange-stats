@@ -291,6 +291,8 @@ class Point {
 				return new Date(this.req[0][this.type])
 			case 'avg':
 				if(typeof this.x === 'number') return new Date(this.x)
+				console.log(typeof this.x, this.x)
+				return this.x
 			case 'maxAvg':
 			case 'minAvg':
 				return this.y.date[0]
