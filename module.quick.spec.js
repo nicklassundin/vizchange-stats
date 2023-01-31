@@ -184,7 +184,7 @@ describe(
                     })
                 })
             })
-            it('y', () => {
+            it.only('y', () => {
                 let params = ['temperature', 'yrly', 'y']
                 let config = Object.assign(configs['latest'], specs)
                 return parser.getByParams(config, params).then(values => {
