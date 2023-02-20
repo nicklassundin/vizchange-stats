@@ -136,9 +136,12 @@ let set = (station) => {
 		preset.station[station] = str
 	}) 
 }
+
+/* TODO get station */
+/*
 set(140480)
 set(140490)
-
+*/
 
 let debug = {
 	slow: undefined,
