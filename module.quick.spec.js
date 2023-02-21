@@ -23,6 +23,20 @@ let specs = {
         'end': 1991
     }
 }
+
+let specs_smhi = {
+    type: 'temperature',
+    station: '53460',
+    coordinates: {
+      latitude: 55.71,
+      longitude: 13.2
+    },
+    baseline: {
+        'start': 1961,
+        'end': 1991
+    }
+}
+
 //console.log("Date:", new Date())
 let precipitation_specs = {
     type: 'precipitation',
@@ -83,6 +97,14 @@ describe(
     'Requests',
     function () {
         describe('recursive', function () {
+            it.only('smhi', function () {
+                let params = ['temperature', 'yrly', 'shortValues', 50];
+                let config = Object.assign(configs.live, specs_smhi)
+                return parser.getByParams(config, params).then((values) => {
+                    console.log(values)
+                    return assert.ok(Math.abs(values.y - 8.248700410396697) < 0.05)
+                })
+            })
             it('promises', function () {
                 let params = ['temperature', 'yrly', 'shortValues', 1];
                 let config = Object.assign(configs['liveHalf'], specs)
@@ -611,7 +633,7 @@ describe(
                         })
                     })
                     describe('snow', function() {
-                        it.only('y', () => {
+                        it('y', () => {
                             let params = ['precipitation', 'yrly', 'snow', 'y']
                             let config = Object.assign(configs['latest'], precipitation_specs)
                             return parser.getByParams(config, params).then(values => {

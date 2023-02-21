@@ -170,9 +170,14 @@ module.exports = {
 			start: specs.dates.start,
 			end: specs.dates.end
 		}
-		var host = specs.url;
-		var type = specs.type
-		var url = `${preset.station[station]}&date=${parsePeriod(dates.start)}-${parsePeriod(dates.end)}`
+		let host = specs.url;
+		let type = specs.type
+		let url = `&date=${parsePeriod(dates.start)}-${parsePeriod(dates.end)}`
+		if (specs.coordinates !== undefined) {
+			url = `?position=${specs.coordinates.latitude},${specs.coordinates.longitude}&radius=30&${url}`
+		}else{
+			url = `${preset.station[station]}${url}`
+		}
 		if(['glob', '64n-90n', 'nhem'].includes(station) && ['glob_temp','nhem_temp','64n-90n_temp','temperature'].includes(type)){
 			// url = `${url}&types=${preset.types[station+type]},station`
 			url = `${url}&types=${preset.types[station+type]}`
@@ -180,12 +185,14 @@ module.exports = {
 		}else if(type){
 			url = `${url}&types=${preset.types[type] !== undefined ? preset.types[type] : type}`
 		}
+		/*
 		if(preset.station[station] === undefined) return Promise.reject({
 			"ERROR": "No such station",
 			"keys": Object.keys(preset.station),
 			"data": [],
 			"URL": url
 		})
+		 */
 		if(full){
 			return module.exports.axios((host)+url)
 		}else{
