@@ -105,7 +105,7 @@ describe(
                     return assert.ok(Math.abs(values.y - 8.248700410396697) < 0.05)
                 })
             })
-            it.only('promises', function () {
+            it('promises', function () {
                 let params = ['temperature', 'yrly', 'shortValues', 1];
                 let config = Object.assign(configs['liveHalf'], specs)
                 return parser.getByParams(config, params).then((values) => {
@@ -117,7 +117,7 @@ describe(
                     return assert.ok(Math.abs(values.y - -0.43) < 0.05)
                 })
             })
-            it('promises & arrays', function () {
+            it.only('promises & arrays', function () {
                 let params = ['temperature', 'yrly', 'values', 0, 'x'];
                 let config = Object.assign(configs['latest'], specs)
                 return parser.getByParams(config, params).then(function (values) {
