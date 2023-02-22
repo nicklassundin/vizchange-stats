@@ -173,7 +173,7 @@ module.exports = {
 		let host = specs.url;
 		let type = specs.type
 		let url = `&date=${parsePeriod(dates.start)}-${parsePeriod(dates.end)}`
-		if (specs.coordinates !== undefined) {
+		if (preset.station[station === undefined) {
 			url = `?position=${specs.coordinates.latitude},${specs.coordinates.longitude}&radius=30&${url}`
 		}else{
 			url = `${preset.station[station]}${url}`
