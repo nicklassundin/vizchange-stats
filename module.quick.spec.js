@@ -97,7 +97,7 @@ describe(
     'Requests',
     function () {
         describe('recursive', function () {
-            it.only('smhi', function () {
+            it('smhi', function () {
                 let params = ['temperature', 'yrly', 'shortValues', 50];
                 let config = Object.assign(configs.live, specs_smhi)
                 return parser.getByParams(config, params).then((values) => {
@@ -105,7 +105,7 @@ describe(
                     return assert.ok(Math.abs(values.y - 8.248700410396697) < 0.05)
                 })
             })
-            it('promises', function () {
+            it.only('promises', function () {
                 let params = ['temperature', 'yrly', 'shortValues', 1];
                 let config = Object.assign(configs['liveHalf'], specs)
                 return parser.getByParams(config, params).then((values) => {
