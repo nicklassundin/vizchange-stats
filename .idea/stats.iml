@@ -16,5 +16,6 @@
     <orderEntry type="module" module-name="story-beta" />
     <orderEntry type="module" module-name="helper" />
     <orderEntry type="module" module-name="production" />
+    <orderEntry type="module" module-name="vizchange-map" />
   </component>
 </module>

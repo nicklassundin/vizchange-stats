@@ -28,8 +28,8 @@ let specs_smhi = {
     type: 'temperature',
     station: '53460',
     coordinates: {
-      latitude: 55.71,
-      longitude: 13.2
+      latitude: 55.6932,
+      longitude: 13.2251
     },
     baseline: {
         'start': 1961,
@@ -96,13 +96,14 @@ const assert = require('assert');
 describe(
     'Requests',
     function () {
-        describe('recursive', function () {
-            it('smhi', function () {
-                let params = ['temperature', 'yrly', 'shortValues', 50];
-                let config = Object.assign(configs.live, specs_smhi)
+        describe.only('recursive', function () {
+            it.only('smhi', function () {
+                let params = ['temperature', 'yrly', 'shortValues', 1];
+                let config = Object.assign(configs['latest'], specs_smhi)
+                console.log(specs_smhi)
                 return parser.getByParams(config, params).then((values) => {
                     console.log(values)
-                    return assert.ok(Math.abs(values.y - 8.248700410396697) < 0.05)
+                    return assert.ok(Math.abs(values.y - 10.277565849227981) < 0.05)
                 })
             })
             it('promises', function () {
@@ -117,7 +118,7 @@ describe(
                     return assert.ok(Math.abs(values.y - -0.43) < 0.05)
                 })
             })
-            it.only('promises & arrays', function () {
+            it('promises & arrays', function () {
                 let params = ['temperature', 'yrly', 'values', 0, 'x'];
                 let config = Object.assign(configs['latest'], specs)
                 return parser.getByParams(config, params).then(function (values) {

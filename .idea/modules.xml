@@ -11,6 +11,7 @@
       <module fileurl="file://$PROJECT_DIR$/../smhi/.idea/smhi.iml" filepath="$PROJECT_DIR$/../smhi/.idea/smhi.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/stats.iml" filepath="$PROJECT_DIR$/.idea/stats.iml" />
       <module fileurl="file://$PROJECT_DIR$/../story-beta/.idea/story-beta.iml" filepath="$PROJECT_DIR$/../story-beta/.idea/story-beta.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../vizchange-map/.idea/vizchange-map.iml" filepath="$PROJECT_DIR$/../vizchange-map/.idea/vizchange-map.iml" />
     </modules>
   </component>
 </project>

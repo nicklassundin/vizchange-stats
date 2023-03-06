@@ -56,7 +56,7 @@ let getSmhiStation = async function(id){
 			res.on("end", () => {
 				try {
 					let json = JSON.parse(body);
-					result(`?position=${json.position[0].longitude},${json.position[0].latitude}`)
+					result(`?position=${json.position[0].latitude},${json.position[0].longitude}`)
 				} catch (error) {
 					console.error(error.message);
 					reject(error)
@@ -113,7 +113,8 @@ const preset = {
 		// '': ['?position='],
 	},
 	types: {
-		temperature: 'temperature,avg_temperature,min_temperature,max_temperature',
+		//temperature: 'temperature,avg_temperature,min_temperature,max_temperature',
+		temperature: 'avg_temperature,min_temperature,max_temperature',
 		precipitation: 'precipitation,avg_temperature',
 		snow: 'precipitation,avg_temperature',
 		rain: 'precipitation,avg_temperature',
