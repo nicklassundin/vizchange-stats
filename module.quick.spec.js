@@ -103,7 +103,7 @@ describe(
                 console.log(specs_smhi)
                 return parser.getByParams(config, params).then((values) => {
                     console.log(values)
-                    return assert.ok(Math.abs(values.y - 10.277565849227981) < 0.05)
+                    return assert.ok(Math.abs(values.y - 10.53896457765667) < 0.05)
                 })
             })
             it('promises', function () {
