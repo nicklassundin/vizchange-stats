@@ -10,6 +10,17 @@
 		},
 		"url": "https://vischange.k8s.glimworks.se/data/query/v1"
 	},
+	"middle": {
+		"baseline": {
+			"start": 1961,
+			"end": 1991
+		},
+		"dates": {
+			"start": 1983,
+			"end": 1996
+		},
+		"url": "https://vischange.k8s.glimworks.se/data/query/v1"
+	},
 	"liveHalf": {
 		"baseline": {
 			"start": 1961,
@@ -30,7 +41,7 @@
 			"start": 2018,
 			"end": 2030
 		},
-		"url": "staging-devop-deploy-https://vischange.k8s.glimworks.se/data/query/v1"
+		"url": "https://vischange.k8s.glimworks.se/data/query/v1"
 	},
 	"empty": {
 		"baseline": {
@@ -142,5 +153,16 @@
 			"end": 1991
 		},
 		"url": "https://vischange.k8s.glimworks.se/data/query/v1"
+	},
+	"latest-staging": {
+		"dates": {
+			"start": 2019,
+			"end": 2025
+		},
+		"baseline": {
+			"start": 1961,
+			"end": 1991
+		},
+		"url": "https://staging-devop-deploy-vischange.k8s.glimworks.se/data/query/v1"
 	}
 }

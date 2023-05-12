@@ -181,8 +181,9 @@ class PointReq {
 }
 
 class Point {
-	static build(specs, full=false){
+	static build(specs, full=false, sort=undefined){
 		switch (specs.keys[0]){
+			case 'year':
 			case 'weeks':
 			case 'splitMonth':
 			case 'splitDecades':
@@ -202,12 +203,11 @@ class Point {
 			case 'summer':
 			case 'winter':
 			case 'autumn':
-			case 'year':
 				full = true;
 				break;
 			default:
 		}
-		return curl.proxRequest(specs, full).then(res => {
+		return curl.proxRequest(specs, full, sort).then(res => {
 			if (res.length < 1) return new Point(specs, res, full)
 
 			if (!full) res = res.reduce((a, b) => Object.assign(a, b))
@@ -291,7 +291,6 @@ class Point {
 				return new Date(this.req[0][this.type])
 			case 'avg':
 				if(typeof this.x === 'number') return new Date(this.x)
-				console.log(typeof this.x, this.x)
 				return this.x
 			case 'maxAvg':
 			case 'minAvg':
@@ -404,8 +403,6 @@ class Point {
 		let req = this.req.sort((a, b) => {
 			return (new Date(a.date).getTime()) - (new Date(b.date).getTime())
 		}).filter((e) => {
-			//n += 1;
-			//console.log(n+'/'+this.req.length)
 			return f(this.getY(e))
 		})
 		return new Point(this.specs, req, true)
@@ -581,7 +578,6 @@ class Point {
 								date: []
 							};
 						}
-						//console.log('(', (all[year][key] ? all[year][key].y : 0),'*', (all[year][key] ? all[year][key].nr : 1), '+', entry.y, ')/', ((all[year][key] ? all[year][key].nr : 0) + 1))
 						if(!isNaN(entry.y)) all[year][key].y.push(entry.y)
 						if(!isNaN(entry.date)) all[year][key].date.push(entry.date)
 						return all;
@@ -644,7 +640,7 @@ class Point {
 							return result[0]
 					}
 				case 'growingSeason':
-					result = result.filter(each => each.start !== undefined).sort((a, b) => (new Date(a)) < (new Date(b)))
+					result = result.filter(each => each.start !== undefined && !isNaN(each.value)).sort((a, b) => (new Date(a)) < (new Date(b)))
 					result = result.reduce((all, entry) => {
 						let doy = this.key(entry.start)
 						let year = entry.start.getFullYear();

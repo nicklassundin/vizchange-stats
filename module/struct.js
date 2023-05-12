@@ -6,6 +6,7 @@ const help = require('climate-plots-helper')
  * const $ = require( "jquery" )( window );
  */
 const {Point} = require('./point.js')
+const curl = require("../gateway");
 class Extreme {
     constructor(struct, type) {
         this.parent = struct;
@@ -28,15 +29,10 @@ function getDateOfWeek(w, y) {
 
     return new Date(y, 0, d);
 }
-//function ConvertRGBtoHex(red, green, blue) {
-//	return "#" + ColorToHex(red) + ColorToHex(green) + ColorToHex(blue);
-//}
+
 
 module.exports = class Struct {
     static build(seedSpecs, x, type, f = () => true, full = false, parentType, parentEntry) {
-        //console.log(seedSpecs.keys[0], seedSpecs.dates)
-
-        //console.log('build.start', seedSpecs.dates)
         switch (seedSpecs.type) {
             case 'freezeup':
             case 'breakup':
@@ -181,6 +177,11 @@ module.exports = class Struct {
     set 'entry' (value) {
         this.POINT = value
     }
+    get 'subDivide'() {
+        let specs = JSON.parse(JSON.stringify(this.specs))
+        specs.keys.shift()
+        return curl.proxRequest(specs, false, specs.keys[0])
+    }
     get 'entry' () {
         if (this.POINT === undefined) {
             let specs = JSON.parse(JSON.stringify(this.specs));
@@ -310,16 +311,16 @@ module.exports = class Struct {
                 specs.dates.end = k;
         }
         let result = Struct.build(specs, k, type, f, this.full, this.parentType, this.entry);
+
         if(this.full){
             switch(key) {
-
                 case 'year':
                     break;
-
                 default:
                     result.entry = this.entry.then(entry => {
-                        //console.log('key', key, entry instanceof Point);
+                        /*
                         if(!(entry instanceof Point)) console.log('entry', entry)
+                         */
                         return entry.dateSlice(result.specs.dates.start, result.specs.dates.end)
                     })
             }
@@ -539,7 +540,6 @@ module.exports = class Struct {
             case 'all':
                 return this.entry.then((entry) => {
                     if(entry instanceof Point){
-                        console.log('point')
                         return entry.splinter.map(each => Promise.resolve(each.short))
                     }else{
                         return new Error(`Invalid`)

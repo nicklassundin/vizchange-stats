@@ -8,6 +8,7 @@
       <module fileurl="file://$PROJECT_DIR$/../parser/.idea/parser.iml" filepath="$PROJECT_DIR$/../parser/.idea/parser.iml" />
       <module fileurl="file://$PROJECT_DIR$/../plots/.idea/plots.iml" filepath="$PROJECT_DIR$/../plots/.idea/plots.iml" />
       <module fileurl="file://$PROJECT_DIR$/../production/.idea/production.iml" filepath="$PROJECT_DIR$/../production/.idea/production.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../renderer/.idea/renderer.iml" filepath="$PROJECT_DIR$/../renderer/.idea/renderer.iml" />
       <module fileurl="file://$PROJECT_DIR$/../smhi/.idea/smhi.iml" filepath="$PROJECT_DIR$/../smhi/.idea/smhi.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/stats.iml" filepath="$PROJECT_DIR$/.idea/stats.iml" />
       <module fileurl="file://$PROJECT_DIR$/../story-beta/.idea/story-beta.iml" filepath="$PROJECT_DIR$/../story-beta/.idea/story-beta.iml" />

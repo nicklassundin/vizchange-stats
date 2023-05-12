@@ -165,7 +165,7 @@ let parsePeriod = function(date){
 
 module.exports = {
 	preset: preset,
-	proxRequest: function(specs, full = false){
+	proxRequest: function(specs, full = false, sort){
 		var station = specs.station;
 		var dates = {
 			start: specs.dates.start,
@@ -186,18 +186,16 @@ module.exports = {
 		}else if(type){
 			url = `${url}&types=${preset.types[type] !== undefined ? preset.types[type] : type}`
 		}
-		/*
-		if(preset.station[station] === undefined) return Promise.reject({
-			"ERROR": "No such station",
-			"keys": Object.keys(preset.station),
-			"data": [],
-			"URL": url
-		})
-		 */
+
 		if(full){
 			return module.exports.axios((host)+url)
 		}else{
-			return module.exports.axios((host)+url+"&calculate")
+			// TODO use sort
+			if(sort && false){
+				return module.exports.axios((host)+url+`&calculate&${sort}`)
+			}else{
+				return module.exports.axios((host)+url+"&calculate")
+			}
 		}
 	},
 	number: 0,
@@ -226,7 +224,7 @@ module.exports = {
 			// TODO nicer solution to individual requests
 			this.cached[url] = axios.get(url).then(result => {
 				this.number += 1;
-			//	console.log('rqst Nr:', this.number)
+				console.log('rqst Nr:', this.number, url)
 /*
 				let list = undefined;
 
@@ -249,7 +247,7 @@ module.exports = {
 				return result
 			}).catch(
 				function (error) {
-					console.log('Show error notification!')
+					console.log('Show error notification!', error)
 					return Promise.reject(error)
 				}
 			)

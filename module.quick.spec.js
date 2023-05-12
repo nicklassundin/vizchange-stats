@@ -96,11 +96,10 @@ const assert = require('assert');
 describe(
     'Requests',
     function () {
-        describe.only('recursive', function () {
-            it.only('smhi', function () {
+        describe('recursive', function () {
+            it('smhi', function () {
                 let params = ['temperature', 'yrly', 'shortValues', 1];
                 let config = Object.assign(configs['latest'], specs_smhi)
-                console.log(specs_smhi)
                 return parser.getByParams(config, params).then((values) => {
                     console.log(values)
                     return assert.ok(Math.abs(values.y - 10.53896457765667) < 0.05)
@@ -499,35 +498,55 @@ describe(
                             })
                         })
                     })
-                    it('growingSeason Days', () => {
-                        let params = ['temperature', 'yrly', 'growingSeason', 'baseline']
-                        let config = Object.assign(configs['live'], specs)
-                        return parser.getByParams(config, params).then(values => {
-                            return values.y.then(y => {
-                                //console.log('values', y)
-                                return assert.ok(Math.abs(y - 121.8) < 0.001)
+                    describe('growingSeason', () => {
+                        it('growingSeason Days', () => {
+                            let params = ['temperature', 'yrly', 'growingSeason', 'baseline']
+                            let config = Object.assign(configs['live'], specs)
+                            return parser.getByParams(config, params).then(values => {
+                                return values.y.then(y => {
+                                    //console.log('values', y)
+                                    return assert.ok(Math.abs(y - 121.8) < 0.001)
+                                })
+                            })
+                        })
+                        it('growingSeason Weeks', () => {
+                            let params = ['temperature', 'weekly', 'growingSeason', 'baseline']
+                            let config = Object.assign(configs['live'], specs)
+                            return parser.getByParams(config, params).then(values => {
+                                return values.y.then(y => {
+                                    console.log('values', y)
+                                    return assert.ok(Math.abs(y - 19.7) < 0.001)
+                                })
                             })
                         })
                     })
-                    it('growingSeason Weeks', () => {
-                        let params = ['temperature', 'weekly', 'growingSeason', 'baseline']
-                        let config = Object.assign(configs['live'], specs)
-                        return parser.getByParams(config, params).then(values => {
-                            return values.y.then(y => {
-                                console.log('values', y)
-                                return assert.ok(Math.abs(y - 19.7) < 0.001)
-                            })
-                        })
-                    })
-                })
-                describe('temperature', function() {
 
-                    it.skip('last entry', () => {
-                        let params = ['temperature', 'yrly', 'max', 'values', 111, 'entry', 'req']
+                })
+                // TODO sort
+                describe('glimwork sort', function() {
+                    it('avg', () => {
+                        let params = ['temperature', 'yrly', 'subDivide']
                         let config = Object.assign(configs['live'], specs)
                         return parser.getByParams(config, params).then(values => {
-                           // //console.log(values)
-                            return assert.ok(Math.abs(values.y - -4.2) < 0.01)
+                            console.log(values)
+                            return assert.ok(Math.abs(values.y - -4.9) < 0.0001 )
+                        })
+                    })
+
+                    it('max', () => {
+                        let params = ['temperature', 'yrly', 'max', 'shortValues', 1]
+                        let config = Object.assign(configs['latest'], specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values.y)
+                            return assert.equal(values.y, -1.5)
+                        })
+                    })
+                    it('min', () => {
+                        let params = ['temperature', 'yrly', 'min', 'shortValues', 1]
+                        let config = Object.assign(configs['latest'], specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values)
+                            return assert.equal(values.y, -7.9)
                         })
                     })
                 })
@@ -910,32 +929,69 @@ describe(
                         })
                     })
                 })
-                describe('growing Season', function() {
-                    it('weeks', () => {
-                        let params = ['temperature', 'weekly', 'growingSeason', 'shortValues', 1]
-                        let config = Object.assign(configs['latest'], specs)
-                        return parser.getByParams(config, params).then(values => {
-                            //console.log('values', values)
-                            return assert.equal(values.y, 22)
-                        })
-                    })
-                    it('full test', () => {
-                        let params = ['temperature', 'weekly', 'growingSeason', 'shortValues']
-                        let config = Object.assign(configs['live'], specs)
-                        return parser.getByParams(config, params).then(values => {
-                            return Promise.all(values).then(values => {
+                describe.only('growing Season', function() {
+                    describe('weeks', () => {
+                        it('weeks 1', () => {
+                            let params = ['temperature', 'weekly', 'growingSeason', 'shortValues', 1]
+                            let config = Object.assign(configs['latest'], specs)
+                            return parser.getByParams(config, params).then(values => {
                                 //console.log('values', values)
-                                values = values.map((value, i) => value.x == i+1910)
-                                return assert.ok(values.reduce((a, b) => a && b))
+                                return assert.equal(values.y, 22)
+                            })
+                        })
+                        it('test concequatiev', () => {
+                            let params = ['temperature', 'yrly', 'values', 77, 'entry', 'req']
+                            let config = Object.assign(configs['live'], specs)
+                            return parser.getByParams(config, params).then(values => {
+                                // function count number of concequtive weeks with positive avg_temperature
+                                let concequative = function (values) {
+                                    let count = 0
+                                    let max = 0
+                                    values.forEach(each => {
+                                        if (each['avg_temperature'] > 0) {
+                                            count++
+                                            if (count > max) {
+                                                max = count
+                                            }
+                                        } else {
+                                            count = 0
+                                        }
+                                    })
+                                    return max/7
+                                }
+                                console.log('concequtive', concequative(values))
+                                return assert.equal(values.y, 22)
+                            })
+                        })
+                        it.only('weeks 2', () => {
+                            let params = ['temperature', 'weekly', 'growingSeason', 'shortValues', 2]
+                            let config = Object.assign(configs['middle'], specs)
+                            return parser.getByParams(config, params).then(values => {
+                                console.log('values', values)
+                                return assert.equal(values.y, 25)
+                            })
+                        })
+
+                        it.skip('full test', () => {
+                            let params = ['temperature', 'weekly', 'growingSeason', 'shortValues']
+                            let config = Object.assign(configs['live'], specs)
+                            return parser.getByParams(config, params).then(values => {
+                                return Promise.all(values).then(values => {
+                                    //console.log('values', values)
+                                    values = values.map((value, i) => value.x == i+1910)
+                                    return assert.ok(values.reduce((a, b) => a && b))
+                                })
                             })
                         })
                     })
-                    it('days', () => {
-                        let params = ['temperature', 'yrly', 'growingSeason', 'shortValues', 110]
-                        let config = Object.assign(configs['live'], specs)
-                        return parser.getByParams(config, params).then(values => {
-                            //console.log('values', values)
-                            return assert.equal(values.y, 154)
+                    describe('days', () => {
+                        it('days', () => {
+                            let params = ['temperature', 'yrly', 'growingSeason', 'shortValues', 110]
+                            let config = Object.assign(configs['live'], specs)
+                            return parser.getByParams(config, params).then(values => {
+                                //console.log('values', values)
+                                return assert.equal(values.y, 154)
+                            })
                         })
                     })
                     it('difference', () => {
