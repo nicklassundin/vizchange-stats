@@ -22,7 +22,7 @@ describe('Request-full', function() {
 	it.only('y', () => {
 		return cache.fullresult.then(all => {
 			return all.yrly.then(yrly => {
-				// console.log(yrly)
+				// ////console.log(yrly)
 				let y = 1.5903616882136928;
 				return assert.equal(yrly.y, y)
 			})

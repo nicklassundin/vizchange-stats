@@ -51,7 +51,7 @@ module.exports = class Struct {
         let d1 = 1;
         let m2 = 0;
         let d2 = 1;
-        //console.log(specs.keys[0])
+        ////console.log(specs.keys[0])
         specs.dates.type = specs.type
         switch (specs.keys[0]) {
             case 'month':
@@ -154,7 +154,7 @@ module.exports = class Struct {
                 }
         }
         // TODO sort out dates correctly with testing
-       // console.log(specs.dates)
+       // //console.log(specs.dates)
         if (typeof specs.dates.start === 'number') {
             specs.dates.start = new Date(specs.dates.start + y1, m1, 1)
             specs.dates.end = new Date(specs.dates.end + y2, m2, d2)
@@ -319,7 +319,7 @@ module.exports = class Struct {
                 default:
                     result.entry = this.entry.then(entry => {
                         /*
-                        if(!(entry instanceof Point)) console.log('entry', entry)
+                        if(!(entry instanceof Point)) //console.log('entry', entry)
                          */
                         return entry.dateSlice(result.specs.dates.start, result.specs.dates.end)
                     })
@@ -580,22 +580,22 @@ module.exports = class Struct {
             default:
                 return this.entry.then(entry => {
                     try {
-                        // console.log(entry.x, entry.specs.dates)
+                        // //console.log(entry.x, entry.specs.dates)
                         return entry.short
                     }catch(error) {
-                        //console.log(entry)
+                        ////console.log(entry)
                         throw error
                     }
                 })
         }
     }
     'sequence' (f = (e) => e > 0) {
-       // console.log(this.x, this.shortValues)
+       // //console.log(this.x, this.shortValues)
         return Promise.all(this.shortValues).then((values => {
-            //console.log("sequence", values.length, this.specs.keys, this.specs.dates)
+            ////console.log("sequence", values.length, this.specs.keys, this.specs.dates)
             values = values.map(each => {
                 let res = {};
-                //if(each.x === 1) console.log(each.xInterval)
+                //if(each.x === 1) //console.log(each.xInterval)
                 res.y = f(each.y)
                     ? 1
                     : 0;
@@ -731,7 +731,7 @@ module.exports = class Struct {
         let mov = 5;
         return this.shortValues.reduce((all, current) => {
             current = current.then((value) => {
-                //console.log(value)
+                ////console.log(value)
                 value.yReal = value.y;
                 delete value.y
                 value.all = [];
@@ -740,21 +740,21 @@ module.exports = class Struct {
             all.push(current.then())
             let middle = all.length - (mov % 2 + 1)
             if(middle < 0){
-                //console.log('middle Zero??', middle)
+                ////console.log('middle Zero??', middle)
                 return all
             }
             if(middle+mov%2 > mov%2 && middle >= 0){
                 let worker = all[middle].then()
-                //console.log('interval', middle-mov%2, middle+mov%2)
+                ////console.log('interval', middle-mov%2, middle+mov%2)
                 for (let i = middle-mov%2; i <= middle+mov%2; i++){
-                    //console.log(i, middle, all.length)
+                    ////console.log(i, middle, all.length)
                     let worker = all[i].then()
                     all[middle] = all[middle].then(value => {
                         return worker.then(cur => {
-                          //  console.log('current ID:', cur.id)
-                          //  console.log('pre', 'id:', value.id, 'legth:', value.all.length)
+                          //  //console.log('current ID:', cur.id)
+                          //  //console.log('pre', 'id:', value.id, 'legth:', value.all.length)
                             value.all.push(cur.yReal)
-                          //  console.log('post', 'id:', value.id, 'legth:', value.all.length)
+                          //  //console.log('post', 'id:', value.id, 'legth:', value.all.length)
                             return value
                         })
                     })

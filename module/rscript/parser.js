@@ -12,6 +12,6 @@ R("example/ex-async.R").
             throw err;
 
         }
-        console.log(d);
+        //console.log(d);
 
     });

@@ -157,7 +157,7 @@ let parsePeriod = function(date){
 		let day = pad(date.getDate());
 		return `${year}${month}${day}`;
 	}catch(error){
-		console.log(typeof date, date)
+		//console.log(typeof date, date)
 		throw error;
 	}
 
@@ -224,7 +224,7 @@ module.exports = {
 			// TODO nicer solution to individual requests
 			this.cached[url] = axios.get(url).then(result => {
 				this.number += 1;
-				console.log('rqst Nr:', this.number, url)
+				//console.log('rqst Nr:', this.number, url)
 /*
 				let list = undefined;
 
@@ -247,7 +247,7 @@ module.exports = {
 				return result
 			}).catch(
 				function (error) {
-					console.log('Show error notification!', error)
+					//console.log('Show error notification!', error)
 					return Promise.reject(error)
 				}
 			)

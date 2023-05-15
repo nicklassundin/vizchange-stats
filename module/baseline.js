@@ -4,7 +4,7 @@ class Baseline {
         this.cache = {};
     }
     getBaseline(specs){
-        //console.log(specs)
+        ////console.log(specs)
         let start = specs.baseline.start;
         let end = specs.baseline.end;
         if(undefined === this.cache[JSON.stringify(specs)]){

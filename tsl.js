@@ -37,9 +37,9 @@ const https = require('https');
 // 				// console.warn(error)
 // 				rej(error)
 // 			}else{
-// 				console.log("Confirmed", true)
+// 				//console.log("Confirmed", true)
 // 				// var sum = new Summery(response)
-// 				// console.log('Proxy Connect', true)
+// 				// //console.log('Proxy Connect', true)
 // 				// res(sum.stations)
 // 			}
 // 		}).on('error', error => {
