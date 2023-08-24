@@ -641,6 +641,8 @@ class Point {
 					}
 				case 'growingSeason':
 					result = result.filter(each => each.start !== undefined && !isNaN(each.value)).sort((a, b) => (new Date(a)) < (new Date(b)))
+
+					// console.log(result.map(each => each.value))
 					result = result.reduce((all, entry) => {
 						let doy = this.key(entry.start)
 						let year = entry.start.getFullYear();
@@ -648,7 +650,7 @@ class Point {
 						let curr = {
 							value: (all[year][doy] ? all[year][doy].value : []).concat([entry.value]),
 							nr: (all[year][doy] ? all[year][doy].nr : 0) + 1,
-							y: (all[year][doy] ? all[year][doy].y : 0) + entry.y,
+							y: (all[year][doy] ? all[year][doy].y : 0) + entry.value,
 							start: (all[year][doy] ? all[year][doy].start : entry.start),
 							end: entry.end
 						}
@@ -658,26 +660,24 @@ class Point {
 							//[doy]: curr,
 						};
 					}, {});
-					Object.keys(result).forEach(key => {
-						result[key] = Object.values(result[key]).map(each => {
-							each.value = each.value.reduce((a, b) => a + b)/each.nr
-							let f = (e) => e > 0
-							each.y = f(each.value) ? 1 : 0;
-							return each
-						}).reduce((all, current) => {
-							// NEXT TODO
-							if(all.length > 0) {
-								current.y = current.y > 0 ? current.y + all[all.length - 1].y : 0
-								current.start = current.y > 0 ? all[all.length - 1].start : current.start
-							}
-							all.push(current)
-							return all
-						}, [])
-						result[key] = Math.max(...result[key].map(e => e.y));
-					})
-					result = Object.values(result).filter(each => each !== 0)
-					if(result.length === 0) return undefined
-					return result.reduce((a, b) => a + b)/result.length
+					result = result[`${this.year}`]
+
+					result = Object.values(result).map(each => {
+						each.value = each.value.reduce((a, b) => a + b)/each.nr
+						let f = (e) => e > 0
+						each.y = f(each.value / each.nr) ? 1 : 0;
+						return each
+					}).reduce((all, current) => {
+						// NEXT TODO
+						if(all.length > 0) {
+							current.y = current.y > 0 ? current.y + all[all.length - 1].y : 0
+							current.start = current.y > 0 ? all[all.length - 1].start : current.start
+						}
+						all.push(current)
+						return all
+					}, [])
+					result = Math.max(...result.map(e => e.y));
+					return result
 				case 'high':
 				case 'low':
 					return result.length

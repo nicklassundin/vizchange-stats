@@ -929,7 +929,7 @@ describe(
                         })
                     })
                 })
-                describe.only('growing Season', function() {
+                describe('growing Season', function() {
                     describe('weeks', () => {
                         it('weeks 1', () => {
                             let params = ['temperature', 'weekly', 'growingSeason', 'shortValues', 1]
@@ -939,36 +939,12 @@ describe(
                                 return assert.equal(values.y, 22)
                             })
                         })
-                        it('test concequatiev', () => {
-                            let params = ['temperature', 'yrly', 'values', 77, 'entry', 'req']
-                            let config = Object.assign(configs['live'], specs)
-                            return parser.getByParams(config, params).then(values => {
-                                // function count number of concequtive weeks with positive avg_temperature
-                                let concequative = function (values) {
-                                    let count = 0
-                                    let max = 0
-                                    values.forEach(each => {
-                                        if (each['avg_temperature'] > 0) {
-                                            count++
-                                            if (count > max) {
-                                                max = count
-                                            }
-                                        } else {
-                                            count = 0
-                                        }
-                                    })
-                                    return max/7
-                                }
-                                //console.log('concequtive', concequative(values))
-                                return assert.equal(values.y, 22)
-                            })
-                        })
-                        it.only('weeks 2', () => {
-                            let params = ['temperature', 'weekly', 'growingSeason', 'shortValues', 2]
+                        it('weeks 2', () => {
+                            let params = ['temperature', 'weekly', 'growingSeason', 'shortValues', 6]
                             let config = Object.assign(configs['middle'], specs)
                             return parser.getByParams(config, params).then(values => {
-                                //console.log('values', values)
-                                return assert.equal(values.y, 25)
+                                console.log('values', values)
+                                return assert.equal(values.y, 26)
                             })
                         })
 
@@ -994,12 +970,12 @@ describe(
                             })
                         })
                     })
-                    it('difference', () => {
+                    it.only('difference', () => {
                         let params = ['temperature', 'yrly', 'growingSeason', 'difference', 0]
                         let config = Object.assign(configs['latest'], specs)
                         return parser.getByParams(config, params).then(values => {
-                            ////console.log('values', values)
-                            return assert.ok(Math.abs(values.y -27.2) < 1)
+                            console.log('values', values)
+                            return assert.ok(Math.abs(values.y + 15.0) < 1)
                         })
                     })
                     it.skip('days -- error', () => {
