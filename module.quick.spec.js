@@ -87,6 +87,15 @@ let snowdepth_single_specs = {
     },
 }
 
+let perma_specs = {
+    type: 'perma',
+    station: 'calm',
+    baseline: {
+        'start': 1961,
+        'end': 1991
+    },
+}
+
 let configs = require('./config.json')
 let cache = {}
 
@@ -603,6 +612,16 @@ describe(
                         // TODO
                     })
                 })
+                describe.only('perma', function () {
+                    it('perma', () => {
+                        let params = ['perma', 'yrly', 'shortValues', 3];
+                        let config = Object.assign(configs['middle'], perma_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            console.log(values)
+                            return assert.equal(values.y, 10)
+                        })
+                    })
+                })
                 describe('precipitation', function() {
                     it('difference', () => {
                         let params = ['precipitation', 'yrly', 'difference'];
@@ -970,7 +989,7 @@ describe(
                             })
                         })
                     })
-                    it.only('difference', () => {
+                    it('difference', () => {
                         let params = ['temperature', 'yrly', 'growingSeason', 'difference', 0]
                         let config = Object.assign(configs['latest'], specs)
                         return parser.getByParams(config, params).then(values => {

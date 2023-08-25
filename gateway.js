@@ -167,6 +167,7 @@ module.exports = {
 	preset: preset,
 	proxRequest: function(specs, full = false, sort){
 		var station = specs.station;
+		station = station.replace('å', 'a').replace('ä', 'a').replace('ö', 'o')
 		var dates = {
 			start: specs.dates.start,
 			end: specs.dates.end
@@ -202,6 +203,7 @@ module.exports = {
 	queue: 0,
 	cached: {},
 	async axios(url){
+		console.log(url)
 		//let path = `${url.split('/').join('').replace('https:', '').replace('.', '').replace(',', '').}.json`;
 		let path = `${hashCode(url)}.json`;
 
