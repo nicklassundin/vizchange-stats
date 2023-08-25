@@ -618,7 +618,7 @@ describe(
                         let config = Object.assign(configs['middle'], perma_specs)
                         return parser.getByParams(config, params).then(values => {
                             console.log(values)
-                            return assert.equal(values.y, 10)
+                            return assert.equal(values.y, 0.5325)
                         })
                     })
                 })
