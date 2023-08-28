@@ -435,7 +435,6 @@ class Point {
 	'getY'(req = this.req){
 		let y = req[`${this.type}`]
 		let date = new Date(req[this.type]);
-
 		switch (this.specs.dates.type) {
 			case 'month':
 				if(help.monthByIndex(req.date.getMonth()) !== this.specs.keys[0]) return undefined
@@ -507,9 +506,11 @@ class Point {
 				// TODO generalize
 		}
 		if(y === undefined) y = req[`${this.subType}${this.type}`];
+
 		if(y === undefined && this.SUBTYPE === 'sum') y = req[`avg_${this.type}`]
 		if(y === undefined) y = req[this.type];
 		if(typeof y == 'object') y = y[this.SUBTYPE]
+		if(y !== undefined && typeof y === 'string') y = y.replace(',', '.')
 		return Number(y)
 	}
 	key(date) {
