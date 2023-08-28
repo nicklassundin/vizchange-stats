@@ -414,6 +414,7 @@ class Point {
 			return f(this.getY(e))
 		})
 
+		// TODO safe check future this just solution for half data when data not uploaded correctly for previous year
 		if(this.year === req[req.length - 1].date.getFullYear()){
 			req = [];
 		}
