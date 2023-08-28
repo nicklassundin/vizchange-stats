@@ -245,6 +245,23 @@ module.exports = {
 */
 
 				if(result && result.data) result = result.data
+				if(Array.isArray(result)){
+					result = result.map(each => {
+						Object.keys(each).forEach(key => {
+							switch (key) {
+								case 'position':
+								case 'station':
+								case 'date':
+									break;
+								default:
+									if(typeof each[key] === 'string'){
+										each[key] = each[key].replace(',', '.')
+									}
+							}
+						})
+						return each
+					})
+				}
 				return result
 			}).catch(
 				function (error) {
