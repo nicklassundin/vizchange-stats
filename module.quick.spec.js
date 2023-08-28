@@ -875,12 +875,12 @@ describe(
                         })
                     })
                     it.only('last', () => {
-                        let params = ['temperature', 'yrlySplit', 'min', 'last', 'shortValues', 3]
+                        let params = ['temperature', 'yrlySplit', 'min', 'last', 'shortValues', 4]
                         let config = Object.assign(configs['latest'], specs)
                         parser.temperature.f = (e) => e <= 0;
                         return parser.getByParams(config, params).then(values => {
-                            console.log(values)
-                            return assert.equal(values.y, 170)
+                            //console.log(values)
+                            return assert.equal(values.y, undefined)
                         })
                     })
                     it('last', () => {

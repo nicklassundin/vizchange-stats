@@ -413,6 +413,10 @@ class Point {
 		}).filter((e) => {
 			return f(this.getY(e))
 		})
+
+		if(this.year === req[req.length - 1].date.getFullYear()){
+			req = [];
+		}
 		return new Point(this.specs, req, true)
 	}
 	'high' (f){
