@@ -415,9 +415,10 @@ class Point {
 		})
 
 		// TODO safe check future this just solution for half data when data not uploaded correctly for previous year
-		if(this.year === req[req.length - 1].date.getFullYear()){
+		if(req.length > 0 && this.year === req[req.length - 1].date.getFullYear()){
 			req = [];
 		}
+		//
 		return new Point(this.specs, req, true)
 	}
 	'high' (f){
