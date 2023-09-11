@@ -10,19 +10,7 @@
 //
 // TODO local cache should be available
 //const cached_list = require('./debug/list.js')
-const http = require('http');
-const fs = require("fs");
-const axios = require('axios').create({
-	httpAgent: new http.Agent({
-//		keepAlive: true,
-		scheduling: 'fifo',
-		maxSockets: 1,
-		maxTotalSockets: 1,
-	}),
-});
-// TODO this should work on client side FIXME
-//const { setupCache } = require('axios-cache-adapter');
-//setupCache(axios)
+
 
 hashCode = function(s) {
 	let h = 0, l = s.length, i = 0;
@@ -32,45 +20,6 @@ hashCode = function(s) {
 	return h;
 };
 
-/*
-let cache = {}
-Object.keys(require(`${__dirname}/debug/list.json`)).forEach(key => {
-	cache[key] = require(`./debug/${key}`)
-})
-*/
-
-
-
-let getSmhiStation = async function(id){
-	return await new Promise((result, reject) => {
-		let host = `https://opendata-download-metobs.smhi.se`
-		let path = `/api/version/1.0/parameter/1/station/${id}.json`
-		const https = require('https')
-		https.get(`${host}${path}`,(res) => {
-			let body = "";
-
-			res.on("data", (chunk) => {
-				body += chunk;
-			});
-
-			res.on("end", () => {
-				try {
-					let json = JSON.parse(body);
-					result(`?position=${json.position[0].latitude},${json.position[0].longitude}`)
-				} catch (error) {
-					console.error(error.message);
-					reject(error)
-
-				}
-
-			});
-
-
-		}).on("error", (error) => {
-			console.error(error.message);
-		});
-	})
-}
 const preset = {
 	stationTypes: {
 		abisko: ['temperature, precipitation', 'growingSeason','snowdepth_single', 'decadeMeans', 'periodMeans', 'perma'],
@@ -132,118 +81,13 @@ const preset = {
 		'64n-90ntemperature': '64n-90n_temp',
 	}
 }
-let set = (station) => {
-	getSmhiStation(station).then(str => {
-		preset.station[station] = str
-	}) 
-}
-
-/* TODO get station */
-/*
-set(140480)
-set(140490)
-*/
-
-let debug = {
-	slow: undefined,
-}
-
-let parsePeriod = function(date){
-	try{
-		if(typeof date === 'string') date = new Date(date);
-		let pad = (value) => value >= 10 ? `${value}` : `0${value}`;
-		let year = date.getFullYear();
-		let month = pad(date.getMonth()+1);
-		let day = pad(date.getDate());
-		return `${year}${month}${day}`;
-	}catch(error){
-		//console.log(typeof date, date)
-		throw error;
-	}
-
-}
 
 module.exports = {
-	preset: preset,
-	proxRequest: function(specs, full = false, sort){
-		var station = specs.station;
-		station = station.replace('å', 'a').replace('ä', 'a').replace('ö', 'o')
-		var dates = {
-			start: specs.dates.start,
-			end: specs.dates.end
-		}
-		let host = specs.url;
-		let type = specs.type
-		let url = `&date=${parsePeriod(dates.start)}-${parsePeriod(dates.end)}`
-		if (preset.station[station] === undefined) {
-			url = `?position=${specs.coordinates.latitude},${specs.coordinates.longitude}&radius=30${url}`
-		}else{
-			url = `${preset.station[station]}${url}`
-		}
-		if(['glob', '64n-90n', 'nhem'].includes(station) && ['glob_temp','nhem_temp','64n-90n_temp','temperature'].includes(type)){
-			// url = `${url}&types=${preset.types[station+type]},station`
-			url = `${url}&types=${preset.types[station+type]}`
-
-		}else if(type){
-			url = `${url}&types=${preset.types[type] !== undefined ? preset.types[type] : type}`
-		}
-
-		if(full){
-			return module.exports.axios((host)+url)
-		}else{
-			// TODO use sort
-			if(sort && false){
-				return module.exports.axios((host)+url+`&calculate&${sort}`)
-			}else{
-				return module.exports.axios((host)+url+"&calculate")
-			}
-		}
-	},
-	number: 0,
-	queue: 0,
-	cached: {},
-	async axios(url){
-		//let path = `${url.split('/').join('').replace('https:', '').replace('.', '').replace(',', '').}.json`;
-		let path = `${hashCode(url)}.json`;
-
-		/*
-		if(cached_list[path.replace('.json', '')]){
-			return cached_list[path.replace('.json', '')]
-		}
-
-		 */
-
-		/*
-            if(cache[path] !== undefined){
-                return Promise.resolve(cache[path])
-            }
-
-      */
-
-
+	async get(url){
 		if(this.cached[url] === undefined){
 			// TODO nicer solution to individual requests
 			this.cached[url] = axios.get(url).then(result => {
 				this.number += 1;
-				//console.log('rqst Nr:', this.number, url)
-/*
-				let list = undefined;
-
-				let fs = require("fs");
-				if(fs.existsSync('./debug/list.json')){
-					list = require('./debug/list.json')
-					list[path] = result.data.length
-				}else{
-					list = {}
-					list[path] = result.data.length;
-				}
-				fs.writeFile('./debug/list.json', JSON.stringify(list), () => {})
-				fs.writeFile('./debug/list.js', Object.keys(list).map(key => {
-					return `module.exports['${key.replace('.json', '')}'] = require('./${key}');`
-				}).join('\n'), () => {})
-				fs.writeFile('./debug/'+path, JSON.stringify(result.data), () => {})
-*/
-
 				if(result && result.data) result = result.data
 				if(Array.isArray(result)){
 					result = result.map(each => {
