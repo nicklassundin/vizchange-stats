@@ -290,12 +290,17 @@ class Point {
 			case 'breakfreeze':
 				return new Date(this.req[0][this.type])
 			case 'avg':
+				return NaN;
+				/*
 				if(typeof this.x === 'number') return new Date(this.x)
 				return this.x
+				 */
 			case 'maxAvg':
 			case 'minAvg':
 				return this.y.date[0]
-				break;
+			case 'min':
+			case 'max':
+				return this.y.date;
 			default:
 				return this.x;
 		}
@@ -508,6 +513,13 @@ class Point {
 					date: req.date,
 					y: y
 				}
+			case 'min':
+			case 'max':
+				if(y === undefined) y = Number(req[`${this.subType}${this.type}`]);
+				return {
+					date: req.date,
+					y: y
+				}
 			default:
 				// TODO generalize
 		}
@@ -564,7 +576,13 @@ class Point {
 					return result.reduce((a,b) => a + b)/result.length
 				case 'min':
 				case 'max':
-					return Math[this.SUBTYPE](...result)
+					return result.reduce((a, b) => {
+						if(Math[this.SUBTYPE](a.y, b.y) - a.y === 0){
+							return a
+						}else{
+							return b
+						}
+					})
 				case 'maxAvg':
 				case 'minAvg':
 					let time = this.specs.keys[this.specs.keys.length - 1]
@@ -855,6 +873,9 @@ class Point {
 			case 'minAvg':
 			case 'maxAvg':
 				value = Number(y.value)
+				y = y.y;
+			case 'min':
+			case 'max':
 				y = y.y;
 			default:
 		}

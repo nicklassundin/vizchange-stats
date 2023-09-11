@@ -105,6 +105,33 @@ const assert = require('assert');
 describe(
     'Requests',
     function () {
+        describe.only('point formater', function () {
+            describe('temperature', function () {
+                it.only('avg', function () {
+                    let params = ['temperature', 'yrly', 'shortValues', 1];
+                    let config = Object.assign(configs['latest'], specs_smhi)
+                    return parser.getByParams(config, params).then((values) => {
+                        return assert.ok(Math.abs(values.y - 10.53896457765667) < 0.05)
+                    })
+                })
+                it('min', function () {
+                    let params = ['temperature', 'yrly', 'min', 'shortValues', 1];
+                    let config = Object.assign(configs['latest'], specs_smhi)
+                    return parser.getByParams(config, params).then((values) => {
+                        console.log(values)
+                        return assert.ok(Math.abs(values.y - 10.53896457765667) < 0.05)
+                    })
+                })
+                it('max', function () {
+                    let params = ['temperature', 'yrly', 'max', 'shortValues', 1];
+                    let config = Object.assign(configs['latest'], specs_smhi)
+                    return parser.getByParams(config, params).then((values) => {
+                        console.log(values)
+                        return assert.ok(Math.abs(values.y - 10.53896457765667) < 0.05)
+                    })
+                })
+            })
+        })
         describe('recursive', function () {
             it('smhi', function () {
                 let params = ['temperature', 'yrly', 'shortValues', 1];
@@ -619,7 +646,7 @@ describe(
                         // TODO
                     })
                 })
-                describe.only('perma', function () {
+                describe('perma', function () {
                     it('perma', () => {
                         let params = ['perma', 'yrly', 'shortValues', 3];
                         let config = Object.assign(configs['middle'], perma_specs)
