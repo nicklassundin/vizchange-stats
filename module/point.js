@@ -290,7 +290,7 @@ class Point {
 			case 'breakfreeze':
 				return new Date(this.req[0][this.type])
 			case 'avg':
-				return NaN;
+				return undefined;
 				/*
 				if(typeof this.x === 'number') return new Date(this.x)
 				return this.x
