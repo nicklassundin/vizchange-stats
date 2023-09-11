@@ -879,7 +879,7 @@ class Point {
 				y = y.y;
 			default:
 		}
-		return {
+		let result ={
 			compressed: true,
 			y: y,
 			x: this.x,
@@ -890,12 +890,13 @@ class Point {
 			week: this.week,
 			month: this.month,
 			monthName: this.monthName,
-			date: this.date,
 //			type: this.type,
 			xInterval: this.specs.dates,
 //			typeMeta: this.typeMeta,
 			value
 		}
+		if(this.date !== undefined) result.date = this.date;
+		return result
 	}
 	'getSeed' () {
 		let specs = this.specs;

@@ -111,6 +111,7 @@ describe(
                     let params = ['temperature', 'yrly', 'shortValues', 1];
                     let config = Object.assign(configs['latest'], specs_smhi)
                     return parser.getByParams(config, params).then((values) => {
+                        console.log(values);
                         return assert.ok(Math.abs(values.y - 10.53896457765667) < 0.05)
                     })
                 })
