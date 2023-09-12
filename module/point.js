@@ -610,36 +610,34 @@ class Point {
 						if(!isNaN(entry.date)) all[year][key].date.push(entry.date)
 						return all;
 					}, {})
-					result = Object.values(result).map(year => Object.values(year)).filter(year => {
-						return year.length > 10
-					})
-					result = result.map(year => {
-						year = year.map(each => {
-							switch (this.specs.parentType) {
-								case 'avg':
-									each.y = each.y.reduce((a, b) => a + b)/each.y.length
-									return each
-								case 'sum':
-									if(each.y.length === 0){
-										each.y == NaN
-									}else{
-										each.y = each.y.reduce((a, b) => a + b)
-									}
-
-									return each
-								default:
-									return each
-							}
-						})
-						switch (this.SUBTYPE) {
-							case 'minAvg':
-								year = year.sort((a, b) => (a.y - b.y)/Math.abs(a.y - b.y))[0];
-								return year
-							case 'maxAvg':
-								year = year.sort((a, b) => (b.y - a.y)/Math.abs(a.y - b.y))[0]
-								return year
+					result = result[this.year]
+					result = Object.values(result).map(each => {
+						switch (this.specs.parentType) {
+							case 'avg':
+								each.y = each.y.reduce((a, b) => a + b)/each.y.length
+								return each
+							case 'sum':
+								if(each.y.length === 0){
+									each.y == NaN
+								}else{
+									each.y = each.y.reduce((a, b) => a + b)
+								}
+								return each
+							default:
+								return each
 						}
 					})
+					switch (this.SUBTYPE) {
+						case 'minAvg':
+							result = result.sort((a, b) => (a.y - b.y)/Math.abs(a.y - b.y))[0];
+							break;
+						case 'maxAvg':
+							result = result.sort((a, b) => (b.y - a.y)/Math.abs(a.y - b.y))[0]
+							break;
+						default:
+					}
+					return result
+					/*
 					return result.reduce((all, current) => {
 						all.y = (all.y*all.value.length) + current.y
 						all.value.push(current.value)
@@ -651,6 +649,8 @@ class Point {
 						y: 0,
 						date: []
 					})
+
+					 */
 				case 'snow':
 				case 'rain':
 					return result.reduce((a,b) => a + b)
@@ -670,7 +670,6 @@ class Point {
 				case 'growingSeason':
 					result = result.filter(each => each.start !== undefined && !isNaN(each.value)).sort((a, b) => (new Date(a)) < (new Date(b)))
 
-					// console.log(result.map(each => each.value))
 					result = result.reduce((all, entry) => {
 						let doy = this.key(entry.start)
 						let year = entry.start.getFullYear();
@@ -877,12 +876,14 @@ class Point {
 			case 'maxAvg':
 				value = Number(y.value)
 				y = y.y;
+				break;
 			case 'min':
 			case 'max':
 				y = y.y;
+				break;
 			default:
 		}
-		let result ={
+		let result = {
 			compressed: true,
 			y: y,
 			x: this.x,

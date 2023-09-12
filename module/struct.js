@@ -556,7 +556,9 @@ module.exports = class Struct {
                 return this.values.reverse().map((value, index) => {
                     let i = index % qLength;
                     val[i] = val[i].then(() => {
-                        return new Promise((res) => res(value.short));
+                        return new Promise((res) => {
+                            return res(value.short)
+                        });
                     })
                     return val[i].then()
                 }).reverse()
