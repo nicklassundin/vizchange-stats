@@ -577,10 +577,13 @@ class Point {
 				case 'min':
 				case 'max':
 					return result.reduce((a, b) => {
-						if(Math[this.SUBTYPE](a.y, b.y) - a.y === 0){
-							return a
-						}else{
-							return b
+						switch(Math[this.SUBTYPE](a.y, b.y)) {
+							case a.y:
+								return a
+							case b.y:
+								return b
+							default:
+								return a
 						}
 					})
 				case 'maxAvg':

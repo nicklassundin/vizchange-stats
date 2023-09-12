@@ -105,9 +105,9 @@ const assert = require('assert');
 describe(
     'Requests',
     function () {
-        describe.only('point formater', function () {
+        describe('point formater', function () {
             describe('temperature', function () {
-                it.only('avg', function () {
+                it('avg', function () {
                     let params = ['temperature', 'yrly', 'shortValues', 1];
                     let config = Object.assign(configs['latest'], specs_smhi)
                     return parser.getByParams(config, params).then((values) => {
@@ -130,6 +130,17 @@ describe(
                         console.log(values)
                         return assert.ok(Math.abs(values.y - 10.53896457765667) < 0.05)
                     })
+                })
+            })
+        })
+        describe.only('details', function () {
+            it('max', function () {
+                let params = ['temperature', 'yrly', 'max', 'shortValues', 3];
+                //let params = ['temperature', 'yrly', 'min', 'shortValues', 76];
+                let config = Object.assign(configs['middle'], specs)
+                return parser.getByParams(config, params).then((values) => {
+                    //console.log(values)
+                    return assert.ok(Math.abs(values.y - 24.3) < 0.05)
                 })
             })
         })
