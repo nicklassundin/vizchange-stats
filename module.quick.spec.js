@@ -32,8 +32,8 @@ let stations = {
     },
     raw: {
         precipitation: translate.getStation('abisko').then(station => {
-            station.types = ['avg_temperature', 'min_temperature', 'max_temperature', 'precipitation']
-            return (new Data(configs['live'])).init(station)
+            station.types = ['avg_temperature', 'precipitation']
+            return (new Data(configs['latest'])).init(station)
         })
     }
 }
@@ -45,7 +45,7 @@ describe(
     'Requests',
     function () {
         describe.only('new Implementation', function () {
-            describe.skip('calculated', function () {
+            describe('calculated', function () {
                 it('coldest day of year', function () {
                     return stations.calculated.temperature.then(temp => {
                         return temp.min('avg_temperature').then(result => {
@@ -59,12 +59,28 @@ describe(
                         })
                     })
                 })
+                it('Moving Average', function () {
+                    return stations.calculated.temperature.then(temp => {
+                        return temp.ma('avg_temperature').then(result => {
+                            console.log(result)
+                            return assert.equal(result.reduce((a, b) => {
+                                if (a.x === 1996){
+                                    return a;
+                                }else{
+                                    return b
+                                }
+                            }).y, -26.9)
+                        })
+                    })
+                })
+
             })
             describe('raw', function () {
                 describe('precipitation', function () {
                     it('snow', function () {
                         return stations.raw.precipitation.then(prec => {
                             return prec.snow().then(result => {
+                                console.log(result)
                                 return result
                             })
                         })
@@ -72,7 +88,6 @@ describe(
                 })
             })
         })
-
         describe('recursive', function () {
             it('smhi', function () {
                 let params = ['avg_temperature', 'yrly', 'shortValues', 1];

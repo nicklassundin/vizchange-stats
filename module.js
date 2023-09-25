@@ -12,24 +12,31 @@ const axios = require('axios').create({
 const {Specs} = require('./module/specs');
 const {Point} = require('./module/point');
 const {Parser} = require('./module/rscript/parser.js');
+const {ParserRaw} = require('./module/rscript/parser.js');
 class Data {
 	constructor(spec){
 		this.spec = new Specs(spec);
 	}
 	init(request) {
+		this.request = request;
 		let url = this.spec.getUrl(request)
-		console.log(url)
-		this.parsed = axios.get(url).then(response => (new Parser(response.data)))
+		if(request.sort) {
+			this.parsed = axios.get(url).then(response => (new Parser(response.data, this.request)))
+		}else{
+			let startTime = Date.now();
+			this.parsed = axios.get(url).then(response => {
+				console.log(`request time (ms): `, (Date.now() - startTime))
+				return (new ParserRaw(response.data, this.request))
+			})
+		}
 		return this
 	}
-	calculated (type, column) {
+	calculated (type, tag, calc) {
 		if(type === ''){
 			throw(new Error('Request has no type'))
 		}else{
 			return this.parsed.then(data => {
-				return data.calculate(type, column).then(result => {
-					return result
-				})
+				return data.get(type, tag, calc)
 			})
 		}
 	}
@@ -45,15 +52,11 @@ class Data {
 	sum(type) {
 		return this.calculated(type, 'sum')
 	}
-	getRaw (column) {
-		return this.parsed.then(data => {
-			return data.raw(column).then(result => {
-				return result
-			})
-		})
+	ma(type) {
+		return this.calculated(type, 'min', 'ma')
 	}
-	snow() {
-		return this.getRaw('snow')
+	snow(type) {
+		return this.calculated(type, undefined, 'snow')
 	}
 	getByParams(request, params) {
 		request.types = [params[0]]

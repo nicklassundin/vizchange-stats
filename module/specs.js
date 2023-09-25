@@ -13,5 +13,9 @@ class Specs {
                 return `${url}&calculate&${request.sort}`
         }
     }
+    getUrlRaw (request) {
+        let url = `${this.config.url}?position=${request.latitude},${request.longitude}&radius=30&date=${this.config.dates.start}0101-${this.config.dates.end}1231&types=`
+        return `${url}${request.types.join(',')}`
+    }
 }
 module.exports.Specs = Specs;
