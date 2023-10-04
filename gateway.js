@@ -220,7 +220,6 @@ module.exports = {
 
       */
 
-		console.log("URL", url);
 		if(this.cached[url] === undefined){
 			// TODO nicer solution to individual requests
 			this.cached[url] = axios.get(url).then(result => {

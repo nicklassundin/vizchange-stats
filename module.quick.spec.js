@@ -235,7 +235,7 @@ describe(
                             return assert.equal(values.x, 'feb')
                         })
                     })
-                    it.only('snow', () => {
+                    it('snow', () => {
                         let params = ['precipitation', 'yrly', 'snow', 'shortValues', 1]
                         let config = Object.assign(configs['latest'], precipitation_specs)
                         return parser.getByParams(config, params).then(values => {
@@ -306,7 +306,7 @@ describe(
             describe('type', function() {
                 describe('extreme events', function() {
                     describe('daily', () => {
-                        it.only('max', () => {
+                        it('max', () => {
                             let params = ['temperature', 'yrly', 'maxAvg', 'shortValues', 1]
                             let config = Object.assign(configs['latest'], specs)
                             return parser.getByParams(config, params).then(values => {
@@ -659,7 +659,7 @@ describe(
                         // TODO
                     })
                 })
-                describe('perma', function () {
+                describe.only('perma', function () {
                     it('perma', () => {
                         let params = ['perma', 'yrly', 'shortValues', 3];
                         let config = Object.assign(configs['middle'], perma_specs)
