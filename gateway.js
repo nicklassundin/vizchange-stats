@@ -92,21 +92,21 @@ const preset = {
 	// radious: 'radius=500000',
 	radious30: 'radius=30',
 	station: {
-		abisko: '?position=18.8166,68.3538&radius=30',
-		pavlopetri: '?position=22.98865,36.51698&radius=30',
+		abisko: '?position=68.3538,18.8166&radius=30',
+		pavlopetri: '?position=36.51698,22.98865&radius=30',
 		glob: '?position=22.98865,36.51698&radius=30',
 		nhem: '?position=22.98865,36.51698&radius=30',
-		'calm': '?position=18.33333333,68.4263889&radius=300000',
+		'calm': '?position=68.4263889,18.33333333&radius=300000',
 		'64n-90n': '?position=22.98865,36.51698&radius=30',
-		'tornetrask': '?position=19.723333333333333,68.22555555555556&radius=30',
-		'heliport': '?position=18.795555555555556,68.3644444&radius=30',
-		'katterjokk': '?position=18.1747222222222,68.4252778&radius=30',
-		'kursflaket': '?position=18.878333333333334,68.3513889&radius=30',
-		'lakta': '?position=18.33333333,68.4263889&radius=30',
-		'mellanflaket': '?position=18.964166666667,68.3480556&radius=30',
-		'narkevaere': '?position=19.76583333333,68.1977778&radius=30',
-		'storflaket': '?position=18.96527777778,68.3475&radius=30',
-		'bergfors': '?position=19.762777777778,68.1455556&radius=30',
+		'tornetrask': '?position=68.22555555555556,19.723333333333333&radius=30',
+		'heliport': '?position=68.3644444,18.795555555555556,&radius=30',
+		'katterjokk': '?position=68.4252778,18.1747222222222&radius=30',
+		'kursflaket': '?position=68.3513889,18.878333333333334&radius=30',
+		'lakta': '?position=68.4263889,18.33333333&radius=30',
+		'mellanflaket': '?position=68.3480556,18.964166666667&radius=30',
+		'narkevaere': '?position=68.1977778,19.76583333333&radius=30',
+		'storflaket': '?position=68.3475,18.96527777778&radius=30',
+		'bergfors': '?position=68.1455556,19.762777777778&radius=30',
 		get 'umea'() {
 			return preset.station['140480']+'&radius=10000'
 		}
@@ -135,7 +135,7 @@ const preset = {
 let set = (station) => {
 	getSmhiStation(station).then(str => {
 		preset.station[station] = str
-	}) 
+	})
 }
 
 /* TODO get station */
@@ -220,7 +220,7 @@ module.exports = {
 
       */
 
-
+		console.log("URL", url);
 		if(this.cached[url] === undefined){
 			// TODO nicer solution to individual requests
 			this.cached[url] = axios.get(url).then(result => {
