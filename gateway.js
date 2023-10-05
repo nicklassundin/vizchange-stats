@@ -96,7 +96,7 @@ const preset = {
 		pavlopetri: '?position=36.51698,22.98865&radius=30',
 		glob: '?position=22.98865,36.51698&radius=30',
 		nhem: '?position=22.98865,36.51698&radius=30',
-		'calm': '?position=68.4263889,18.33333333&radius=300000',
+		'calm': '?position=68.4263889,18.33333333&radius=170000',
 		'64n-90n': '?position=22.98865,36.51698&radius=30',
 		'tornetrask': '?position=68.22555555555556,19.723333333333333&radius=30',
 		'heliport': '?position=68.3644444,18.795555555555556,&radius=30',
@@ -219,7 +219,7 @@ module.exports = {
             }
 
       */
-
+		//console.log('URL', url)
 		if(this.cached[url] === undefined){
 			// TODO nicer solution to individual requests
 			this.cached[url] = axios.get(url).then(result => {

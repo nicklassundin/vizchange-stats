@@ -663,6 +663,7 @@ describe(
                     it('perma', () => {
                         let params = ['perma', 'yrly', 'shortValues', 3];
                         let config = Object.assign(configs['middle'], perma_specs)
+                        console.log(config)
                         return parser.getByParams(config, params).then(values => {
                             //////console.log(values)
                             return assert.ok(Math.abs(values.y - 0.5325) <= 0)
