@@ -547,7 +547,7 @@ module.exports = class Struct {
                 })
             default:
                 //let startTime = (new Date()).getTime();
-                let length = 5;
+                let length = 25;
                 let val = []
                 for (let i = 0; i < length; i++) {
                     val.push(Promise.resolve(true))
