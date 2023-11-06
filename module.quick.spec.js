@@ -544,12 +544,22 @@ describe(
                             })
                         })
                     })
-                    it('icetime', () => {
+                    it.only('icetime', () => {
                         let params = ['icetime', 'yrlyFull', 'baseline'];
                         let config = Object.assign(configs['live'], icetime_specs)
                         return parser.getByParams(config, params).then(values => {
                             return values.y.then(y => {
-                                //////////console.log('values', y)
+                                console.log('values', y)
+                                return assert.ok(Math.abs(y - 176.29032258064515) < 0.001)
+                            })
+                        })
+                    })
+                    it.only('icetime', () => {
+                        let params = ['icetime', 'yrly', 'shortValues', 3];
+                        let config = Object.assign(configs['middle'], icetime_specs)
+                        return parser.getByParams(config, params).then(values => {
+                            return values.y.then(y => {
+                                console.log('values', y)
                                 return assert.ok(Math.abs(y - 176.29032258064515) < 0.001)
                             })
                         })
@@ -659,7 +669,7 @@ describe(
                         // TODO
                     })
                 })
-                describe.only('perma', function () {
+                describe('perma', function () {
                     it('perma', () => {
                         let params = ['perma', 'yrly', 'shortValues', 3];
                         let config = Object.assign(configs['middle'], perma_specs)
@@ -1313,7 +1323,7 @@ describe(
                 })
             })
         })
-        describe.skip('speed tests', function() {
+        describe('speed tests', function() {
             describe('precalculated' , function() {
                 it('precalculatede', () => {
                     let params = ['temperature', 'yrly', 'shortValues']
