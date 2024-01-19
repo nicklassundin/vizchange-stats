@@ -7,7 +7,8 @@
     "test": "mocha --timeout 1000000 './*.quick.spec.js'",
     "test-slow": "mocha --timeout 500000 './*.slow.spec.js'",
     "test-quick": "mocha --timeout 5000 './*.quick.spec.js' './module/*.quick.spec.js'",
-    "webpack": "webpack --mode=development"
+    "webpack": "webpack --mode=development",
+    "arkit": "npx arkit"
   },
   "repository": {
     "type": "git",
@@ -44,10 +45,20 @@
     ]
   },
   "devDependencies": {
+    "arkit": "^1.6.4",
     "express": "^4.18.2",
     "https": "^1.0.0",
     "https-browserify": "^1.0.0",
     "webpack": "^5.73.0",
     "webpack-cli": "^4.10.0"
+  },
+  "arkit": {
+    "$schema": "https://arkit.pro/schema.json",
+    "output": {
+      "path": [
+        "docs/res/arkit.svg",
+        "docs/res/arkit.png"
+      ]
+    }
   }
 }

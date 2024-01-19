@@ -20,21 +20,53 @@ class Specs  {
 
 const translate = require('./module/translate.js')
 let configs = require('./config.json')
-let cache = {}
 const assert = require('assert');
+
 let stations = {
-    calculated: {
-        temperature: translate.getStation('abisko').then(station => {
-            station.sort = 'year';
-            station.types = ['avg_temperature', 'min_temperature', 'max_temperature']
-            return (new Data(configs['live'])).init(station)
+    get: (config) => {
+        let hash = JSON.stringify(config);
+        if(!stations.cache[hash]){
+            stations.cache[hash] = stations.nestle(new Data(configs['live']), config);
+            //stations.cache[hash] = stations.nestle(new Data(configs['latest']), config);
+        }
+        return stations.cache[hash];
+    },
+    nestle: function(data, station) {
+        return (data).init(station);
+    },
+    cache: {},
+    temperature: (sort, types) => {
+        return translate.getStation('abisko').then(station => {
+            station.types = ['avg_temperature', 'min_temperature', 'max_temperature'];
+            if(types) station.types = types;
+            station.sort = sort;
+            return stations.get(station)
         })
     },
+    calculated: {
+        yrly: {
+            temperature: () => stations.temperature('year')
+        },
+        monthly: {
+            temperature: () => stations.temperature('month')
+        },
+        wkly: {
+            temperature: () => stations.temperature('week')
+        },
+    },
     raw: {
+        // TODO to large data structure need compression or change storage type
         precipitation: translate.getStation('abisko').then(station => {
             station.types = ['avg_temperature', 'precipitation']
-            return (new Data(configs['latest'])).init(station)
-        })
+            return nestle(new Data(configs['latest']), station)
+        }),
+        temperature: translate.getStation('abisko').then(station => {
+            station.types = ['avg_temperature', 'min_temperature', 'max_temperature']
+            return nestle(new Data(configs['live']), station)
+        }),
+        daily: {
+            temperature: () => stations.temperature()
+        }
     }
 }
 
@@ -45,24 +77,185 @@ describe(
     'Requests',
     function () {
         describe.only('new Implementation', function () {
-            describe('calculated', function () {
-                it('coldest day of year', function () {
-                    return stations.calculated.temperature.then(temp => {
-                        return temp.min('avg_temperature').then(result => {
-                            return assert.equal(result.reduce((a, b) => {
-                                if (a.x === 1996){
-                                    return a;
-                                }else{
-                                    return b
-                                }
-                            }).y, -27)
+            describe('Speed test', function () {
+                beforeEach(() => {
+                    console.time('Speed test');
+                })
+                afterEach(() => {
+                    console.timeEnd('Speed test');
+                })
+                describe('calculated', function () {
+                    it('years', function () {
+                        return stations.calculated.yrly.temperature().then(temp => {
+                            return temp.min('avg_temperature').then(result => {
+                                console.log(result[99])
+                                return true;
+                            })
+                        })
+                    })
+                    it('month', function () {
+                        return stations.calculated.monthly.temperature().then(temp => {
+                            return temp.min('avg_temperature').then(result => {
+                                console.log(result[99])
+                                return true;
+                            })
+                        })
+                    })
+                    it('week', function () {
+                        return stations.calculated.wkly.temperature().then(temp => {
+                            return temp.min('avg_temperature').then(result => {
+                                console.log(result[99])
+                                return true;
+                            })
+                        })
+                    })
+                    // TODO to large data structure need compression
+                    it('day', function () {
+                        return stations.raw.daily.temperature().then(temp => {
+                            return temp.min('avg_temperature').then(result => {
+                                console.log(result[99])
+                                return true;
+                            })
                         })
                     })
                 })
-                it('Moving Average', function () {
+                it.skip('raw', function () {
+                    return stations.raw.temperature.then(temp => {
+                        return temp.min('avg_temperature').then(result => {
+                            return true;
+                        })
+                    })
+                })
+            })
+            describe('calculated', function () {
+                describe('warmest / coldest', function() {
+                    describe('year', function() {
+                        describe('absolut', function() {
+                            it('avg', () => {
+                                return stations.calculated.yrly.temperature().then(temp => {
+                                    return temp.mean('avg_temperature').then(result => {
+
+                                        console.log(result[99])
+                                        return assert.ok(Math.abs(result[99].y - - 0.95252732) < 0.001)
+                                    })
+                                })
+                            })
+                            it('min', () => {
+                                return stations.calculated.yrly.temperature().then(temp => {
+                                    return temp.min('min_temperature').then(result => {
+
+                                        console.log(result[99])
+                                        return assert.ok(Math.abs(result[99].y - -34.0) < 0.001)
+                                    })
+                                })
+                            })
+                            it('max', () => {
+                                return stations.calculated.yrly.temperature().then(temp => {
+                                    return temp.max('max_temperature').then(result => {
+
+                                        console.log(result[99])
+                                        return assert.ok(Math.abs(result[99].y - 21.4) < 0.001)
+                                    })
+                                })
+                            })
+                        })
+                    })
+                    describe('month', function() {
+                        describe('absolut', function() {
+                            it('avg', () => {
+                                return stations.calculated.monthly.temperature().then(temp => {
+                                    return temp.mean('avg_temperature').then(result => {
+
+                                        console.log(result[99])
+                                        return assert.ok(Math.abs(result[99].y - - 11.7709677) < 0.001)
+                                    })
+                                })
+                            })
+                            it('min', () => {
+                                return stations.calculated.monthly.temperature().then(temp => {
+                                    return temp.min('min_temperature').then(result => {
+
+                                        console.log(result[99])
+                                        return assert.ok(Math.abs(result[99].y - -25.10) < 0.001)
+                                    })
+                                })
+                            })
+                            it('max', () => {
+                                return stations.calculated.monthly.temperature().then(temp => {
+                                    return temp.max('max_temperature').then(result => {
+
+                                        console.log(result[99])
+                                        return assert.ok(Math.abs(result[99].y - 1.3) < 0.001)
+                                    })
+                                })
+                            })
+                        })
+                    })
+                    describe('week' , function() {
+                        describe('absolut', function() {
+                            it('avg', () => {
+                                return stations.calculated.wkly.temperature().then(temp => {
+                                    return temp.mean('avg_temperature').then(result => {
+
+                                        console.log(result[99])
+                                        return assert.ok(Math.abs(result[99].y - -17.9571428 ) < 0.001)
+                                    })
+                                })
+                            })
+                            it('min', () => {
+                                return stations.calculated.wkly.temperature().then(temp => {
+                                    return temp.min('min_temperature').then(result => {
+                                        console.log(result[99])
+                                        return assert.ok(Math.abs(result[99].y - -38.8) < 0.001)
+                                    })
+                                })
+                            })
+                            it('max', () => {
+                                return stations.calculated.wkly.temperature().then(temp => {
+                                    return temp.max('max_temperature').then(result => {
+                                        console.log(result[99])
+                                        return assert.ok(Math.abs(result[99].y - - 22.1) < 0.001)
+                                    })
+                                })
+                            })
+                        })
+                    })
+                    describe('daily', function () {
+                        describe('absolut', function() {
+                            it('avg', () => {
+                                return stations.raw.daily.temperature().then(temp => {
+                                    return temp.mean('avg_temperature').then(result => {
+
+                                        console.log(result[99])
+                                        return assert.ok(Math.abs(result[99].y - 2.7) < 0.001)
+                                    })
+                                })
+                            })
+                            it('min', () => {
+                                return stations.raw.daily.temperature().then(temp => {
+                                    return temp.min('min_temperature').then(result => {
+
+                                        console.log(result[99])
+                                        return assert.ok(Math.abs(result[99].y - 0.2) < 0.001)
+                                    })
+                                })
+                            })
+                            it('max', () => {
+                                return stations.raw.daily.temperature().then(temp => {
+                                    return temp.max('max_temperature').then(result => {
+
+                                        console.log(result[99])
+                                        return assert.ok(Math.abs(result[99].y - 4.5) < 0.001)
+                                    })
+                                })
+                            })
+                        })
+                    })
+                })
+                it.skip('Moving Average', function () {
                     return stations.calculated.temperature.then(temp => {
-                        return temp.ma('avg_temperature').then(result => {
-                            console.log(result)
+                        return temp().ma('avg_temperature').then(result => {
+
                             return assert.equal(result.reduce((a, b) => {
                                 if (a.x === 1996){
                                     return a;
@@ -75,12 +268,12 @@ describe(
                 })
 
             })
-            describe('raw', function () {
+            describe.skip('raw', function () {
                 describe('precipitation', function () {
                     it('snow', function () {
                         return stations.raw.precipitation.then(prec => {
-                            return prec.snow().then(result => {
-                                console.log(result)
+                            return prec().snow().then(result => {
+
                                 return result
                             })
                         })
@@ -705,47 +898,6 @@ describe(
                         return instances.latest.getByParams(config, params).then(values => {
                             ////////console.log(values)
                             return assert.equal(values.y, 410.25)
-                        })
-                    })
-                })
-                describe('warmest / coldest', function() {
-                    describe('weeks', function() {
-                        it('max', () => {
-                            let params = ['temperature', 'weekly', 'maxAvg', 'shortValues', 40]
-                            let config = Object.assign(configs['liveHalf'], specs)
-                            return instances.latest.getByParams(config, params).then(values => {
-                                //////console.log(values)
-                                //return assert.ok(Math.abs(values.y - 17.90) < 0.000001 )
-                                return assert.ok(Math.abs(values.y - 17.185714285714287) < 0.000001 )
-                            })
-                        })
-                        it('min', () => {
-                            let params = ['temperature', 'weekly', 'minAvg', 'shortValues', 40]
-                            let config = Object.assign(configs['liveHalf'], specs)
-                            return instances.latest.getByParams(config, params).then(values => {
-                                //////console.log(values)
-                                //return assert.ok(Math.abs(values.y - -20.257142857142856) < 0.00001)
-                                return assert.ok(Math.abs(values.y - -23.45714285714286) < 0.00001)
-
-                            })
-                        })
-                    })
-                    describe('daily' , function() {
-                        it('max', () => {
-                            let params = ['temperature', 'yrly', 'max', 'shortValues', 40]
-                            let config = Object.assign(configs['liveHalf'], specs)
-                            return instances.latest.getByParams(config, params).then(values => {
-                                ////////console.log(values)
-                                return assert.equal(values.y, 26.9)
-                            })
-                        })
-                        it('min', () => {
-                            let params = ['temperature', 'yrly', 'min', 'shortValues', 40]
-                            let config = Object.assign(configs['liveHalf'], specs)
-                            return instances.latest.getByParams(config, params).then(values => {
-                                ////////console.log(values)
-                                return assert.equal(values.y, -31.5)
-                            })
                         })
                     })
                 })

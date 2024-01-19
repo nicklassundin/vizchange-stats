@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="310px" preserveAspectRatio="none" style="width:482px;height:310px;" version="1.1" viewBox="0 0 482 310" width="482px" zoomAndPan="magnify"><defs/><g><!--MD5=[a6f11bb19cee6b13000111f5ad685e8b]
+cluster Dependencies--><path d="M25,216 L127,216 A4.5,4.5 0 0 1 130,219 L137,235.9688 L450,235.9688 A3,3 0 0 1 453,238.9688 L453,295 A3,3 0 0 1 450,298 L25,298 A3,3 0 0 1 22,295 L22,219 A3,3 0 0 1 25,216 " fill="#FFFFFF" style="stroke: #000000; stroke-width: 1.5;"/><line style="stroke: #000000; stroke-width: 1.5;" x1="22" x2="137" y1="235.9688" y2="235.9688"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="102" x="26" y="229.1387">Dependencies</text><!--MD5=[92c76255242b65bb2780cba28222c775]
+entity axios--><rect fill="#F8F8F8" height="33.9688" rx="3" ry="3" style="stroke: #383838; stroke-width: 1.0;" width="53" x="214.5" y="248"/><rect fill="#F8F8F8" height="5" style="stroke: #383838; stroke-width: 1.0;" width="10" x="209.5" y="253"/><rect fill="#F8F8F8" height="5" style="stroke: #383838; stroke-width: 1.0;" width="10" x="209.5" y="271.9688"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="33" x="224.5" y="269.1387">axios</text><!--MD5=[ff43301d5c32a86a3bfb9f0d14e32f61]
+entity r-integration--><rect fill="#F8F8F8" height="33.9688" rx="3" ry="3" style="stroke: #383838; stroke-width: 1.0;" width="97" x="38.5" y="248"/><rect fill="#F8F8F8" height="5" style="stroke: #383838; stroke-width: 1.0;" width="10" x="33.5" y="253"/><rect fill="#F8F8F8" height="5" style="stroke: #383838; stroke-width: 1.0;" width="10" x="33.5" y="271.9688"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="77" x="48.5" y="269.1387">r-integration</text><!--MD5=[319c8b0459fbc1fddb9261b967a6d129]
+entity r-script--><rect fill="#F8F8F8" height="33.9688" rx="3" ry="3" style="stroke: #383838; stroke-width: 1.0;" width="65" x="281.5" y="248"/><rect fill="#F8F8F8" height="5" style="stroke: #383838; stroke-width: 1.0;" width="10" x="276.5" y="253"/><rect fill="#F8F8F8" height="5" style="stroke: #383838; stroke-width: 1.0;" width="10" x="276.5" y="271.9688"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="45" x="291.5" y="269.1387">r-script</text><!--MD5=[83d7c66368a3272c2ae5778d39252274]
+entity webpack--><rect fill="#F8F8F8" height="33.9688" rx="3" ry="3" style="stroke: #383838; stroke-width: 1.0;" width="76" x="361" y="248"/><rect fill="#F8F8F8" height="5" style="stroke: #383838; stroke-width: 1.0;" width="10" x="356" y="253"/><rect fill="#F8F8F8" height="5" style="stroke: #383838; stroke-width: 1.0;" width="10" x="356" y="271.9688"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="56" x="371" y="269.1387">webpack</text><!--MD5=[a0d91d521d26d026d736e286eb2ffc7d]
+entity webr--><rect fill="#F8F8F8" height="33.9688" rx="3" ry="3" style="stroke: #383838; stroke-width: 1.0;" width="51" x="149.5" y="248"/><rect fill="#F8F8F8" height="5" style="stroke: #383838; stroke-width: 1.0;" width="10" x="144.5" y="253"/><rect fill="#F8F8F8" height="5" style="stroke: #383838; stroke-width: 1.0;" width="10" x="144.5" y="271.9688"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="31" x="159.5" y="269.1387">webr</text><ellipse cx="310.1482" cy="126.8774" fill="#F8F8F8" rx="37.6482" ry="12.8774" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="49" x="285.6482" y="130.3618">bundle</text><ellipse cx="324.8406" cy="20.8774" fill="#F8F8F8" rx="46.8406" ry="12.8774" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="62" x="293.8406" y="24.3618">gateway</text><ellipse cx="405.7635" cy="20.8774" fill="#F8F8F8" rx="19.2635" ry="12.8774" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="23" x="394.2635" y="24.3618">list</text><ellipse cx="151.7696" cy="20.8774" fill="#F8F8F8" rx="39.7696" ry="12.8774" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="52" x="125.7696" y="24.3618">module</text><ellipse cx="151.9914" cy="73.8774" fill="#F8F8F8" rx="31.9914" ry="12.8774" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="41" x="131.4914" y="77.3618">parser</text><ellipse cx="97.9203" cy="126.8774" fill="#F8F8F8" rx="24.9203" ry="12.8774" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="31" x="82.4203" y="130.3618">point</text><ellipse cx="235.163" cy="20.8774" fill="#F8F8F8" rx="29.163" ry="12.8774" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="37" x="216.663" y="24.3618">specs</text><ellipse cx="324.7904" cy="73.8774" fill="#F8F8F8" rx="51.7904" ry="12.8774" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="69" x="290.2904" y="77.3618">translate</text><ellipse cx="401.9213" cy="183.2843" fill="#F8F8F8" rx="69.4213" ry="16.2843" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="113" x="345.4213" y="186.7686">webpack.config</text><!--MD5=[120c09663b7563294614d999f9b38b3f]
+link <b>bundle</b> to r-script--><path d="M310.355,140.069 C311.032,163.08 312.515,213.508 313.366,242.4451 " fill="none" id="&lt;b&gt;bundle&lt;/b&gt;-&gt;r-script" style="stroke: #000000; stroke-width: 1.0;"/><polygon fill="#000000" points="313.517,247.5868,317.2504,238.473,313.3698,242.589,309.2538,238.7084,313.517,247.5868" style="stroke: #000000; stroke-width: 1.0;"/><!--MD5=[22b13300c4401bf080a1d61455b75e4f]
+link <b>module</b> to axios--><path d="M166.599,33.163 C174.924,40.269 184.886,50.157 191,61 C224.9,121.118 236.026,203.924 239.506,242.5474 " fill="none" id="&lt;b&gt;module&lt;/b&gt;-&gt;axios" style="stroke: #000000; stroke-width: 1.0;"/><polygon fill="#000000" points="239.966,247.9174,243.1835,238.6089,239.5394,242.9356,235.2127,239.2915,239.966,247.9174" style="stroke: #000000; stroke-width: 1.0;"/><!--MD5=[ceea939c048c5ba78351268f7ac69a9c]
+link <b>module</b> to parser--><path d="M152,34.086 C152,40.471 152,48.424 152,55.473 " fill="none" id="&lt;b&gt;module&lt;/b&gt;-&gt;parser" style="stroke: #000000; stroke-width: 1.0;"/><polygon fill="#000000" points="152,60.646,156,51.646,152,55.646,148,51.646,152,60.646" style="stroke: #000000; stroke-width: 1.0;"/><!--MD5=[af78c52f3be6e1411ac1581337766e3b]
+link <b>module</b> to point--><path d="M137.342,33.131 C128.997,40.225 119.034,50.112 113,61 C104.7725,75.844 101.0492,94.994 99.3693,108.655 " fill="none" id="&lt;b&gt;module&lt;/b&gt;-&gt;point" style="stroke: #000000; stroke-width: 1.0;"/><polygon fill="#000000" points="98.8027,113.782,103.7684,105.2766,99.3527,108.8123,95.817,104.3966,98.8027,113.782" style="stroke: #000000; stroke-width: 1.0;"/><!--MD5=[df0653c64b124f95bdb9413718aca8bc]
+link <b>module</b> to specs--><path d="M192.203,21 C195.059,21 197.915,21 200.771,21 " fill="none" id="&lt;b&gt;module&lt;/b&gt;-&gt;specs" style="stroke: #000000; stroke-width: 1.0;"/><polygon fill="#000000" points="205.911,21,196.911,17,200.911,21,196.911,25,205.911,21" style="stroke: #000000; stroke-width: 1.0;"/><!--MD5=[dffbd2e25499b971e5d4aaab9ea491b8]
+link parser to point--><path d="M140.016,86.319 C132.219,93.682 121.972,103.36 113.549,111.314 " fill="none" id="parser-&gt;point" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="109.58,115.063,118.8694,111.7908,113.2148,111.6296,113.376,105.9751,109.58,115.063" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[40b089647076d95b0c7f34a28daa56a2]
+link parser to r-integration--><path d="M147.972,86.989 C143.58,100.039 136.333,121.516 130,140 C117.589,176.223 102.9434,218.3223 94.3445,242.9743 " fill="none" id="parser-&gt;r-integration" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="92.6044,247.9616,99.3461,240.7818,94.2516,243.2407,91.7927,238.1462,92.6044,247.9616" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[010884aa02930d481bb7f55bea8e5577]
+link parser to webr--><path d="M153.474,87.11 C157.298,118.533 167.575,202.99 172.414,242.7503 " fill="none" id="parser-&gt;webr" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="173.032,247.8266,175.9151,238.4092,172.4278,242.8632,167.9737,239.3759,173.032,247.8266" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[089ad03f8697effb2f4ae3776d83f483]
+link <b>webpack.config</b> to webpack--><path d="M401.407,200.207 C400.949,212.351 400.31,229.2914 399.805,242.6633 " fill="none" id="&lt;b&gt;webpack.config&lt;/b&gt;-&gt;webpack" style="stroke: #000000; stroke-width: 1.0;"/><polygon fill="#000000" points="399.612,247.7802,403.9489,238.9376,399.8007,242.7838,395.9546,238.6356,399.612,247.7802" style="stroke: #000000; stroke-width: 1.0;"/><!--MD5=[7d3c1dba57eb4eba1f44b3adad030cb2]
+link <b>gateway</b> to <b>list</b>--><!--MD5=[622ad9398fc1bdfd6a60659dd6e4a168]
+link <b>gateway</b> to <b>translate</b>--><script type="text/plantuml"><![CDATA[MD5=[836c3d6af1fb9904bd3c2acff0b08333]
+@startuml
+
+scale max 1920 width
+top to bottom direction
+
+skinparam nodesep 14
+skinparam ranksep 27
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName Tahoma
+skinparam defaultFontSize 12
+skinparam roundCorner 6
+skinparam dpi 150
+skinparam arrowColor black
+skinparam arrowThickness 0.5
+skinparam packageTitleAlignment left
+
+skinparam usecase {
+  borderThickness 0.5
+}
+
+skinparam rectangle {
+  borderThickness 0.5
+}
+
+skinparam component {
+  borderThickness 1
+}
+
+
+(<b>bundle</b>)
+(<b>gateway</b>)
+(<b>list</b>)
+(<b>module</b>)
+(parser)
+(point)
+(specs)
+(<b>translate</b>)
+(<b>webpack.config</b>)
+
+package "Dependencies" {
+  [axios]
+  [r-integration]
+  [r-script]
+  [webpack]
+  [webr]
+}
+
+(<b>bundle</b>) ---[thickness=1]> [r-script]
+(<b>module</b>) --[thickness=1]> [axios]
+(<b>module</b>) --[thickness=1]> (parser)
+(<b>module</b>) -[thickness=1]> (point)
+(<b>module</b>) -[thickness=1]> (specs)
+(parser) --> (point)
+(parser) ----> [r-integration]
+(parser) ----> [webr]
+(<b>webpack.config</b>) --[thickness=1]> [webpack]
+
+@enduml
+
+
+' View and edit on https://arkit.pro
+]]></script></g></svg>

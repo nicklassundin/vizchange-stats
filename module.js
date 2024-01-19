@@ -21,11 +21,11 @@ class Data {
 		this.request = request;
 		let url = this.spec.getUrl(request)
 		if(request.sort) {
-			this.parsed = axios.get(url).then(response => (new Parser(response.data, this.request)))
-		}else{
-			let startTime = Date.now();
 			this.parsed = axios.get(url).then(response => {
-				console.log(`request time (ms): `, (Date.now() - startTime))
+				return (new Parser(response.data, this.request))
+			})
+		}else{
+			this.parsed = axios.get(url).then(response => {
 				return (new ParserRaw(response.data, this.request))
 			})
 		}
@@ -47,13 +47,22 @@ class Data {
 		return this.calculated(type, 'min')
 	}
 	mean(type) {
-		return this.calculated(type, 'mean')
+		return this.calculated(type, 'avg')
+	}
+	meanMax(type) {
+		return this.calculated(type, 'avg', 'max')
 	}
 	sum(type) {
 		return this.calculated(type, 'sum')
 	}
 	ma(type) {
 		return this.calculated(type, 'min', 'ma')
+	}
+	abs_min(type) {
+		return this.calculated(type, 'min', 'min')
+	}
+	abs_max(type) {
+		return this.calculated(type, 'max', 'max')
 	}
 	snow(type) {
 		return this.calculated(type, undefined, 'snow')

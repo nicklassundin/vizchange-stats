@@ -1,13 +1,24 @@
-// PLACE HOLDER TODO
-
-const R = require('r-integration');
-
 const {WebR} = require('webr');
 const {Point} = require('../point');
+
 class Parser {
     constructor (data, request){
-        this.initData(data);
+        console.log('DataLength:', data.length)
+        this.data = this.initData(data);
         this.request = request;
+        this.dataframe = {};
+        this.request.label = [];
+        switch (request.sort) {
+            case 'week':
+                this.request.label.push('week');
+            case 'month':
+                this.request.label.push('month');
+            case 'year':
+                this.request.label.push('year');
+                break;
+            default:
+                this.request.label = ['year'];
+        }
     }
     initData (data) {
         let structure = data.reduce((a, b) => {
@@ -15,13 +26,13 @@ class Parser {
         })
         let types = Object.keys(structure)
         let initial = {}
-        types.forEach(type => {
+        for (const type of types) {
             initial[type] = {};
             Object.keys(structure[type]).forEach(key => {
                 initial[type][key] = []
             })
-        })
-        this.data = data.reduce((a, b) => {
+        }
+        data = data.reduce((a, b) => {
             Object.keys(b).forEach(type => {
                 Object.keys(structure[type]).forEach(key => {
                     a[type][key].push(b[type][key])
@@ -29,53 +40,86 @@ class Parser {
             });
             return a
         }, initial)
+        return data;
     }
-    async initR (type, tag) {
-        if(!this.webR){
-            this.webR = new WebR();
+    async get (type, y, calc) {
+        return this.getMatch(type, y, calc).then((df) => {
+            // NOTE / TODO this should be a callback function to R script library
+            //return this.cbind(df.values[0].values, df.values[1].values);
+            return this.cbind(df);
+        });
+    }
+    async getMatch (type, y, calc) {
+        await this.initR(type);
+        return (await this.getCol(type, y, calc)).toJs();
+    }
+    getName(type, tag){
+        if(tag === this.xLabel){
+            return tag;
         }
-        await this.webR.init();
-        // TODO destroy object when used
-        await this.webR.objs.globalEnv.bind(`${type}_${tag}`, this.data[type][tag]);
+        return `${type}_${tag}`;
     }
-    async getCol (type, tag, calc) {
+    getData(type, tag){
+        return this.data[type][tag]
+    }
+    async initR(type) {
+        if (!this.webR) {
+            this.webR = new WebR();
+            await this.webR.init();
+        }
+        for (const tag in this.data[type]) {
+            await this.webR.objs.globalEnv.bind(this.getName(type, tag), this.getData(type, tag))
+        }
+        this.dataframe[type] = await this.createDataFrame(type, Object.keys(this.data[type]));
+    }
+    createDataFrame(type, tags) {
+        return this.webR.evalR(`df <- data.frame(${tags.map(tag => this.getName(type, tag)).join(',')})
+        colnames(df) <- c("${tags.join('","')}") 
+        df <- df[order(df$${this.xLabel.join(',df$')}),]
+        return(df)`)
+    }
+    async getCol (type, tag, calc, df = this.getDf(type)) {
         switch (calc) {
             case 'ma': /* TODO moving average */
-                return this.webR.evalR(`stats::filter(${type}_${tag}[order(${type}_${this.xLabel})], rep(1,5), sides = 1)/5`);
+                return this.webR.evalR(`stats::filter(${this.getName(type, tag)}[order(${this.getName(type, this.xLabel)})], rep(1,5), sides = 1)/5`);
+            case 'snow':
+                // TODO
+                return this.webR.evalR(`mapply(function (x) (abs(x) - x) / (2 * abs(x)), avg_temperature)*precipitation`).catch(err => console.log(err))
+            case 'max':
+            case 'min':
             default:
-                return this.webR.evalR(`return(${type}_${tag}[order(${type}_${this.xLabel})])`);
+                return this.webR.evalR(`return(df[c("${tag}","${this.xLabel.join('","')}")])`, {df: this.getDf(type)});
         }
     }
-    async cbind (x, y) {
-        return x.then((x_r) => {
-            return y.then((y_r) => {
-                return y_r.map((each, i) => {
-                    return {
-                        y: each,
-                        x: x_r[i]
-                    }
-                })
-            })
+    async evalR(code, type) {
+        return await this.webR.evalR(code, { df: this.getDf(type) });
+    }
+    getDf(type) {
+        return this.dataframe[type]
+    }
+    async cbind () {
+        let df = arguments[0]
+        return df.values[0].values.map((each, i) => {
+            return new Point(Object.keys(df.values).map((key, j) => df.values[j].values[i]), df.names)
         })
     }
     get xLabel () {
-        return this.request.sort;
-    }
-    async getMatch (type, y, calc) {
-        await this.initR(type, this.xLabel);
-        await this.initR(type, y);
-        let x_n = (await this.getCol(type, this.xLabel)).toArray();
-        let y_n = (await this.getCol(type, y, calc)).toArray();
-        return await this.cbind(x_n, y_n)
-    }
-    async get (type, y, calc) {
-        return this.getMatch(type, y, calc);
+        return this.request.label;
     }
 }
 module.exports.Parser = Parser;
 class ParserRaw extends Parser {
-    constructor (data) {
-        super(data);
+    constructor (data, request) {
+        super(data, request);
+        this.dataframe = [];
+        this.frameSlice = 1000;
+        this.dataframeGroups = Array.from({ length: this.data.date.length/this.frameSlice }, (value, index) => index);
+        this.dataframeGroups = this.dataframeGroups.map(g => {
+            return {
+                start: g*this.frameSlice,
+                end: (this.frameSlice > this.data.date.length) ? this.data.date.length : (g+1)*this.frameSlice
+            }
+        })
     }
     initData(data) {
         let startTime = Date.now();
@@ -87,12 +131,18 @@ class ParserRaw extends Parser {
         keys.forEach((key) => {
             entry[key] = [];
         })
-        //console.log('Data Time: ', Date.now() - startTime)
-        this.data = data.reduce((a, b) => {
-            Object.keys(b).forEach((key) => {
+        this.data = data.map(entry => {
+            entry.date = (new Date(entry.date)).getTime();
+            return entry
+        }).reduce((a, b) => {
+            keys.forEach((key) => {
                 switch (key) {
                     case 'date':
                         a[key].push(b[key]);
+                        break;
+                    case 'position':
+                    case 'station':
+                         a[key].push(b[key]);
                         break;
                     default:
                         a[key].push(Number(b[key]));
@@ -103,34 +153,45 @@ class ParserRaw extends Parser {
         }, entry)
         return this.data
     }
-    async getMatch (type, y, calc) {
-        let x_n = (await this.getCol(this.xLabel)).toArray();
-        let y_n = (await this.getCol(type, y, calc)).toArray();
-        return await this.cbind(x_n, y_n)
+    async initR(type) {
+        if (!this.webR) {
+            this.webR = new WebR();
+            await this.webR.init();
+        }
+        let div = this.frameSlice;
+        for (const g of this.dataframeGroups) {
+            for (const tag of Object.keys(this.data)) {
+                let data = this.getData(tag);
+                let end = (g.end > data.length) ? data.length : g.end;
+                await this.webR.objs.globalEnv.bind(this.getName(type, tag), data.slice(g.start, end))
+            }
+            this.dataframe.push(await this.createDataFrame(type, Object.keys(this.data)));
+        }
+    }
+    getName(type, tag){
+        return tag;
+    }
+    getData(type){
+        return this.data[type]
+    }
+    getDf () {
+        return this.dataframe[1]
     }
     async getCol (type, tag, calc) {
-        await this.initR(type);
-        switch (calc) {
-            case 'ma': /* TODO moving average */
-                return this.webR.evalR(`stats::filter(${type}[order(${this.xLabel})], rep(1,5), sides = 1)/5`);
-            case 'snow':
-                await this.initR('avg_temperature');
-                await this.initR('precipitation');
-                //return this.webR.evalR(`return(precipitation[order(${this.xLabel})])`);
-                return this.webR.evalR(`mapply(function (x) (abs(x) - x) / (2 * abs(x)), avg_temperature)*precipitation`).catch(err => console.log(err))
-            default:
-                return this.webR.evalR(`return(${type}[order(${this.xLabel})])`);
+        let call = (options) => {
+            switch (calc) {
+                case 'ma':
+                case 'snow':
+                case 'max':
+                case 'min':
+                default:
+                    return this.webR.evalR(`return(df[c("${type}","${this.xLabel.join('","')}")])`, options);
+            }
         }
-    }
-    async initR (type) {
-        if(!this.webR){
-            this.webR = new WebR();
-            await this.webR.init().catch(err => console.log(err));
-        }
-        await this.webR.objs.globalEnv.bind(`${type}`, this.data[type]).catch(err => console.error(err))
+        return this.dataframe.map(frame => call({df: frame}))[0]
     }
     get xLabel () {
-        return 'date'
+        return ['date']
     }
 }
 module.exports.ParserRaw = ParserRaw;
