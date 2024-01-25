@@ -10,9 +10,7 @@ const axios = require('axios').create({
 	}),
 });
 const {Specs} = require('./module/specs');
-const {Point} = require('./module/point');
-const {Parser} = require('./module/rscript/parser.js');
-const {ParserRaw} = require('./module/rscript/parser.js');
+const {ParserCalc, ParserRaw} = require('./module/parser/parser.js');
 class Data {
 	constructor(spec){
 		this.spec = new Specs(spec);
@@ -20,51 +18,57 @@ class Data {
 	init(request) {
 		this.request = request;
 		let url = this.spec.getUrl(request)
+		this.response = axios.get(url)
 		if(request.sort) {
-			this.parsed = axios.get(url).then(response => {
-				return (new Parser(response.data, this.request))
+			this.parsed = this.response.then(response => {
+				return (new ParserCalc(response.data, this.request))
 			})
 		}else{
-			this.parsed = axios.get(url).then(response => {
+			this.parsed = this.response.then(response => {
 				return (new ParserRaw(response.data, this.request))
 			})
 		}
 		return this
 	}
-	calculated (type, tag, calc) {
-		if(type === ''){
-			throw(new Error('Request has no type'))
-		}else{
-			return this.parsed.then(data => {
-				return data.get(type, tag, calc)
-			})
-		}
+	get handler() {
+		return this.parsed.then(data => {
+			return data.handler
+		})
 	}
-	max(type) {
+	async max(type) {
+		return (await this.handler).get(type, 'max')
 		return this.calculated(type, 'max');
 	}
-	min(type) {
+	async min(type) {
+		return (await this.handler).get(type, 'min')
 		return this.calculated(type, 'min')
 	}
-	mean(type) {
+	async mean(type) {
+		return (await this.handler).get(type, 'avg')
 		return this.calculated(type, 'avg')
 	}
-	meanMax(type) {
+	async meanMax(type) {
+		return (await this.handler).get(type, 'avg', 'max')
 		return this.calculated(type, 'avg', 'max')
 	}
-	sum(type) {
+	async sum(type) {
+		return (await this.handler).get(type, 'sum')
 		return this.calculated(type, 'sum')
 	}
-	ma(type) {
+	async ma(type) {
+		return (await this.handler).get(type, 'min', 'ma')
 		return this.calculated(type, 'min', 'ma')
 	}
-	abs_min(type) {
+	async abs_min(type) {
+		return (await this.handler).get(type, 'min', 'min')
 		return this.calculated(type, 'min', 'min')
 	}
-	abs_max(type) {
+	async abs_max(type) {
+		return (await this.handler).get(type, 'max', 'max')
 		return this.calculated(type, 'max', 'max')
 	}
-	snow(type) {
+	async snow(type) {
+		return (await this.handler).get(type, undefined, 'snow')
 		return this.calculated(type, undefined, 'snow')
 	}
 	getByParams(request, params) {

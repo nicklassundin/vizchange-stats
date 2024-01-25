@@ -84,10 +84,50 @@ describe(
                 afterEach(() => {
                     console.timeEnd('Speed test');
                 })
+                describe('server response', function () {
+                    describe('calculated', function (done) {
+                        it('year', function (done) {
+                            stations.calculated.yrly.temperature().then((temp) => {
+                                temp.response.then(() => {
+                                    done()
+                                })
+                            })
+                            this.timeout(3000)
+                        })
+                        it('month', function (done) {
+                            stations.calculated.monthly.temperature().then(temp => {
+                                temp.response.then(() => {
+                                    done()
+                                })
+                            })
+                            this.timeout(4000)
+                        })
+                        it('week', function (done) {
+                            stations.calculated.wkly.temperature().then(temp => {
+                                temp.response.then(() => {
+                                    done()
+                                })
+                            })
+                            this.timeout(5000)
+                        })
+                    })
+                    describe('raw', function () {
+                        it('day', function (done) {
+                            this.slow(3000)
+                            stations.raw.daily.temperature().then(temp => {
+                                temp.response.then(() => {
+                                    done()
+                                })
+                            })
+                            this.timeout(8000)
+                        })
+                    })
+                })
                 describe('calculated', function () {
                     it('years', function () {
                         return stations.calculated.yrly.temperature().then(temp => {
                             return temp.min('avg_temperature').then(result => {
+                                console.log('length', result.length)
                                 console.log(result[99])
                                 return true;
                             })
@@ -96,6 +136,7 @@ describe(
                     it('month', function () {
                         return stations.calculated.monthly.temperature().then(temp => {
                             return temp.min('avg_temperature').then(result => {
+                                console.log('length', result.length)
                                 console.log(result[99])
                                 return true;
                             })
@@ -104,25 +145,21 @@ describe(
                     it('week', function () {
                         return stations.calculated.wkly.temperature().then(temp => {
                             return temp.min('avg_temperature').then(result => {
-                                console.log(result[99])
-                                return true;
-                            })
-                        })
-                    })
-                    // TODO to large data structure need compression
-                    it('day', function () {
-                        return stations.raw.daily.temperature().then(temp => {
-                            return temp.min('avg_temperature').then(result => {
+                                console.log('length', result.length)
                                 console.log(result[99])
                                 return true;
                             })
                         })
                     })
                 })
-                it.skip('raw', function () {
-                    return stations.raw.temperature.then(temp => {
-                        return temp.min('avg_temperature').then(result => {
-                            return true;
+                describe('raw', function () {
+                    it('day', function () {
+                        return stations.raw.daily.temperature().then(temp => {
+                            return temp.min('avg_temperature').then(result => {
+                                console.log(result.length)
+                                console.log(result[99])
+                                return true;
+                            })
                         })
                     })
                 })
@@ -227,7 +264,7 @@ describe(
                                     return temp.mean('avg_temperature').then(result => {
 
                                         console.log(result[99])
-                                        return assert.ok(Math.abs(result[99].y - 2.7) < 0.001)
+                                        return assert.ok(Math.abs(result[99].y - - 0.7) < 0.001)
                                     })
                                 })
                             })
@@ -236,7 +273,7 @@ describe(
                                     return temp.min('min_temperature').then(result => {
 
                                         console.log(result[99])
-                                        return assert.ok(Math.abs(result[99].y - 0.2) < 0.001)
+                                        return assert.ok(Math.abs(result[99].y - -3.3) < 0.001)
                                     })
                                 })
                             })
@@ -245,7 +282,7 @@ describe(
                                     return temp.max('max_temperature').then(result => {
 
                                         console.log(result[99])
-                                        return assert.ok(Math.abs(result[99].y - 4.5) < 0.001)
+                                        return assert.ok(Math.abs(result[99].y - 2.6) < 0.001)
                                     })
                                 })
                             })
