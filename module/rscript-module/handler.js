@@ -1,6 +1,6 @@
-const {WebR} = require('webr');
+const {WebR, Shelter, RObject} = require('webr');
 const {Point} = require('../point');
-
+const {HandlerResponse} = require('./handlerResponse');
 class Handler {
     constructor(data, request) {
         this.data = data
@@ -9,34 +9,26 @@ class Handler {
         this.webR = undefined;
     }
     async get (type, y, calc) {
-        return this.getMatch(type, y, calc).then((df) => {
-            return this.cbind(df);
+        return this.getMatch(type, y, calc).then((response) => {
+            return  response.resolve();
         });
     }
     async getMatch (type, y, calc) {
         await this.initR(type);
-        return (await this.getCol(type, y, calc)).toJs().then(result => {
-            return result
-        });
+        return (await this.getCol(type, y, calc))
     }
     getDf() {
         return this.dataframe[1];
     }
-    async cbind () {
-        let df = arguments[0]
-        return df.values[0].values.map((each, i) => {
-            return new Point(Object.keys(df.values).map((key, j) => df.values[j].values[i]), df.names)
-        })
-    }
-    addDataFrame(type, tags) {
+    addDataFrame(type, tags, shelter = this.webR) {
         // NOTE: used for raw data
-        return this.webR.evalR(`df2 <- data.frame(${tags.map(tag => this.getName(type, tag)).join(',')})
+        return shelter.evalR(`df2 <- data.frame(${tags.map(tag => this.getName(type, tag)).join(',')})
         colnames(df2) <- c("${tags.join('","')}") 
-        df <- rbind(df, df2)
-        return(df)`, {df: this.dataframe})
+        df <- rbind(df, df2);
+        return(df);`)
     }
-    createDataFrame(type, tags) {
-        return this.webR.evalR(`df <- data.frame(${tags.map(tag => this.getName(type, tag)).join(',')})
+    createDataFrame(type, tags, shelter = this.webR) {
+        return shelter.evalR(`df <- data.frame(${tags.map(tag => this.getName(type, tag)).join(',')})
         colnames(df) <- c("${tags.join('","')}") 
         df <- df[order(df$${this.xLabel.join(',df$')}),]
         return(df)`)
@@ -46,6 +38,7 @@ class Handler {
     }
     async initR(type) {}
     async getCol(type, y, calc) {}
+    getName(type, tag) {}
 }
 
 class RscriptHandler extends Handler {
@@ -69,17 +62,28 @@ class RscriptHandler extends Handler {
         return `${type}_${tag}`;
     }
     getCol (type, tag, calc, df = this.getDf(type)) {
+        let response = new HandlerResponse();
+        let code = '';
+        let result;
         switch (calc) {
             case 'ma': /* TODO moving average */
-                return this.webR.evalR(`stats::filter(${this.getName(type, tag)}[order(${this.getName(type, this.xLabel)})], rep(1,5), sides = 1)/5`);
+                code = `stats::filter(${this.getName(type, tag)}[order(${this.getName(type, this.xLabel)})], rep(1,5), sides = 1)/5`;
+                result = this.webR.evalR(code);
+                break
             case 'snow':
                 // TODO
-                return this.webR.evalR(`mapply(function (x) (abs(x) - x) / (2 * abs(x)), avg_temperature)*precipitation`).catch(err => console.log(err))
+                code = `mapply(function (x) (abs(x) - x) / (2 * abs(x)), avg_temperature)*precipitation`;
+                result = this.webR.evalR(code);
+                break;
             case 'max':
             case 'min':
             default:
-                return this.webR.evalR(`return(df[c("${tag}","${this.xLabel.join('","')}")])`, {df: this.getDf(type)});
+                code = `return(df[c("${tag}","${this.xLabel.join('","')}")])`;
+                result = this.webR.evalR(code, {df: this.getDf(type)});
         }
+        response.addToBody(code);
+        response.result = result;
+        return response
     }
     getData(type, tag) {
         return this.data[type][tag];
@@ -91,7 +95,7 @@ class RscriptHandler extends Handler {
 module.exports.RscriptHandler = RscriptHandler;
 
 class RscriptRawHandler extends Handler {
-    constructor(data, request, frameSlice = 1000){
+    constructor(data, request, frameSlice = Object.keys(data).length*2000){
         super(data, request);
         if(this.data.date.length / frameSlice < 1) {
             this.frameSlice = this.data.date.length;
@@ -114,14 +118,21 @@ class RscriptRawHandler extends Handler {
         }
     }
     getCol (type, tag, calc) {
+        let response = new HandlerResponse();
+        let code = '';
+        let result;
         switch (calc) {
             case 'ma':
             case 'snow':
             case 'max':
             case 'min':
             default:
-                return this.webR.evalR(`return(df[c("${type}","${this.xLabel.join('","')}")])`, this.dataframe);
+                code = `return(df[c("${type}","${this.xLabel.join('","')}")])`;
+                result = this.webR.evalR(code, this.dataframe);
         }
+        response.addToBody(code);
+        response.result = result;
+        return response
     }
     getName(type, tag) {
         // NOTE could be replaced with a if RAW config
@@ -141,18 +152,33 @@ class RscriptRawHandler extends Handler {
         }
         let div = this.frameSlice;
         let dataframe;
+        // current date in time save to variable time
         for (const g of this.dataframeGroups) {
+            // TODO local shelter
+            //let shelter = await new Shelter();
+            //let env = await (new this.webR.REnvironment({ df: this.dataframe}))
             for (const tag of Object.keys(this.data)) {
                 let data = this.getData(tag);
-                await this.webR.objs.globalEnv.bind(this.getName(type, tag), data.slice(g.start, g.end))
+                await this.webR.objs.globalEnv.bind(this.getName(type, tag), await new this.webR.RObject(data.slice(g.start, g.end)))
+                //await env.bind(this.getName(type, tag), data.slice(g.start, g.end))
             }
-            //this.dataframe.push(await this.createDataFrame(type, Object.keys(this.data)));
             if(g.start === 0) {
-                dataframe = (await this.createDataFrame(type, Object.keys(this.data)));
+                //dataframe = await this.createDataFrame(type, Object.keys(this.data), shelter);
+                dataframe = await this.createDataFrame(type, Object.keys(this.data));
             } else {
+                //dataframe = (await this.addDataFrame(type, Object.keys(this.data), shelter));
                 dataframe = (await this.addDataFrame(type, Object.keys(this.data)));
             }
+            // TODO Local shelter
+            //shelter.purge();
         }
+        /**
+        dataframe.toJs().then((data) => {
+            console.log('initR.data', data)
+            console.log('length', data.values[0].values.length)
+        })
+         */
+
         this.dataframe = await dataframe;
         // NOTE dataframe is correct here
     }
