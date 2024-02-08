@@ -20,18 +20,20 @@ class Handler {
     getDf() {
         return this.dataframe[1];
     }
-    addDataFrame(type, tags, shelter = this.webR) {
+    addDataFrame(type, tags, shelter = this.webR, env = this.webR.objs.globalEnv) {
         // NOTE: used for raw data
         return shelter.evalR(`df2 <- data.frame(${tags.map(tag => this.getName(type, tag)).join(',')})
         colnames(df2) <- c("${tags.join('","')}") 
         df <- rbind(df, df2);
-        return(df);`)
+        return(df);`, { env })
     }
-    createDataFrame(type, tags, shelter = this.webR) {
+    createDataFrame(type, tags, shelter = this.webR, env = this.webR.objs.globalEnv) {
+        //console.log(shelter)
+        //console.log(env)
         return shelter.evalR(`df <- data.frame(${tags.map(tag => this.getName(type, tag)).join(',')})
         colnames(df) <- c("${tags.join('","')}") 
         df <- df[order(df$${this.xLabel.join(',df$')}),]
-        return(df)`)
+        return(df)`, { env })
     }
     get xLabel () {
         return this.request.label;
@@ -88,7 +90,7 @@ class RscriptHandler extends Handler {
     getData(type, tag) {
         return this.data[type][tag];
     }
-    async evalR(code, type) {
+    async evalR(code) {
         return await this.webR.evalR(code, { df: this.dataframe });
     }
 }
@@ -103,6 +105,7 @@ class RscriptRawHandler extends Handler {
             this.frameSlice = frameSlice;
         }
         this.dataframeGroups = Array.from({ length: this.data.date.length/this.frameSlice }, (value, index) => index);
+        //console.log(this.dataframeGroups.length)
         this.dataframeGroups = this.dataframeGroups.map(g => {
             return {
                 start: g*this.frameSlice,
@@ -135,7 +138,7 @@ class RscriptRawHandler extends Handler {
         return response
     }
     getName(type, tag) {
-        // NOTE could be replaced with a if RAW config
+        // NOTE could be replaced with an if RAW config
         return tag;
     }
     get xLabel () {
@@ -151,36 +154,45 @@ class RscriptRawHandler extends Handler {
             await this.webR.init();
         }
         let div = this.frameSlice;
-        let dataframe;
         // current date in time save to variable time
+        const shelter = this.webR
+        //const shelter = await new Shelter();
+        const env = this.webR.objs.globalEnv;
+        //const env = await (new this.webR.REnvironment({ }))
+        let todo = Promise.resolve([]);
+        let calls = 0;
+        // TODO make mapping instead
         for (const g of this.dataframeGroups) {
-            // TODO local shelter
-            //let shelter = await new Shelter();
-            //let env = await (new this.webR.REnvironment({ df: this.dataframe}))
-            for (const tag of Object.keys(this.data)) {
+            for (const tag of [type, 'date']) {
+                calls += 1;
+                //console.log('nr of calls', calls);
                 let data = this.getData(tag);
-                await this.webR.objs.globalEnv.bind(this.getName(type, tag), await new this.webR.RObject(data.slice(g.start, g.end)))
-                //await env.bind(this.getName(type, tag), data.slice(g.start, g.end))
+                //let time = (new Date()).getTime();
+                let object = new shelter.RObject(data.slice(g.start, g.end));
+                //object.then(() => console.log(calls, 'time', (new Date()).getTime() - time));
+                todo = todo.then((array) => {
+                    return object.then((object) => {
+                        env.bind(this.getName(type, tag), object)
+                        calls -= 1;
+                        array.push(object)
+                        return array
+                    })
+                })
             }
-            if(g.start === 0) {
-                //dataframe = await this.createDataFrame(type, Object.keys(this.data), shelter);
-                dataframe = await this.createDataFrame(type, Object.keys(this.data));
-            } else {
-                //dataframe = (await this.addDataFrame(type, Object.keys(this.data), shelter));
-                dataframe = (await this.addDataFrame(type, Object.keys(this.data)));
-            }
-            // TODO Local shelter
+            todo.then((array) => {
+                //console.log('done')
+                return (g.start === 0 ? this.createDataFrame(type, Object.keys(this.data), shelter, env) : this.addDataFrame(type, Object.keys(this.data), shelter, env))
+                    .then(() => {
+                        //console.log(array)
+                        array.forEach((object) => {
+                            shelter.destroy(object)
+                        })
+                    })
+                // Clean up
+            })
             //shelter.purge();
         }
-        /**
-        dataframe.toJs().then((data) => {
-            console.log('initR.data', data)
-            console.log('length', data.values[0].values.length)
-        })
-         */
-
-        this.dataframe = await dataframe;
-        // NOTE dataframe is correct here
+        return await todo
     }
 }
 module.exports.RscriptRawHandler = RscriptRawHandler;

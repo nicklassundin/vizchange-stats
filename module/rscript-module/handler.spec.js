@@ -13,6 +13,7 @@ const RawData = {
 }
 let RawDataOdd = require('./RawDataOdd.json');
 let RawDataLong = require('./RawDataLong.json');
+let RawDataMedium = require('./RawDataMedium.json');
 // save RawDataLong as .json file
 const fs = require('fs');
 
@@ -46,6 +47,7 @@ let generateTestFile = (size = 10, name) => {
 }
 //RawDataOdd = generateTestFile(14, 'RawDataOdd');
 //RawDataLong = generateTestFile(60000, 'RawDataLong');
+//RawDataMedium = generateTestFile(10000, 'RawDataMedium');
 describe(
     'Handler',
     function () {
@@ -80,69 +82,77 @@ describe(
                             return true
                         });
                     })
-                    describe('initR - frameSlice', function () {
+                    describe.only('initR - frameSlice', function () {
+                        before('init', function () {
+                            RawDataMedium = RawDataLong
+                        })
                         it.skip('default', async function () {
-                            let handler = new RscriptRawHandler(RawDataLong, RawRequest);
-                            await handler.initR('avg_temperature');
+                            let handler = new RscriptRawHandler(RawDataMedium, RawRequest);
+                            await handler.initR('temperature');
                             return Promise.resolve(handler).then(() => true)
                         })
                         it.skip('failing', async function () {
                             let handler = new RscriptRawHandler(RawDataLong, RawRequest, 1);
-                            await handler.initR('avg_temperature');
+                            await handler.initR('temperature');
                             return Promise.resolve(handler).then(() => true)
                         })
                         it.skip('failing', async function () {
-                            let handler = new RscriptRawHandler(RawDataLong, RawRequest, 500);
-                            await handler.initR('avg_temperature');
+                            let handler = new RscriptRawHandler(RawDataMedium, RawRequest, 500);
+                            await handler.initR('temperature');
                             return Promise.resolve(handler).then(() => true)
                         })
                         it.skip('lowest', async function () {
-                            // NOTE: lowest 900
-                            let low = 875;
-                            //let low = 900;
-                            let handler = new RscriptRawHandler(RawDataLong, RawRequest, low);
-                            await handler.initR('avg_temperature');
-                            console.log(`frameSlice: ${low}`, `length: ${RawDataLong.length}`)
+                            let low = 2;
+                            //let low = 875;
+                            let handler = new RscriptRawHandler(RawDataMedium, RawRequest, low);
+                            await handler.initR('temperature');
+                            console.log(`frameSlice: ${low}`, `length: ${RawDataMedium.length}`)
                             return Promise.resolve(handler).then(() => true)
                         })
-                        it.skip('2500', async function () {
-                            let handler = new RscriptRawHandler(RawDataLong, RawRequest, 2500);
-                            await handler.initR('avg_temperature');
-                            console.log('frameSlice: 2500', `length: ${RawDataLong.length}`)
+                        it('2500', async function () {
+                            let handler = new RscriptRawHandler(RawDataMedium, RawRequest, 2500);
+                            await handler.initR('temperature');
+                            console.log('frameSlice: 2500', `length: ${RawDataMedium.length}`)
                             return Promise.resolve(handler).then(() => true)
                         })
                         it.skip('5000', async function () {
-                            let handler = new RscriptRawHandler(RawDataLong, RawRequest, 5000);
-                            await handler.initR('avg_temperature');
-                            console.log('frameSlice: 5000', `length: ${RawDataLong.length}`)
+                            let handler = new RscriptRawHandler(RawDataMedium, RawRequest, 5000);
+                            await handler.initR('temperature');
+                            console.log('frameSlice: 5000', `length: ${RawDataMedium.length}`)
                             return Promise.resolve(handler).then(() => true)
                         })
-                        it('10000', async function () {
-                            let handler = new RscriptRawHandler(RawDataLong, RawRequest, 10000);
-                            await handler.initR('avg_temperature');
-                            console.log('frameSlice: 10000', `length: ${RawDataLong.length}`)
+                        it.skip('10000', async function () {
+                            let handler = new RscriptRawHandler(RawDataMedium, RawRequest, 10000);
+                            await handler.initR('temperature');
+                            console.log('frameSlice: 10000', `length: ${RawDataMedium.length}`)
                             return Promise.resolve(handler).then(() => true)
                         })
                         it.skip('20000', async function () {
-                            let handler = new RscriptRawHandler(RawDataLong, RawRequest, 20000);
-                            await handler.initR('avg_temperature');
-                            console.log('frameSlice: 20000', `length: ${RawDataLong.length}`)
+                            let handler = new RscriptRawHandler(RawDataMedium, RawRequest, 20000);
+                            await handler.initR('temperature');
+                            console.log('frameSlice: 20000', `length: ${RawDataMedium.length}`)
                             return Promise.resolve(handler).then(() => true)
                         })
                         it.skip('30000', async function () {
-                            let handler = new RscriptRawHandler(RawDataLong, RawRequest, 30000);
-                            await handler.initR('avg_temperature');
-                            console.log('frameSlice: 30000', `length: ${RawDataLong.length}`)
+                            let handler = new RscriptRawHandler(RawDataMedium, RawRequest, 30000);
+                            await handler.initR('temperature');
+                            console.log('frameSlice: 30000', `length: ${RawDataMedium.length}`)
                             return Promise.resolve(handler).then(() => true)
                         })
-                        it.skip('fail', async function () {
-                            let handler = new RscriptRawHandler(RawDataLong, RawRequest, 80000);
-                            await handler.initR('avg_temperature');
+                        it('40000', async function () {
+                            let handler = new RscriptRawHandler(RawDataMedium, RawRequest, 40000);
+                            await handler.initR('temperature');
+                            console.log('frameSlice: 40000', `length: ${RawDataMedium.length}`)
+                            return Promise.resolve(handler).then(() => true)
+                        })
+                        it('fail', async function () {
+                            let handler = new RscriptRawHandler(RawDataMedium, RawRequest, 80000);
+                            await handler.initR('temperature');
                             return Promise.resolve(handler).then(() => true)
                         })
                     })
                 })
-                describe.only('merge check', function () {
+                describe('merge check', function () {
                     it('length test', function () {
                         let handler = new RscriptRawHandler(RawDataOdd, RawRequest, 10);
                         return handler.get('type').then(result => {
