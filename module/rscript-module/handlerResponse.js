@@ -2,12 +2,17 @@ const {Point} = require('../point')
 
 // TODO extend array instead so no value field is required
 class HandlerResponse {
-    constructor(statusCode = 200, body = '') {
+    constructor(webR, statusCode = 200) {
+        this.webR = webR;
         this.statusCode = statusCode
-        this.body = body
+        this.body = ''
+        this.result = Promise.resolve(true);
     }
     addToBody(code) {
         this.body += code;
+    }
+    addResult(result = this.result) {
+        this.result = result.then(() => result)
     }
     async resolve() {
         let response = this;
