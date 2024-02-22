@@ -1,5 +1,14 @@
 const {WebR, Shelter, RObject} = require('webr');
 const {HandlerResponse} = require('./handlerResponse');
+// implement for Date prototype getWeek number function that return int of week number
+Date.prototype.getWeek = function() {
+    let date = new Date(this.getTime());
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+    let week1 = new Date(date.getFullYear(), 0, 4);
+    return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+}
+
 class Handler {
     constructor(data, request) {
         this.data = data
@@ -13,6 +22,7 @@ class Handler {
         }
     }
     async get (type, y, calc) {
+        console.log(this.request)
         await this.initR(type);
         switch (type) {
             case 'snow':
@@ -29,36 +39,21 @@ class Handler {
     getDf() {
         return this.dataframe[1];
     }
-    getDateColCode(unit) {
-        let code = ``;
-        switch (unit) {
-            case 'week':
-                code = `
-                week <- lapply(df$date, function(x) {
-                    d <- as.POSIXlt(x);
-                    return(d$yday %/% 7 - d$wday)
-                })`
-                break;
-            case 'month':
-            case 'year':
-            default:
-                return code;
-        }
-        return ` <- as.Date(df$date, format = "%Y-%m-%d")`
-    }
     addDataFrame(type, shelter = this.webR, env = this.webR.objs.globalEnv) {
         // NOTE: used for raw data
-        return shelter.evalR(`df2 <- data.frame(${this.tags.join(',')})
-        
+        let code =`df2 <- data.frame(${this.tags.join(',')})
         colnames(df2) <- c("${this.tags.join('","')}") 
         df <- rbind(df, df2);
-        return(df);`, { env })
+        return(df);`;
+        return shelter.evalR(code, { env })
+
     }
     createDataFrame(type, shelter = this.webR, env = this.webR.objs.globalEnv) {
-        return shelter.evalR(`df <- data.frame(${this.tags.join(',')})
+        let code = `df <- data.frame(${this.tags.join(',')})
         colnames(df) <- c("${this.tags.join('","')}") 
         df <- df[order(df$${this.xLabel.join(',df$')}),]
-        return(df)`, { env })
+        return(df)`;
+        return shelter.evalR(code, { env })
     }
     get xLabel () {
         return this.request.label;
@@ -89,6 +84,8 @@ class Handler {
                 return(subset(df2, subset = temperature < 0))`
                 break;
             case 'grow':
+                // TODO process by week month and year and do calculation based on that
+                console.log(this.request.sort)
                 code = `df2 <- df[c("${this.tags.join('","')}")]
                 names <- colnames(df2)
                 df2 <- cbind(df2, lapply(df2[c("${type}")], function(x) x >= 0))
@@ -96,7 +93,16 @@ class Handler {
                 v <- lapply(rle(df2$grow)$lengths, function(x) seq(x, 0, length.out = x))
                 df2$grow <- unlist(v)
                 df2 <- df2[c("grow","${this.xLabel.join('","')}")]
-                return(subset(df2, subset = grow == max(grow)))`;
+                `;
+                switch (this.request.sort) {
+                    case 'week':
+                    case 'month':
+                    case 'year':
+                    default:
+                        code += `df2 <- subset(df2, subset = grow == max(grow))`
+                }
+                code += `
+                return(df2)`;
                 break;
             case 'max':
             case 'min':
@@ -109,7 +115,9 @@ class Handler {
         response.addToBody(code);
         return response
     }
-    getName(type, tag) {}
+    getName () {
+        return `${Object.values(arguments).join('_')}`;
+    }
 }
 
 class RscriptHandler extends Handler {
@@ -131,7 +139,7 @@ class RscriptHandler extends Handler {
         }
         this.dataframe = await this.createDataFrame(type);
     }
-    getName(type, tag){
+    getName (type, tag){
         if(tag === this.xLabel){
             return tag;
         }
@@ -146,6 +154,9 @@ module.exports.RscriptHandler = RscriptHandler;
 class RscriptRawHandler extends Handler {
     constructor(data, request, frameSlice = Object.keys(data).length*2000){
         super(data, request);
+        this.tags.push('year');
+        this.tags.push('month');
+        this.tags.push('week');
         if(this.data.date.length / frameSlice < 1) {
             this.frameSlice = this.data.date.length;
         }else {
@@ -166,12 +177,14 @@ class RscriptRawHandler extends Handler {
             })
         }
     }
-    getName(type, tag) {
+    /**
+    getName (type, tag) {
         // NOTE could be replaced with an if RAW config
         return tag;
-    }
+    }*/
     get xLabel () {
-        return ['date']
+        // return ['date']
+        return ['date', 'year', 'month', 'week']
     }
     getData(type) {
         return this.data[type];
@@ -190,8 +203,24 @@ class RscriptRawHandler extends Handler {
         for (const g of this.dataframeGroups) {
             //for (const tag of Object.keys(this.data)) {
             for (const tag of this.tags) {
-                let data = this.getData(tag);
-                await this.webR.objs.globalEnv.bind(this.getName(type, tag), data.slice(g.start, g.end))
+                let data;
+                switch (tag) {
+                    case 'year':
+                        data = this.getData('date').slice(g.start, g.end);
+                        await this.webR.objs.globalEnv.bind(this.getName(tag), data.map(each => (new Date(each)).getFullYear()))
+                        break;
+                    case 'month':
+                        data = this.getData('date').slice(g.start, g.end);
+                        await this.webR.objs.globalEnv.bind(this.getName(tag), data.map(each => (new Date(each)).getMonth()))
+                        break;
+                    case 'week':
+                        data = this.getData('date').slice(g.start, g.end);
+                        await this.webR.objs.globalEnv.bind(this.getName(tag), data.map(each => (new Date(each)).getWeek()))
+                        break;
+                    default:
+                        data = this.getData(tag).slice(g.start, g.end);
+                        await this.webR.objs.globalEnv.bind(this.getName(tag), data)
+                }
             }
             //this.dataframe.push(await this.createDataFrame(type, Object.keys(this.data)));
             if(g.start === 0) {

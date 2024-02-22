@@ -17,9 +17,9 @@ const RawData = {
     "date": [1546387200000, 1546300800000, 1546473600000, 1546560000000],
 }
 const RawStreakData = {
-    "precipitation": [10, 5, 1, 0, 0, 1],
-    "temperature": [-1, 0, 0, -1, -1, 1],
-    "date": [1546387200000, 1556385200000, 1566385200000, 1576385200000, 1586385200000, 1596385200000],
+    "precipitation": [10, 5, 1, 0, 0, 1, 0, 0, 0],
+    "temperature": [-1, 0, 0, -1, -1, 1, -1, -1, 1],
+    "date": [1546387200000, 1556385200000, 1566385200000, 1576385200000, 1586385200000, 1596385200000, 1596385200000, 1596385200000, 1596385200000],
 }
 let RawDataOdd = require('./RawDataOdd.json');
 let RawDataLong = require('./RawDataLong.json');
@@ -100,6 +100,7 @@ describe(
                         let handler = new RscriptRawHandler(RawData, RawRequest);
                         return handler.get('snow', undefined, 'snow').then(result => {
                             result = result.values;
+                            console.log(result)
                             return assert.equal(result[0].y, 2);
                         })             //for (const tag of Object.keys(this.data)) {)
                     })
@@ -113,14 +114,22 @@ describe(
                     })
                 })
                 describe('sort', function () {
-                    it('should return 1', function () {
+                    it('return', function () {
                         let handler = new RscriptRawHandler(RawStreakData, RawRequestSort);
                         return handler.get('precipitation').then(result => {
                             result = result.values
                             console.log(result)
-                            return assert.equal(result[0].y, 1);
+                            return assert.equal(result[0].y, 10);
                         })
                     });
+                    it('Growing Season', function () {
+                        let handler = new RscriptRawHandler(RawStreakData, RawRequestSort);
+                        return handler.get('temperature', undefined, 'grow').then(result => {
+                            result = result.values;
+                            console.log(result)
+                            return assert.equal(result[0].y, 2);
+                        })
+                    })
                 })
                 describe.skip('data managerment check', function () {           //for (const tag of Object.keys(this.data)) {nction () {
                     it('constructor', () => {
