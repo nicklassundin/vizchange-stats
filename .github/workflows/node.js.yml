@@ -16,6 +16,8 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  deploy-cran-repo:
+    uses: r-wasm/actions/.github/workflows/deploy-cran-repo.yml@v1
   build:
 
     runs-on: ${{ matrix.os }}
@@ -26,7 +28,6 @@ jobs:
         node-version: [18.x]
 
     steps:
-    - uses: r-wasm/actions/.github/workflows/deploy-cran-repo.yml@v1
     - uses: actions/checkout@v2
     - name: Setup timezone
       uses: zcong1993/setup-timezone@master
