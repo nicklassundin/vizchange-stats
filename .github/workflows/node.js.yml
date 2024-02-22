@@ -16,8 +16,8 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  deploy-cran-repo:
-    uses: r-wasm/actions/.github/workflows/deploy-cran-repo.yml@v1
+  release-file-system-image:
+    uses: r-wasm/actions/.github/workflows/release-file-system-image.yml@v1
     permissions:
       # To download GitHub Packages within action
       repository-projects: read
