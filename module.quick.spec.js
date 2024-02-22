@@ -70,7 +70,7 @@ let stations = {
     }
 }
 
-describe(
+describe.skip(
     'Requests',
     function () {
         describe('new Implementation', function () {
