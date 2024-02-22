@@ -67,6 +67,7 @@ class Handler {
     }
     async initR(type) {}
     getCol (type, calc, df = this.getDf(type)) {
+        console.log(this.tags)
         let response = new HandlerResponse();
         let code = '';
         switch (calc) {
@@ -85,7 +86,6 @@ class Handler {
                 break;
             case 'grow':
                 // TODO process by week month and year and do calculation based on that
-                console.log(this.request.sort)
                 code = `df2 <- df[c("${this.tags.join('","')}")]
                 names <- colnames(df2)
                 df2 <- cbind(df2, lapply(df2[c("${type}")], function(x) x >= 0))
