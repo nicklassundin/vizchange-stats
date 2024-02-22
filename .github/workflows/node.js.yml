@@ -18,6 +18,13 @@ on:
 jobs:
   deploy-cran-repo:
     uses: r-wasm/actions/.github/workflows/deploy-cran-repo.yml@v1
+    permissions:
+      # To download GitHub Packages within action
+      repository-projects: read
+      # For publishing to pages environment
+      pages: write
+      id-token: write
+
   build:
 
     runs-on: ${{ matrix.os }}
