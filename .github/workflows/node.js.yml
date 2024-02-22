@@ -7,9 +7,9 @@ name: Node.js CI
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ release ]
+    branches: [ release, beta ]
   pull_request:
-    branches: [ release ]
+    branches: [ release, beta ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -26,6 +26,7 @@ jobs:
         node-version: [18.x]
 
     steps:
+    - uses: r-wasm/actions/.github/workflows/deploy-cran-repo.yml@v1
     - uses: actions/checkout@v2
     - name: Setup timezone
       uses: zcong1993/setup-timezone@master
