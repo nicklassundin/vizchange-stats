@@ -16,7 +16,7 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  release-file-system-image:
+  build-and-generate:
     uses: r-wasm/actions/.github/workflows/release-file-system-image.yml@v1
     permissions:
       # For publishing artifact files to the release
