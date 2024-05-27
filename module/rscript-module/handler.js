@@ -9,12 +9,18 @@ Date.prototype.getWeek = function() {
     return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
 }
 
+const webr = new WebR();
+const webr_ready = webr.init().then(() => {
+    //return webr.installPackages(['dplyr', 'devtools'])
+    return webr.installPackages(['dplyr', 'remotes'])
+})
+
 class Handler {
     constructor(data, request) {
         this.data = data
         this.request = request;
         this.dataframe = undefined;
-        this.webR = undefined;
+        this.webR = webr;
         if(this.request.precalc) {
             this.tags = Object.keys(data[Object.keys(data)[0]])
         } else {
@@ -22,7 +28,6 @@ class Handler {
         }
     }
     async get (type, y, calc) {
-        console.log(this.request)
         await this.initR(type);
         switch (type) {
             case 'snow':
@@ -59,15 +64,10 @@ class Handler {
         return this.request.label;
     }
     async buildR(){
-        if (!this.webR) {
-            this.webR = new WebR();
-            await this.webR.init();
-            //await this.webR.installPackages(['dplyr'])
-        }
+        await webr_ready;
     }
     async initR(type) {}
     getCol (type, calc, df = this.getDf(type)) {
-        console.log(this.tags)
         let response = new HandlerResponse();
         let code = '';
         switch (calc) {
@@ -83,6 +83,11 @@ class Handler {
                  */
                 code = `df2 <- df[c("${this.tags.join('","')}")]
                 return(subset(df2, subset = temperature < 0))`
+                //code = `devtools::install_github("nicklassundin/vizchange-rscript-module")
+                code = `Sys.unsetenv("GITHUB_PAT")
+                remotes::install_github("nicklassundin/vizchange-rscript-module", force = TRUE)
+                library(vizchange-rscript-module)
+                return(estSnow(df, c("${this.tags.join('","')}"), ${this.request.sort}))`
                 break;
             case 'grow':
                 // TODO process by week month and year and do calculation based on that
@@ -201,7 +206,6 @@ class RscriptRawHandler extends Handler {
         let calls = 0;
         let dataframe;
         for (const g of this.dataframeGroups) {
-            //for (const tag of Object.keys(this.data)) {
             for (const tag of this.tags) {
                 let data;
                 switch (tag) {

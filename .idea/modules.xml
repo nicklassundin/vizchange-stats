@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/../../onTheSide/54cl42bim/.idea/54cl42bim.iml" filepath="$PROJECT_DIR$/../../onTheSide/54cl42bim/.idea/54cl42bim.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../EDAN70/.idea/EDAN70.iml" filepath="$PROJECT_DIR$/../EDAN70/.idea/EDAN70.iml" />
       <module fileurl="file://$PROJECT_DIR$/../config/.idea/config.iml" filepath="$PROJECT_DIR$/../config/.idea/config.iml" />
       <module fileurl="file://$PROJECT_DIR$/../glimwork-read/.idea/glimwork-read.iml" filepath="$PROJECT_DIR$/../glimwork-read/.idea/glimwork-read.iml" />
       <module fileurl="file://$PROJECT_DIR$/../helper/.idea/helper.iml" filepath="$PROJECT_DIR$/../helper/.idea/helper.iml" />
@@ -11,6 +12,7 @@
       <module fileurl="file://$PROJECT_DIR$/../production/.idea/production.iml" filepath="$PROJECT_DIR$/../production/.idea/production.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../onTheSide/qr-redirect/.idea/qr-redirect.iml" filepath="$PROJECT_DIR$/../../onTheSide/qr-redirect/.idea/qr-redirect.iml" />
       <module fileurl="file://$PROJECT_DIR$/../renderer/.idea/renderer.iml" filepath="$PROJECT_DIR$/../renderer/.idea/renderer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../rscript/.idea/rscript.iml" filepath="$PROJECT_DIR$/../rscript/.idea/rscript.iml" />
       <module fileurl="file://$PROJECT_DIR$/../smhi/.idea/smhi.iml" filepath="$PROJECT_DIR$/../smhi/.idea/smhi.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/stats.iml" filepath="$PROJECT_DIR$/.idea/stats.iml" />
       <module fileurl="file://$PROJECT_DIR$/../story-beta/.idea/story-beta.iml" filepath="$PROJECT_DIR$/../story-beta/.idea/story-beta.iml" />

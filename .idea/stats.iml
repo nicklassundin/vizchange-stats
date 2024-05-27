@@ -20,5 +20,7 @@
     <orderEntry type="module" module-name="renderer" />
     <orderEntry type="module" module-name="qr-redirect" />
     <orderEntry type="module" module-name="54cl42bim" />
+    <orderEntry type="module" module-name="rscript" />
+    <orderEntry type="module" module-name="EDAN70" />
   </component>
 </module>

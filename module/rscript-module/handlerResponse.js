@@ -5,7 +5,7 @@ class HandlerResponse {
     constructor(webR, statusCode = 200) {
         this.webR = webR;
         this.statusCode = statusCode
-        this.body = ''
+        this.body = '';
         this.result = Promise.resolve(true);
     }
     addToBody(code) {

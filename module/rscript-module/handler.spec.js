@@ -62,6 +62,15 @@ let generateTestFile = (size = 10, name) => {
 describe(
     'Handler',
     function () {
+        describe('start test', function () {
+            it('setup', function () {
+                let handler = new RscriptHandler(CalcData, CalcRequest);
+                return handler.get('precipitation', 'min').then(result => {
+                    result = result.values
+                    return true
+                })
+            })
+        })
         describe('Rscript', function () {
             describe('Calc', function () {
                 it('min - should return -2', function () {
@@ -92,7 +101,6 @@ describe(
                         let handler = new RscriptRawHandler(RawDataOdd, RawRequest);
                         return handler.get('precipitation').then(result => {
                             result = result.values
-                            console.log(result)
                             return assert.equal(result[0].y, 1);
                         })
                     });
@@ -100,7 +108,6 @@ describe(
                         let handler = new RscriptRawHandler(RawData, RawRequest);
                         return handler.get('snow', undefined, 'snow').then(result => {
                             result = result.values;
-                            console.log(result)
                             return assert.equal(result[0].y, 2);
                         })             //for (const tag of Object.keys(this.data)) {)
                     })
@@ -108,7 +115,6 @@ describe(
                         let handler = new RscriptRawHandler(RawStreakData, RawRequest);
                         return handler.get('temperature', undefined, 'grow').then(result => {
                             result = result.values;
-                            console.log(result)
                             return assert.equal(result[0].y, 2);
                         })
                     })
@@ -118,7 +124,6 @@ describe(
                         let handler = new RscriptRawHandler(RawStreakData, RawRequestSort);
                         return handler.get('precipitation').then(result => {
                             result = result.values
-                            console.log(result)
                             return assert.equal(result[0].y, 10);
                         })
                     });
@@ -126,7 +131,6 @@ describe(
                         let handler = new RscriptRawHandler(RawStreakData, RawRequestSort);
                         return handler.get('temperature', undefined, 'grow').then(result => {
                             result = result.values;
-                            console.log(result)
                             return assert.equal(result[0].y, 2);
                         })
                     })

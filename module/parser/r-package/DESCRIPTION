@@ -2,3 +2,4 @@ Package: vizchangeRscriptModule
 Type: Package
 Title: Calculate
 Version: 0.0.1.0
+URL: https://github.com/nicklassundin/vizchange-rscript-module

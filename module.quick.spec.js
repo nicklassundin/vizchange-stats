@@ -40,6 +40,7 @@ let stations = {
             station.types = ['avg_temperature', 'min_temperature', 'max_temperature'];
             if(types) station.types = types;
             station.sort = sort;
+            station.precalc = true;
             return stations.get(station)
         })
     },
@@ -70,7 +71,7 @@ let stations = {
     }
 }
 
-describe.skip(
+describe(
     'Requests',
     function () {
         describe('new Implementation', function () {
@@ -81,7 +82,7 @@ describe.skip(
                 afterEach(() => {
                     console.timeEnd('Speed test');
                 })
-                describe('server response', function () {
+                describe.skip('server response', function () {
                     describe('calculated', function (done) {
                         it('year', function (done) {
                             stations.calculated.yrly.temperature().then((temp) => {
@@ -105,7 +106,7 @@ describe.skip(
                                     done()
                                 })
                             })
-                            this.timeout(5000)
+                            this.timeout(6000)
                         })
                     })
                     describe('raw', function () {
