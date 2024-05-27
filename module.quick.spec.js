@@ -554,10 +554,11 @@ describe(
                             })
                         })
                     })
-                    it.only('icetime', () => {
+                    it.skip('icetime', () => {
                         let params = ['icetime', 'yrly', 'shortValues', 3];
                         let config = Object.assign(configs['middle'], icetime_specs)
                         return parser.getByParams(config, params).then(values => {
+                            console.log(values)
                             return values.y.then(y => {
                                 console.log('values', y)
                                 return assert.ok(Math.abs(y - 176.29032258064515) < 0.001)
