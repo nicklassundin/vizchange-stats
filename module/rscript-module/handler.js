@@ -12,7 +12,8 @@ Date.prototype.getWeek = function() {
 const webr = new WebR();
 const webr_ready = webr.init().then(() => {
     //return webr.installPackages(['dplyr', 'devtools'])
-    return webr.installPackages(['dplyr', 'remotes'])
+    //return webr.installPackages(['dplyr', 'remotes'])
+    return true
 })
 
 class Handler {
@@ -81,6 +82,7 @@ class Handler {
                  df2 <- df[c("${this.tags.join('","')}")] %>% filter(temperature < 0)
                  return(df2)`;
                  */
+                /**
                 code = `df2 <- df[c("${this.tags.join('","')}")]
                 return(subset(df2, subset = temperature < 0))`
                 //code = `devtools::install_github("nicklassundin/vizchange-rscript-module")
@@ -88,6 +90,7 @@ class Handler {
                 remotes::install_github("nicklassundin/vizchange-rscript-module", force = TRUE)
                 library(vizchange-rscript-module)
                 return(estSnow(df, c("${this.tags.join('","')}"), ${this.request.sort}))`
+                 */
                 break;
             case 'grow':
                 // TODO process by week month and year and do calculation based on that
