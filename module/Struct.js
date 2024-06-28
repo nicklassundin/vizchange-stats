@@ -46,8 +46,8 @@ module.exports = class Struct {
         switch (specs.keys[0]) {
             case 'month':
                 y2 = -1;
-                m1 = help.months().indexOf(x);
-                m2 = help.months().indexOf(x) + 1;
+                m1 = climatePlotsHelper.months().indexOf(x);
+                m2 = climatePlotsHelper.months().indexOf(x) + 1;
                 break;
             case 'months':
                 y2 = 2;

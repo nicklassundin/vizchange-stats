@@ -1,4 +1,4 @@
-const parser = require('./module.js')
+const parser = require('../module.js')
 
 
 global.climateplots = {
@@ -96,7 +96,7 @@ let perma_specs = {
     },
 }
 
-let configs = require('./config.json')
+let configs = require('../config.json')
 let cache = {}
 
 const assert = require('assert');

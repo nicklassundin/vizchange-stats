@@ -1,4 +1,4 @@
-require('./point.js')
+require('../module/point.js')
 
 describe('Point', function () {
     it('should', function () {
