@@ -146,6 +146,9 @@ module.exports = class Struct {
         if (typeof specs.dates.start === 'number') {
             specs.dates.start = new Date(specs.dates.start + y1, m1, 1);
             specs.dates.end = new Date(specs.dates.end + y2, m2, d2);
+        }else if (typeof specs.dates.start === 'string'){
+            //specs.dates.start = new Date(specs.dates.start);
+            //specs.dates.end = new Date(specs.dates.end);
         }
         return new Struct(parentEntry, specs, x, type, f, full, parentType);
     }

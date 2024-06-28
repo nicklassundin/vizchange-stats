@@ -1,6 +1,6 @@
 require('../module/point.js')
 
-describe('Point', function () {
+describe.only('Point', function () {
     it('should', function () {
         // TODO
     })

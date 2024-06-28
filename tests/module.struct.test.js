@@ -6,7 +6,7 @@ const Point = require('../module/point');
 const curl = require("../module/utility/gateway");
 const helpers = require('../module/helpers/help');
 
-describe('Struct', () => {
+describe.only('Struct', () => {
     let struct;
     let seedSpecs;
 
