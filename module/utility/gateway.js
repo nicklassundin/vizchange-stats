@@ -1,9 +1,9 @@
-const preset = require('./preset');
-const getSmhiStation = require('./smhiStation');
-const parsePeriod = require('./parsePeriod');
-const axiosWrapper = require('./axiosWrapper');
+import preset from './preset.js';
+import getSmhiStation from './smhiStation.js';
+import parsePeriod from './parsePeriod.js';
+import axiosWrapper from './axiosWrapper.js';
 
-module.exports = {
+export default {
 	preset,
 	async proxRequest(specs, full = false, sort) {
 		const { station: rawStation, dates, url: host, type } = specs;

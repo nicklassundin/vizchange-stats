@@ -10,4 +10,4 @@ const parsePeriod = (date) => {
         throw error;
     }
 };
-module.exports = parsePeriod;
+export default parsePeriod;

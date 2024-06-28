@@ -1,11 +1,14 @@
-const axios = require('axios').create({
-    httpAgent: new (require('http').Agent)({
+import axios from 'axios';
+import http from 'http';
+import hashCode from './hashCode.js'
+
+const connection = axios.create({
+    httpAgent: new (http.Agent)({
         scheduling: 'fifo',
         maxSockets: 1,
         maxTotalSockets: 1,
     }),
 });
-const hashCode = require('./hashCode');
 
 const cachedRequests = {};
 
@@ -14,7 +17,7 @@ const axiosWrapper = async (url) => {
 
     console.time(`Request Time: ${url}`);
     if (!cachedRequests[url]) {
-        cachedRequests[url] = axios.get(url).then(result => {
+        cachedRequests[url] = connection.get(url).then(result => {
             console.timeEnd(`Request Time: ${url}`);
 
             if (result && result.data) result = result.data;
@@ -37,4 +40,4 @@ const axiosWrapper = async (url) => {
     return cachedRequests[url];
 };
 
-module.exports = axiosWrapper;
+export default axiosWrapper;

@@ -9,7 +9,7 @@ class Summery {
 	}
 }
 // helper.js
-const climatePlotsHelper = require('climate-plots-helper');
+import climatePlotsHelper from 'climate-plots-helper';
 
 const getDateOfWeek = (w, y) => {
 	let d = (1 + (w - 1) * 7); // 1st of January + 7 days for each week
@@ -29,7 +29,7 @@ const replace = (req, a, b) => {
 	return req;
 };
 
-module.exports = {
+export {
 	getDateOfWeek,
 	ColorToHex,
 	replace,

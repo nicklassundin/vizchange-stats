@@ -1,4 +1,4 @@
-const preset = {
+export default {
     stationTypes: {
         abisko: ['temperature', 'precipitation', 'growingSeason', 'snowdepth_single', 'decadeMeans', 'periodMeans', 'perma'],
         umea: ['temperature', 'precipitation', 'growingSeason'],
@@ -56,4 +56,3 @@ const preset = {
         '64n-90ntemperature': '64n-90n_temp',
     }
 };
-module.exports = preset;

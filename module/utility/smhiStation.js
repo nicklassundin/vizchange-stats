@@ -1,4 +1,5 @@
-const https = require('https');
+import https from 'https';
+
 
 const getSmhiStation = async (id) => {
     const host = 'https://opendata-download-metobs.smhi.se';
@@ -23,4 +24,4 @@ const getSmhiStation = async (id) => {
     });
 };
 
-module.exports = getSmhiStation;
+export default getSmhiStation;

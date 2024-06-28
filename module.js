@@ -1,5 +1,9 @@
-const ByDateStruct = require('./module/parseByDateStruct.js');
-const axios = require('axios').create();
+import ByDateStruct from './module/parseByDateStruct.js';
+import axios from 'axios';
+const config = await import('./config.json', {
+	assert: { type: "json" }
+});
+const connection = axios.create();
 
 const parseByDate = (specs, type = 'avg', custom) => {
 	return new Promise((resolve, reject) => {
@@ -12,14 +16,14 @@ const parseByDate = (specs, type = 'avg', custom) => {
 	}).catch(() => []);
 };
 
-module.exports = {
+export default {
 	precalcCached: {},
 	cache: {},
 	getByParams(specs, params) {
 		return this.recursive(params, this[params[0]](specs).then(result => result.request(params[1])));
 	},
 	getByParamsPreCalculated(specs, params) {
-		let struct = axios.get(`${specs.url}/precalculated/${specs.station}/${params.join('/')}?start=${specs.dates.start}&end=${specs.dates.end}&baselineStart=${specs.baseline.start}&baselineEnd=${specs.baseline.end}`);
+		let struct = connection.get(`${specs.url}/precalculated/${specs.station}/${params.join('/')}?start=${specs.dates.start}&end=${specs.dates.end}&baselineStart=${specs.baseline.start}&baselineEnd=${specs.baseline.end}`);
 
 		let key = `${specs.type}${specs.dates.start}${specs.dates.end}${specs.baseline.start}${specs.baseline.end}`;
 		if (!this.precalcCached[specs.station]) {
@@ -106,6 +110,6 @@ module.exports = {
 	co2_weekly(specs) {
 		return this.getStruct(specs);
 	},
-
-	configs: require('./config')
+	configs: config
+	//configs: require('./config')
 };

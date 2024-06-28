@@ -1,8 +1,9 @@
 // Struct.js
-const { Point } = require('./point.js');
-const curl = require("./utility/gateway");
-const { getDateOfWeek, ColorToHex, replace, climatePlotsHelper } = require('./helpers/help');
-const { fetchData } = require('./helpers/dataFetcher');
+import Point from './Point.js';
+import curl from './utility/gateway.js';
+import { getDateOfWeek, ColorToHex, replace, climatePlotsHelper } from './helpers/help.js';
+import fetchData from './helpers/dataFetcher.js';
+
 
 class Extreme {
     constructor(struct, type) {
@@ -22,7 +23,7 @@ class Extreme {
     }
 }
 
-module.exports = class Struct {
+export default class Struct {
     static build(seedSpecs, x, type, f = () => true, full = false, parentType, parentEntry) {
         switch (seedSpecs.type) {
             case 'freezeup':
@@ -147,8 +148,8 @@ module.exports = class Struct {
             specs.dates.start = new Date(specs.dates.start + y1, m1, 1);
             specs.dates.end = new Date(specs.dates.end + y2, m2, d2);
         }else if (typeof specs.dates.start === 'string'){
-            //specs.dates.start = new Date(specs.dates.start);
-            //specs.dates.end = new Date(specs.dates.end);
+            specs.dates.start = new Date(specs.dates.start);
+            specs.dates.end = new Date(specs.dates.end);
         }
         return new Struct(parentEntry, specs, x, type, f, full, parentType);
     }

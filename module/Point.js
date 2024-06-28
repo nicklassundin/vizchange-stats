@@ -1,5 +1,5 @@
-const help = require('climate-plots-helper');
-const curl = require('./utility/gateway.js')
+import help from 'climate-plots-helper';
+import curl from './utility/gateway.js';
 
 function ColorToHex(color) {
 	let hexadecimal = color.toString();
@@ -180,7 +180,7 @@ class PointReq {
 	}
 }
 
-class Point {
+export default class Point {
 	static build(specs, full=false, sort=undefined){
 		switch (specs.keys[0]){
 			case 'year':
@@ -918,5 +918,3 @@ class Point {
 		})
 	}
 }
-// module.exports.Entry = Entry;
-module.exports.Point = Point

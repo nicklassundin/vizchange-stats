@@ -1,5 +1,4 @@
-const parser = require('../module.js')
-
+import parser from '../module.js'
 
 global.climateplots = {
     dev: true
@@ -96,10 +95,15 @@ let perma_specs = {
     },
 }
 
-let configs = require('../config.json')
+//let configs = require('../config.json')
+
+const configs = (await import('../config.json', {
+    assert: { type: "json" }
+})).default;
+console.log(configs)
 let cache = {}
 
-const assert = require('assert');
+import assert from 'assert'
 
 
 describe(

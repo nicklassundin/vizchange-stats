@@ -1,6 +1,6 @@
-const Struct = require('./Struct.js');
+import Struct from './Struct.js';
 
-module.exports = class ByDateStruct {
+export default class ByDateStruct {
 	constructor(type = 'avg', custom, specs, preCalculated) {
 		this.specs = specs;
 		this.type = type;
