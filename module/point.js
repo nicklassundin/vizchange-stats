@@ -1,5 +1,5 @@
 const help = require('climate-plots-helper');
-const curl = require('../gateway.js')
+const curl = require('./utility/gateway.js')
 
 function ColorToHex(color) {
 	let hexadecimal = color.toString();
