@@ -53,8 +53,8 @@ Array.prototype.divideConquerFilter = function(f){
 	return recursive(this)
 }
 class PointReq {
-	static build(requests, specs){
-		try{
+	static build(requests, specs) {
+		try {
 			requests = requests.map(each => {
 				each.date = new Date(each.date)
 				return each
@@ -68,6 +68,7 @@ class PointReq {
 				}
 			})
 		}catch (error) {
+			console.log(requests, specs)
 			throw error
 		}
 		let result = {}
@@ -228,7 +229,7 @@ export default class Point {
 		//req = replace(req,'glob_temp', 'temperature')
 		//req = replace(req,'64n-90n_temp', 'temperature')
 		//req = replace(req,'nhem_temp', 'temperature')
-		if(typeof req[type] == 'string' && req[type].length < 1) req[type] = undefined
+		if (typeof req[type] == 'string' && req[type].length < 1) req[type] = undefined
 		if(full){
 			this.req = PointReq.build(req, specs);
 		}else{
@@ -403,7 +404,7 @@ export default class Point {
 		}))
 		return new Point(specs, req, this.full)
 	}
-	'first'(f){
+	first(f){
 		//let n = 0;
 		let req = this.req.sort((a, b) => {
 			return (new Date(a.date).getTime()) - (new Date(b.date).getTime())
@@ -412,7 +413,7 @@ export default class Point {
 		})
 		return new Point(this.specs, req, true)
 	}
-	'last'(f){
+	last(f){
 		let req = this.req.sort((a, b) => {
 			return (new Date(a.date).getTime()) - (new Date(b.date).getTime())
 		}).filter((e) => {
