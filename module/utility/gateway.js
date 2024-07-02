@@ -3,6 +3,7 @@ import getSmhiStation from './smhiStation.js';
 import parsePeriod from './parsePeriod.js';
 import axiosWrapper from './axiosWrapper.js';
 
+
 export default {
 	preset,
 	async proxRequest(specs, full = false, sort) {
@@ -21,7 +22,6 @@ export default {
 		} else if (type) {
 			url = `${url}&types=${preset.types[type] || type}`;
 		}
-
 		return full ? axiosWrapper(`${host}${url}`) : axiosWrapper(`${host}${url}&calculate`);
 	},
 	number: 0,

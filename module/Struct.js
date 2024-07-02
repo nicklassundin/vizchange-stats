@@ -324,6 +324,7 @@ export default class Struct {
         }
         if (genSpecs.keys[0] === undefined) {
             this.VALUES = this.entry;
+            console.log('this.VALUES', this.VALUES)
         } else if (Object.keys(this.VALUES).length === 0) {
             let keys = (new Point(genSpecs))[`${genSpecs.keys[0]}s`];
             this.VALUES = {};
