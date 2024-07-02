@@ -68,7 +68,6 @@ class PointReq {
 				}
 			})
 		}catch (error) {
-			console.log(requests, specs)
 			throw error
 		}
 		let result = {}
@@ -444,7 +443,7 @@ export default class Point {
 	set 'y' (val){
 		this.req[`${this.subType}${this.type}`] = val
 	}
-	'getY'(req = this.req){
+	getY(req = this.req){
 		let y = req[`${this.type}`]
 		let date = new Date(req[this.type]);
 		switch (this.specs.dates.type) {
@@ -471,7 +470,15 @@ export default class Point {
 				if(!Array.isArray(date)){
 					date = [date];
 				}
+				let key = `${this.specs.parentType}_${this.type}`;
 				date = date.map(each => help.dayOfYear(each)).reduce((a, b) => a + b)/date.length
+				if(isNaN(req[key]) && this.x == 1950){
+					console.log(this.x, key)
+					console.log(Object.keys(req))
+					//console.log(req)
+					// TODO build special case where 4 hour interval messurement instead of min_temperature and max temperature is taken
+					throw new Error(`Invalid date ${this.type}`)
+				}
 				return {
 					value: date,
 					y: req[`${this.specs.parentType}_${this.type}`]
@@ -543,12 +550,14 @@ export default class Point {
 			default:
 		}
 	}
-	get 'y' (){
+	get y (){
 		let result = NaN;
 		if(this.req.length === 0) return NaN
 		if(this.full){
 			result = this.req.map(each => this.getY(each)).filter(y => (y !== undefined && !isNaN(y)) || (typeof y === 'object'))
-			if(result.length === 0) return NaN
+			if(result.length === 0) {
+				return NaN
+			}
 			switch(this.SUBTYPE){
 				case 'sum':
 					switch (this.specs.keys[0]) {
@@ -863,7 +872,7 @@ export default class Point {
 	clone(){
 		return new Point(this.specs, this.req, this.full)
 	}
-	get 'short' (){
+	get short (){
 		let y = this.y
 		let value = undefined;
 		switch(this.SUBTYPE) {

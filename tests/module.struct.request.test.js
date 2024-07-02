@@ -17,6 +17,10 @@ let specs = {
 const configs = (await import('../config.json', {
     assert: { type: "json" }
 })).default;
+const specsJson = (await import('./specs.json', {
+    assert: { type: "json" }
+})).default;
+
 describe.only('Struct Class', () => {
     let seedSpecs;
     let struct;
@@ -68,26 +72,77 @@ describe.only('Struct Class', () => {
 
             expect(proxRequestStub).to.have.been.calledTwice;
         });
-        it('should call once when avg is called', async () => {
-            const proxRequestStub = sinon.stub(curl, 'proxRequest').resolves([{
-                date: '2023-01-01',
-                temperature: '10'
-            }]);
-            let params = ['temperature', 'yrly', 'shortValues']
-            let config = Object.assign(configs['live'], specs)
-            const startTime = (new Date()).getTime();
-            await parser.getByParams(config, params).then(values => {
-                return Promise.any(values).then(values => {
-                    let endTime = (new Date()).getTime();
-                    return true
-                })
-            }).then(() => {
-                let endTime = (new Date()).getTime();
-                console.log('Time: ' + (endTime - startTime));
-            });
+        describe('number of calls', function () {
+            describe('temperature', function () {
+                it('avg / min / max', async () => {
+                    const proxRequestStub = sinon.stub(curl, 'proxRequest').resolves([{
+                        date: '2023-01-01',
+                        temperature: '10'
+                    }]);
+                    let params = ['temperature', 'yrly', 'shortValues']
+                    let config = Object.assign(configs['latest'], specsJson['specs'])
+                    const startTime = (new Date()).getTime();
+                    await parser.getByParams(config, params).then(values => {
+                        return Promise.any(values).then(values => {
+                            let endTime = (new Date()).getTime();
+                            return true
+                        })
+                    }).then(() => {
+                        let endTime = (new Date()).getTime();
+                        console.log('Time: ' + (endTime - startTime));
+                    });
 
-            const avg = await struct.avg;
-            expect(proxRequestStub.callCount).to.equal(1);
-        });
+                    const avg = await struct.avg;
+                    expect(proxRequestStub.callCount).to.equal(7);
+                });
+                it('first', async () => {
+                    const proxRequestStub = sinon.stub(curl, 'proxRequest').resolves([{
+                        date: '2023-01-01',
+                        avg_temperature: 5,
+                        min_temperature: -10,
+                        max_temperature: 20
+                    },{
+                        date: '2023-01-02',
+                        avg_temperature: -10,
+                        min_temperature: -20,
+                        max_temperature: 0
+                    },{
+                        date: '2023-01-03',
+                        avg_temperature: 15,
+                        min_temperature: 10,
+                        max_temperature: 20
+                    },{
+                        date: '2023-01-04',
+                        avg_temperature: 10,
+                        min_temperature: 5,
+                        max_temperature: 15
+                    },{
+                        date: '2023-01-05',
+                        avg_temperature: 5,
+                        min_temperature: 0,
+                        max_temperature: 10
+                    },{
+                        date: '2023-01-06',
+                        avg_temperature: 0,
+                        min_temperature: -5,
+                        max_temperature: 5
+                    },{
+                        date: '2023-01-07',
+                        avg_temperature: -5,
+                        min_temperature: -10,
+                        max_temperature: 0
+                    }]);
+                    let params = ['temperature', 'yrlySplit', 'min', 'first', 'shortValues', 5];
+                    let config = Object.assign(configs['latest'], specsJson['specs'])
+                    const startTime = (new Date()).getTime();
+                    await parser.getByParams(config, params).then(values => {
+                        console.log(values)
+                        return assert.equal(values.y, 242)
+                    })
+
+                    expect(proxRequestStub.callCount).to.equal(7);
+                });
+            })
+        })
     });
 });

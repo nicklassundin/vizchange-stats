@@ -18,7 +18,7 @@ const axiosWrapper = async (url) => {
     console.time(`Request Time: ${url}`);
     if (!cachedRequests[url]) {
         cachedRequests[url] = connection.get(url).then(result => {
-            console.timeEnd(`Request Time: ${url}`);
+            //console.timeEnd(`Request Time: ${url}`);
 
             if (result && result.data) result = result.data;
             if (Array.isArray(result)) {
@@ -33,7 +33,7 @@ const axiosWrapper = async (url) => {
             }
             return result;
         }).catch(error => {
-            console.timeEnd(`Request Time: ${url}`);
+            //console.timeEnd(`Request Time: ${url}`);
             return Promise.reject(error);
         });
     }

@@ -72,14 +72,14 @@ export default class Struct {
             case 'nov':
                 specs.dates.type = 'month';
                 y2 = 1;
-                m1 = help.months().indexOf(specs.keys[0]);
+                m1 = climatePlotsHelper.months().indexOf(specs.keys[0]);
                 m2 = m1 + 1;
                 break;
             case 'dec':
                 specs.dates.type = 'month';
                 specs.dates.month = 'dec';
                 y2 = 1;
-                m1 = help.months().indexOf(specs.keys[0]);
+                m1 = climatePlotsHelper.months().indexOf(specs.keys[0]);
                 m2 = m1 + 1;
                 break;
             case 'spring':
@@ -121,7 +121,7 @@ export default class Struct {
                 y2 = 0;
                 m1 = (x > 12) ? x - 12 : x;
                 m2 = (x > 12) ? x - 12 : x;
-                specs.dates.type = help.monthByIndex(x);
+                specs.dates.type = climatePlotsHelper.monthByIndex(x);
                 break;
             case 'monthly':
                 break;
@@ -315,6 +315,7 @@ export default class Struct {
     }
 
     get values() {
+        // TODO handle whne to calculate and when to request calculate
         let genSpecs = JSON.parse(JSON.stringify(this.specs));
         genSpecs.keys.shift();
         switch (this.specs.keys[0]) {
@@ -324,7 +325,6 @@ export default class Struct {
         }
         if (genSpecs.keys[0] === undefined) {
             this.VALUES = this.entry;
-            console.log('this.VALUES', this.VALUES)
         } else if (Object.keys(this.VALUES).length === 0) {
             let keys = (new Point(genSpecs))[`${genSpecs.keys[0]}s`];
             this.VALUES = {};
@@ -640,7 +640,7 @@ export default class Struct {
     }
 
     ci() {
-        return help.confidenceInterval(this.y, this.variance(), this.count);
+        return climatePlotsHelper.confidenceInterval(this.y, this.variance(), this.count);
     }
 
     plotCI() {

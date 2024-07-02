@@ -7,7 +7,11 @@ import axiosWrapper from './axiosWrapper.js';
 export default {
 	preset,
 	async proxRequest(specs, full = false, sort) {
-		const { station: rawStation, dates, url: host, type } = specs;
+		const url = this.constructUrl(specs);
+		return this.makeRequest(url, specs.url, full);
+	},
+	constructUrl(specs) {
+		const { station: rawStation, dates, type } = specs;
 		const station = rawStation.replace(/å|ä/g, 'a').replace('ö', 'o');
 		let url = `&date=${parsePeriod(dates.start)}-${parsePeriod(dates.end)}`;
 
@@ -22,6 +26,9 @@ export default {
 		} else if (type) {
 			url = `${url}&types=${preset.types[type] || type}`;
 		}
+		return url;
+	},
+	async makeRequest(url, host, full) {
 		return full ? axiosWrapper(`${host}${url}`) : axiosWrapper(`${host}${url}&calculate`);
 	},
 	number: 0,

@@ -38,7 +38,7 @@ export default {
         },
     },
     types: {
-        temperature: 'avg_temperature,min_temperature,max_temperature',
+        temperature: 'avg_temperature,min_temperature,max_temperature,temperature',
         precipitation: 'precipitation,avg_temperature',
         snow: 'precipitation,avg_temperature',
         rain: 'precipitation,avg_temperature',

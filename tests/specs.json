@@ -1,0 +1,78 @@
+{
+  "specs": {
+    "type": "temperature",
+    "station": "abisko",
+    "baseline": {
+      "start": 1961,
+      "end": 1991
+    }
+  },
+  "specs_smhi": {
+    "type": "temperature",
+    "station": "53460",
+    "coordinates": {
+      "latitude": 55.6932,
+      "longitude": 13.2251
+    },
+    "baseline": {
+      "start": 1961,
+      "end": 1991
+    }
+  },
+  "precipitation_specs": {
+    "type": "precipitation",
+    "station": "abisko",
+    "baseline": {
+      "start": 1961,
+      "end": 1991
+    }
+  },
+  "freezeup_specs": {
+    "type": "freezeup",
+    "station": "abisko",
+    "baseline": {
+      "start": 1961,
+      "end": 1991
+    }
+  },
+  "breakup_specs": {
+    "type": "breakup",
+    "station": "abisko",
+    "baseline": {
+      "start": 1961,
+      "end": 1991
+    }
+  },
+  "icetime_specs": {
+    "type": "icetime",
+    "station": "abisko",
+    "baseline": {
+      "start": 1961,
+      "end": 1991
+    }
+  },
+  "co2_weekly_specs": {
+    "type": "co2_weekly",
+    "station": "glob",
+    "baseline": {
+      "start": 1961,
+      "end": 1991
+    }
+  },
+  "snowdepth_single_specs": {
+    "type": "snowdepth_single",
+    "station": "abisko",
+    "baseline": {
+      "start": 1961,
+      "end": 1991
+    }
+  },
+  "perma_specs": {
+    "type": "perma",
+    "station": "calm",
+    "baseline": {
+      "start": 1961,
+      "end": 1991
+    }
+  }
+}

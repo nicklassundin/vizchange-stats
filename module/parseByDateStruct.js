@@ -43,6 +43,7 @@ export default class ByDateStruct {
 					break;
 				case 'yrly':
 					this.values[key] = this.insert(true, 'yrly', 'year', 'DOY');
+					//this.values[key] = this.insert(false, 'yrly', 'year', 'DOY');
 					break;
 				case 'weekly':
 					this.values[key] = this.insert(true, 'weekly', 'year', 'week');
