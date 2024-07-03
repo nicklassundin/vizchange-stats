@@ -20,7 +20,7 @@ import sinon from "sinon";
 import curl from "../module/utility/gateway.js";
 
 
-describe.only(
+describe(
     'Requests',
     function () {
         describe('point formater', function () {
@@ -844,7 +844,7 @@ describe.only(
                             return assert.equal(values.y, 242)
                         })
                     })
-                    it.only('first', () => {
+                    it('first', () => {
                         let params = ['temperature', 'yrlySplit', 'min', 'first', 'shortValues', 10];
                         let config = Object.assign(configs['liveHalf'], specsJson['specs'])
                         return parser.getByParams(config, params).then(values => {
