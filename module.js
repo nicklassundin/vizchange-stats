@@ -110,6 +110,6 @@ export default {
 	co2_weekly(specs) {
 		return this.getStruct(specs);
 	},
-	configs: config
+	configs: config.default
 	//configs: require('./config')
 };
