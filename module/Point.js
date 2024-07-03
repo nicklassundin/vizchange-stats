@@ -258,7 +258,7 @@ export default class Point {
 	get 'splitDecade' () {
 		return this.splitYear - this.splitYear % 10 +1;
 	}
-	get 'date' () {
+	get date () {
 		// TODO sort out none valid points HOTFIX
 		//if(this.req.length < 1) return this.x
 		if(this.req.length < 1) return undefined
@@ -471,17 +471,12 @@ export default class Point {
 					date = [date];
 				}
 				let key = `${this.specs.parentType}_${this.type}`;
-				date = date.map(each => help.dayOfYear(each)).reduce((a, b) => a + b)/date.length
-				if(isNaN(req[key]) && this.x == 1950){
-					console.log(this.x, key)
-					console.log(Object.keys(req))
-					//console.log(req)
-					// TODO build special case where 4 hour interval messurement instead of min_temperature and max temperature is taken
-					throw new Error(`Invalid date ${this.type}`)
-				}
+				date = date.map(each => help.dayOfYear(each)).filter(each => !isNaN(each))[0]
+				let value = req[`${this.specs.parentType}_${this.type}`]
+				if(value === undefined) value = req[`${this.type}`]
 				return {
 					value: date,
-					y: req[`${this.specs.parentType}_${this.type}`]
+					y: value
 				}
 			case 'high':
 			case 'low':

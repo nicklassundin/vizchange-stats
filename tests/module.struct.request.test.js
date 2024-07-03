@@ -95,53 +95,85 @@ describe.only('Struct Class', () => {
                     const avg = await struct.avg;
                     expect(proxRequestStub.callCount).to.equal(7);
                 });
-                it('first', async () => {
-                    const proxRequestStub = sinon.stub(curl, 'proxRequest').resolves([{
-                        date: '2023-01-01',
-                        avg_temperature: 5,
-                        min_temperature: -10,
-                        max_temperature: 20
-                    },{
-                        date: '2023-01-02',
-                        avg_temperature: -10,
-                        min_temperature: -20,
-                        max_temperature: 0
-                    },{
-                        date: '2023-01-03',
-                        avg_temperature: 15,
-                        min_temperature: 10,
-                        max_temperature: 20
-                    },{
-                        date: '2023-01-04',
-                        avg_temperature: 10,
-                        min_temperature: 5,
-                        max_temperature: 15
-                    },{
-                        date: '2023-01-05',
-                        avg_temperature: 5,
-                        min_temperature: 0,
-                        max_temperature: 10
-                    },{
-                        date: '2023-01-06',
-                        avg_temperature: 0,
-                        min_temperature: -5,
-                        max_temperature: 5
-                    },{
-                        date: '2023-01-07',
-                        avg_temperature: -5,
-                        min_temperature: -10,
-                        max_temperature: 0
-                    }]);
-                    let params = ['temperature', 'yrlySplit', 'min', 'first', 'shortValues', 5];
-                    let config = Object.assign(configs['latest'], specsJson['specs'])
-                    const startTime = (new Date()).getTime();
-                    await parser.getByParams(config, params).then(values => {
-                        console.log(values)
-                        return assert.equal(values.y, 242)
-                    })
+                describe('first', function () {
+                    it('standard', async () => {
+                        const proxRequestStub = sinon.stub(curl, 'proxRequest').resolves([{
+                            date: '2022-11-01',
+                            avg_templateture: 0,
+                            min_temperature: -5,
+                            max_temperature: 5,
+                        },{
+                            date: '2023-01-01',
+                            avg_temperature: 5,
+                            min_temperature: -10,
+                            max_temperature: 20
+                        },{
+                            date: '2023-01-02',
+                            avg_temperature: -10,
+                            min_temperature: -20,
+                            max_temperature: 0
+                        }]);
+                        let params = ['temperature', 'yrlySplit', 'min', 'first', 'shortValues', 5];
+                        let config = Object.assign(configs['latest'], specsJson['specs'])
+                        const startTime = (new Date()).getTime();
+                        await parser.getByParams(config, params).then(values => {
+                            console.log(values)
+                            return assert.equal(values.y, 305)
+                        })
+                        expect(proxRequestStub.callCount).to.equal(7);
+                    });
+                    it('date descrepencies', async () => {
+                        const proxRequestStub = sinon.stub(curl, 'proxRequest').resolves([{
+                            date: '2022-11-01',
+                            avg_templateture: 0,
+                            min_temperature: -5,
+                            max_temperature: 5,
+                        },{
+                            date: '2023-01-01T04:00:00.000Z,',
+                            temperature: 5,
+                        },{
+                            date: '2023-01-01T06:00:00.000Z',
+                            temperature: -3,
+                        },{
+                            date: '2023-01-02',
+                            avg_temperature: -10,
+                            min_temperature: -20,
+                            max_temperature: 0
+                        }]);
+                        let params = ['temperature', 'yrlySplit', 'min', 'first', 'shortValues', 5];
+                        let config = Object.assign(configs['latest'], specsJson['specs'])
+                        const startTime = (new Date()).getTime();
+                        await parser.getByParams(config, params).then(values => {
+                            console.log(values)
+                            return assert.equal(values.y, 305)
+                        })
+                        expect(proxRequestStub.callCount).to.equal(7);
+                    });
+                    it('date descrepencies 2', async () => {
+                        const proxRequestStub = sinon.stub(curl, 'proxRequest').resolves([{
+                            date: '2022-11-01T04:00:00.000Z',
+                            temperature: 0,
+                        },{
+                            date: '2022-11-01T06:00:00.000Z',
+                            temperature: -10,
+                        },{
+                            date: '2023-01-01T04:00:00.000Z,',
+                            temperature: 5,
+                        },{
+                            date: '2023-01-01T06:00:00.000Z',
+                            temperature: -3,
+                        }]);
+                        let params = ['temperature', 'yrlySplit', 'min', 'first', 'shortValues', 5];
+                        let config = Object.assign(configs['latest'], specsJson['specs'])
+                        const startTime = (new Date()).getTime();
+                        await parser.getByParams(config, params).then(values => {
+                            console.log(values)
+                            return assert.equal(values.y, 305)
+                        })
+                        expect(proxRequestStub.callCount).to.equal(7);
+                    });
 
-                    expect(proxRequestStub.callCount).to.equal(7);
-                });
+                })
             })
         })
     });
