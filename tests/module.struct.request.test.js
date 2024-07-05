@@ -89,7 +89,6 @@ describe.only('Struct Class', () => {
                         })
                     }).then(() => {
                         let endTime = (new Date()).getTime();
-                        console.log('Time: ' + (endTime - startTime));
                     });
 
                     const avg = await struct.avg;
@@ -117,7 +116,6 @@ describe.only('Struct Class', () => {
                         let config = Object.assign(configs['latest'], specsJson['specs'])
                         const startTime = (new Date()).getTime();
                         await parser.getByParams(config, params).then(values => {
-                            console.log(values)
                             return assert.equal(values.y, 305)
                         })
                         expect(proxRequestStub.callCount).to.equal(7);
@@ -144,7 +142,6 @@ describe.only('Struct Class', () => {
                         let config = Object.assign(configs['latest'], specsJson['specs'])
                         const startTime = (new Date()).getTime();
                         await parser.getByParams(config, params).then(values => {
-                            console.log(values)
                             return assert.equal(values.y, 305)
                         })
                         expect(proxRequestStub.callCount).to.equal(7);
@@ -167,7 +164,6 @@ describe.only('Struct Class', () => {
                         let config = Object.assign(configs['latest'], specsJson['specs'])
                         const startTime = (new Date()).getTime();
                         await parser.getByParams(config, params).then(values => {
-                            console.log(values)
                             return assert.equal(values.y, 305)
                         })
                         expect(proxRequestStub.callCount).to.equal(7);

@@ -154,6 +154,17 @@
 		},
 		"url": "https://vischange.k8s.glimworks.se/data/query/v1"
 	},
+	"limit": {
+		"dates": {
+			"start": 1940,
+			"end": 2020
+		},
+		"baseline": {
+			"start": 1961,
+			"end": 1991
+		},
+		"url": "https://vischange.k8s.glimworks.se/data/query/v1"
+	},
 	"latest-staging": {
 		"dates": {
 			"start": 2019,

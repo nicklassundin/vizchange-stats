@@ -519,6 +519,7 @@ export default class Point {
 			case 'min':
 			case 'max':
 				if(y === undefined) y = Number(req[`${this.subType}${this.type}`]);
+				if(typeof y == 'object') y = Number(y[this.specs.parentType])
 				return {
 					date: req.date,
 					y: y
