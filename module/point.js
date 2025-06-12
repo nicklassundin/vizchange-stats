@@ -296,7 +296,6 @@ class Point {
 				}
 			case 'breakfreeze':
 				let doy = this.req[0][this.type]
-				console.log(doy)
 				let year = this.x
 				let date = new Date(year, 0, 1);
 				// add days to date
