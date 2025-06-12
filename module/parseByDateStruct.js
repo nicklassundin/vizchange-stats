@@ -13,7 +13,7 @@ module.exports = class ByDateStruct {
 		let specs = JSON.parse(JSON.stringify(this.specs));
 		specs.keys = k
 		let type = this.type;
-//		return Struct.build(specs, kn, type, undefined, full)
+		//		return Struct.build(specs, kn, type, undefined, full)
 		return Struct.build(specs, k[0], type, undefined, full)
 	}
 	"request" (key) {
@@ -54,9 +54,9 @@ module.exports = class ByDateStruct {
 			case 'weekly':
 				this.values[key] = this.insert(true, key, 'year', 'week')
 				break;
-			//case 'weeks':
-			//	this.values[key] = this.insert(true, key, 'year', 'week')
-			//	break;
+				//case 'weeks':
+				//	this.values[key] = this.insert(true, key, 'year', 'week')
+				//	break;
 			case 'monthly':
 				// deprecated TODO
 				this.values[key] = this.insert(false, key, 'month', 'year')
@@ -76,7 +76,7 @@ module.exports = class ByDateStruct {
 					'30Periodyear': this.insert(false, key, '30periodyear', 'splitMonth')
 				}
 				break;
-				 */
+				*/
 			case 'splitDecades':
 				this.values[key] = this.insert(true, key, 'splitMonth', 'decade')
 				break;
@@ -86,7 +86,7 @@ module.exports = class ByDateStruct {
 			case 'yrlyFull':
 				this.values[key] = this.insert(true, "yrlyFull", "year", 'DOY');
 				break;
-			/*
+				/*
 			case 'custom':
 				if (this.custom) {
 
@@ -113,7 +113,7 @@ module.exports = class ByDateStruct {
 
 				}
 				break;
-				 */
+				*/
 			case 'default':
 				break;
 		}

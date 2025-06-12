@@ -54,6 +54,13 @@ Array.prototype.divideConquerFilter = function(f){
 }
 class PointReq {
 	static build(requests, specs){
+		let start = specs.dates.start;
+		let end = specs.dates.end;
+		requests = requests.filter((each) => {
+			if(typeof each.date === 'string') each.date = new Date(each.date);
+			if(each.date.getTime() >= start.getTime() && each.date.getTime() <= end.getTime()) return true;
+			return false;
+		})
 		try{
 			requests = requests.map(each => {
 				each.date = new Date(each.date)
@@ -135,9 +142,9 @@ class PointReq {
 				break;
 			default:
 		}
-		request = replace(request,'glob_temp', 'temperature')
-		request = replace(request,'64n-90n_temp', 'temperature')
-		request = replace(request,'nhem_temp', 'temperature')
+		// request = replace(request,'glob_temp', 'temperature')
+		// request = replace(request,'64n-90n_temp', 'temperature')
+		// request = replace(request,'nhem_temp', 'temperature')
 		this.request = request;
 		Object.keys(request).forEach((key) => {
 			this[key] = request[key];
@@ -288,7 +295,13 @@ class Point {
 					return this.req[0].date
 				}
 			case 'breakfreeze':
-				return new Date(this.req[0][this.type])
+				let doy = this.req[0][this.type]
+				console.log(doy)
+				let year = this.x
+				let date = new Date(year, 0, 1);
+				// add days to date
+				date.setDate(date.getDate() + doy - 1);
+				return date
 			case 'avg':
 				return undefined;
 				/*
@@ -459,8 +472,12 @@ class Point {
 		}
 		switch (this.SUBTYPE){
 			case 'breakfreeze':
-				y = help.dayOfYear(date)
-				if(help.isFirstHalfYear(date.getMonth()) && this.specs.type === 'freezeup'){
+				// console.log(req)
+				// console.log(this.type)
+				y = req[this.type]
+				// console.log(y)
+				if(y < 365/2 && this.specs.type === 'freezeup'){
+				// if(help.isFirstHalfYear(date.getMonth()) && this.specs.type === 'freezeup'){
 					y += (((date.getFullYear()-1) % 4 === 0 && (date.getFullYear()-1) % 100 > 0) || (date.getFullYear()) %400 === 0) ? 366 : 365;
 				}
 				return y

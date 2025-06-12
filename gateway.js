@@ -163,6 +163,8 @@ let parsePeriod = function(date){
 
 }
 
+cache = {};
+
 module.exports = {
 	preset: preset,
 	proxRequest: function(specs, full = false, sort){
@@ -187,6 +189,47 @@ module.exports = {
 		}else if(type){
 			url = `${url}&types=${preset.types[type] !== undefined ? preset.types[type] : type}`
 		}
+		let fil = true;
+		if (type == "perma") {
+			station = 'CALM'
+			fil = false;
+		}
+		if (cache[station] === undefined) {
+			cache[station] = module.exports.getData(station, preset.stationTypes[station], dates, full, sort, type=specs.type)
+		}
+		result = cache[station]
+		// filter result based on dates
+		if (fil) {
+
+		result = result.then(result => {
+			return result.filter(each => {
+				let date = new Date(each.date);
+				let start = new Date(dates.start);
+				let end = new Date(dates.end);
+				if (date >= start && date <= end) {
+					return true;
+				} else {
+					return false;
+				}
+			})
+		})
+		}
+		result = result.then(result => {
+			console.log(specs.station)
+			if(station == "CALM") {
+				if(specs.station != 'calm') {
+					result = result.filter(each => {
+						return each.station.toLowerCase() == specs.station.toLowerCase();
+					}).map(each => {
+						each.date = new Date(new Date(each.date).toISOString())
+						return each;
+					})
+				}
+			}
+			// console.log("Gateway:", result)
+			return result
+		})
+		return result
 
 		if(full){
 			return module.exports.axios((host)+url)
@@ -202,46 +245,37 @@ module.exports = {
 	number: 0,
 	queue: 0,
 	cached: {},
+	async getData(station, types, dates, full = false, sort = undefined, type=''){
+		if (!Array.isArray(types)) {
+			types = [types];
+		}
+		let url = window.location.origin + '/data?station=' + station + '&types=' + types.join(',') + '&start=' + parsePeriod(dates.start) + '&end=' + parsePeriod(dates.end);
+		if (type) {
+			url += `&type=${type}`;
+		}	
+		
+		return axios(url).then(result => {
+			// print earliest date in result.date
+			// if(result && result.data && Array.isArray(result.data)){
+				// if(result.data.length > 0){
+					// let earliest = new Date(result.data[0].date);
+					// console.log('Earliest date in result:', earliest);
+					// console.log(result.data[0])
+				// }
+			// }
+			console.log(result.data)
+			return result.data
+		})
+	},
 	async axios(url){
-		//let path = `${url.split('/').join('').replace('https:', '').replace('.', '').replace(',', '').}.json`;
+		// get this host
 		let path = `${hashCode(url)}.json`;
 
-		/*
-		if(cached_list[path.replace('.json', '')]){
-			return cached_list[path.replace('.json', '')]
-		}
-
-		 */
-
-		/*
-            if(cache[path] !== undefined){
-                return Promise.resolve(cache[path])
-            }
-
-      */
 		//console.log('URL', url)
 		if(this.cached[url] === undefined){
 			// TODO nicer solution to individual requests
 			this.cached[url] = axios.get(url).then(result => {
 				this.number += 1;
-				//console.log('rqst Nr:', this.number, url)
-/*
-				let list = undefined;
-
-				let fs = require("fs");
-				if(fs.existsSync('./debug/list.json')){
-					list = require('./debug/list.json')
-					list[path] = result.data.length
-				}else{
-					list = {}
-					list[path] = result.data.length;
-				}
-				fs.writeFile('./debug/list.json', JSON.stringify(list), () => {})
-				fs.writeFile('./debug/list.js', Object.keys(list).map(key => {
-					return `module.exports['${key.replace('.json', '')}'] = require('./${key}');`
-				}).join('\n'), () => {})
-				fs.writeFile('./debug/'+path, JSON.stringify(result.data), () => {})
-*/
 
 				if(result && result.data) result = result.data
 				if(Array.isArray(result)){
@@ -261,6 +295,8 @@ module.exports = {
 						return each
 					})
 				}
+				console.log(result[0])
+				console.log(result[1])
 				return result
 			}).catch(
 				function (error) {
