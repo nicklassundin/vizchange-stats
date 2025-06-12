@@ -195,7 +195,8 @@ module.exports = {
 			fil = false;
 		}
 		if (cache[station] === undefined) {
-			cache[station] = module.exports.getData(station, preset.stationTypes[station], dates, full, sort, type=specs.type)
+			console.log(global.hostUrl)
+			cache[station] = module.exports.getData(global.hostUrl, station, preset.stationTypes[station], dates, full, sort, type=specs.type)
 		}
 		result = cache[station]
 		// filter result based on dates
@@ -245,11 +246,12 @@ module.exports = {
 	number: 0,
 	queue: 0,
 	cached: {},
-	async getData(station, types, dates, full = false, sort = undefined, type=''){
+	async getData(hosturl, station, types, dates, full = false, sort = undefined, type=''){
 		if (!Array.isArray(types)) {
 			types = [types];
 		}
-		let url = window.location.origin + '/data?station=' + station + '&types=' + types.join(',') + '&start=' + parsePeriod(dates.start) + '&end=' + parsePeriod(dates.end);
+		let url = hosturl + '/data?station=' + station + '&types=' + types.join(',') + '&start=' + parsePeriod(dates.start) + '&end=' + parsePeriod(dates.end);
+		// let url = window.location.origin + '/data?station=' + station + '&types=' + types.join(',') + '&start=' + parsePeriod(dates.start) + '&end=' + parsePeriod(dates.end);
 		if (type) {
 			url += `&type=${type}`;
 		}	
