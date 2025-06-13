@@ -189,6 +189,9 @@ class PointReq {
 
 class Point {
 	static build(specs, full=false, sort=undefined){
+		if (specs.type == 'complete_ice_cover'){
+			specs.type = 'max_thickness'
+		}
 		switch (specs.keys[0]){
 			case 'year':
 			case 'weeks':
@@ -222,6 +225,9 @@ class Point {
 		})
 	}
 	constructor(specs, req = {}, full=false){
+		if (specs.type == 'co2_weekly'){
+			specs.type = 'co2';
+		} 
 		this.full = full;
 		this.specs = specs;
 		if(typeof this.specs.dates.start === 'string'){
@@ -456,6 +462,7 @@ class Point {
 		this.req[`${this.subType}${this.type}`] = val
 	}
 	'getY'(req = this.req){
+
 		let y = req[`${this.type}`]
 		let date = new Date(req[this.type]);
 		switch (this.specs.dates.type) {
@@ -471,10 +478,7 @@ class Point {
 		}
 		switch (this.SUBTYPE){
 			case 'breakfreeze':
-				// console.log(req)
-				// console.log(this.type)
 				y = req[this.type]
-				// console.log(y)
 				if(y < 365/2 && this.specs.type === 'freezeup'){
 				// if(help.isFirstHalfYear(date.getMonth()) && this.specs.type === 'freezeup'){
 					y += (((date.getFullYear()-1) % 4 === 0 && (date.getFullYear()-1) % 100 > 0) || (date.getFullYear()) %400 === 0) ? 366 : 365;
